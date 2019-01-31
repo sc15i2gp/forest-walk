@@ -1,0 +1,34 @@
+#include "mesh.h"
+
+void mesh::push_vertex_data(vec3* new_vertex_data, int new_vertex_data_length, GLuint* new_indices, int number_of_new_indices)
+{
+	int index_offset = this->vertex_data_length;
+	for(int i = 0; i < 2*new_vertex_data_length; i += 2)
+	{
+		vec3* vertex_data_location = this->vertex_data + 2*this->vertex_data_length;
+		vertex_data_location[0] = new_vertex_data[i];
+		vertex_data_location[1] = new_vertex_data[i+1];
+		this->vertex_data_length++;
+	}
+	for(int i = 0; i < number_of_new_indices; i += 3)
+	{
+		GLuint* index_location = this->indices + this->number_of_indices;
+		index_location[0] = new_indices[i] + index_offset;
+		index_location[1] = new_indices[i+1] + index_offset;
+		index_location[2] = new_indices[i+2] + index_offset;
+		this->number_of_indices += 3;
+	}
+}
+
+mesh create_mesh(int vertex_data_buffer_length, int index_buffer_length)
+{
+	vec3* vertex_data_buffer = (vec3*)malloc(sizeof(vec3)*vertex_data_buffer_length);
+	GLuint* index_buffer = (GLuint*)malloc(sizeof(GLuint)*index_buffer_length);
+	return mesh{0, vertex_data_buffer, 0, index_buffer};
+}
+
+void destroy_mesh(mesh m)
+{
+	free(m.vertex_data);
+	free(m.indices);
+}
