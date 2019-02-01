@@ -264,7 +264,7 @@ void derive_str(l_system* l, char* input_str)
 	prune_branches(input_str);
 	//printf("Deriving %s\n", input_str);
 	//TODO far future: Move this to function parameter
-	char* output_buffer = (char*)malloc(0x40000000); //1 MB
+	char* output_buffer = (char*)malloc(0x400000); 
 	char* output_loc = output_buffer;
 	char_queue l_context_queue;
 	char_queue r_context_queue;

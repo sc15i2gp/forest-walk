@@ -18,8 +18,10 @@ public:
 	~AppWindow();
 public slots:
 	void update_render();
+	void reset();
 private:
 	QPushButton* derive_button;
+	QPushButton* reset_button;
 	GLWidget* gl_widget;
 	QBoxLayout* layout;
 	LSystemWidget* l_system_widget;

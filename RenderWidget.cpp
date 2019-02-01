@@ -2,9 +2,10 @@
 
 GLWidget::GLWidget(QWidget* parent): QGLWidget(parent)
 {
-	tree.branch_mesh = create_mesh(4096, 4096);
-	tree.leaf_mesh = create_mesh(4096, 4096);
-	tree.fruit_mesh = create_mesh(4096, 4096);
+	//NOTE: If there is a bug in the rendering, make sure enough memory is allocated
+	tree.branch_mesh = create_mesh(16*4096, 16*4096);
+	tree.leaf_mesh = create_mesh(16*4096, 16*4096);
+	tree.fruit_mesh = create_mesh(16*4096, 16*4096);
 }
 
 GLWidget::~GLWidget()
@@ -80,7 +81,6 @@ void GLWidget::set_material(material* m)
 
 void GLWidget::load_tree_model(char* tree_string)
 {
-	printf("Loading tree: %s\n", tree_string);
 	if(branches.vertex_buffer) clear_buffers(branches);
 	if(leaves.vertex_buffer) clear_buffers(leaves);
 	if(fruit.vertex_buffer) clear_buffers(fruit);
@@ -105,7 +105,6 @@ void GLWidget::load_tree_model(char* tree_string)
 
 void GLWidget::render_scene(int view_width, int view_height)
 {
-	printf("RENDERING\n");
 	glViewport(0.0, 0.0, view_width, view_height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
