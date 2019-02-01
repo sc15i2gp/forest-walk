@@ -261,8 +261,6 @@ int main(int argc, char** argv)
 			{
 				if(is_stack_macro(at))
 				{
-					printf("AT AT AT AT AT \n\n\n");
-					printf("%.30s\n", at);
 					char* type = get_macro_type_param(at);
 					char* size = get_macro_size_param(at);
 					for(int j = 0; j < stack_type_index; j++)
