@@ -191,12 +191,16 @@ void GLWidget::move_camera_target_down()
 	update();
 }
 
-void GLWidget::move_camera_target_left()
+void GLWidget::move_camera_forwards()
 {
-	
+	vec3 forwards = normalise(camera_target - camera_position);
+	camera_position = camera_position + 0.125f*forwards;
+	update();
 }
 
-void GLWidget::move_camera_target_right()
+void GLWidget::move_camera_backwards()
 {
-
+	vec3 backwards = normalise(camera_position - camera_target);
+	camera_position = camera_position + 0.125f*backwards;
+	update();
 }

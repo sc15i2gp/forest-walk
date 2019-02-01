@@ -38,8 +38,8 @@ public slots:
 	
 	void move_camera_target_up();
 	void move_camera_target_down();
-	void move_camera_target_left();
-	void move_camera_target_right();
+	void move_camera_forwards();
+	void move_camera_backwards();
 
 protected:
 	void initializeGL();

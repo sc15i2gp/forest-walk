@@ -31,10 +31,12 @@ void AppWindow::init_GLwidget()
 
 	QPushButton* camera_target_move_up = new QPushButton("^");
 	QPushButton* camera_target_move_down = new QPushButton("v");
-	target_move_grid->addWidget(camera_target_move_up, 0, 1);
-	target_move_grid->addWidget(camera_target_move_down, 2, 1);
-	target_move_grid->addWidget(new QPushButton("<"), 1, 0);
-	target_move_grid->addWidget(new QPushButton(">"), 1, 2);
+	QPushButton* camera_move_forwards = new QPushButton("^");
+	QPushButton* camera_move_backwards = new QPushButton("v");
+	target_move_grid->addWidget(camera_target_move_up, 0, 0);
+	target_move_grid->addWidget(camera_target_move_down, 2, 0);
+	target_move_grid->addWidget(camera_move_forwards, 0, 2);
+	target_move_grid->addWidget(camera_move_backwards, 2, 2);
 	
 	camera_controls_layout->addLayout(camera_move_grid);
 	camera_controls_layout->addLayout(target_move_grid);
@@ -48,6 +50,8 @@ void AppWindow::init_GLwidget()
 	connect(camera_move_right, SIGNAL(clicked()), gl_widget, SLOT(move_camera_right()));
 	connect(camera_target_move_up, SIGNAL(clicked()), gl_widget, SLOT(move_camera_target_up()));
 	connect(camera_target_move_down, SIGNAL(clicked()), gl_widget, SLOT(move_camera_target_down()));
+	connect(camera_move_forwards, SIGNAL(clicked()), gl_widget, SLOT(move_camera_forwards()));
+	connect(camera_move_backwards, SIGNAL(clicked()), gl_widget, SLOT(move_camera_backwards()));
 }
 
 AppWindow::~AppWindow()
