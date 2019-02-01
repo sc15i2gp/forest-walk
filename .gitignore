@@ -4,3 +4,4 @@
 *.swp
 forest-walk
 gen_stack_code
+moc_*

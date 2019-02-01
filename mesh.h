@@ -11,5 +11,12 @@ struct mesh
 	void push_vertex_data(vec3*,int, GLuint*,int);
 };
 
+struct tree_mesh_group
+{
+	mesh branch_mesh;
+	mesh leaf_mesh;
+	mesh fruit_mesh;
+};
+
 mesh create_mesh(int vertex_data_buffer_length, int index_buffer_length);
 void destroy_mesh(mesh m);

@@ -2,14 +2,6 @@
 #include "maths.h"
 #include "mesh.h"
 #include "string_functions.h"
-
-struct tree_mesh_group
-{
-	mesh branch_mesh;
-	mesh leaf_mesh;
-	mesh fruit_mesh;
-};
-
 struct polygon
 {
 	vec3 positions[8] = {};
