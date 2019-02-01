@@ -1,0 +1,6 @@
+*.o
+*_stack.*
+*.stash
+*.swp
+forest-walk
+gen_stack_code
