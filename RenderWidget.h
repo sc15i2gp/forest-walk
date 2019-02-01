@@ -1,4 +1,5 @@
 #pragma once
+#include <QObject>
 #include <QWidget>
 #include <QGLFunctions>
 #include <GL/glu.h>
@@ -22,11 +23,23 @@ struct material
 
 class GLWidget: public QGLWidget, protected QGLFunctions
 {
+	Q_OBJECT
 public:
 	GLWidget(QWidget* parent);
 	~GLWidget();
 	
 	void load_tree_model(char*);
+
+public slots:	
+	void move_camera_up();
+	void move_camera_down();
+	void move_camera_left();
+	void move_camera_right();
+	
+	void move_camera_target_up();
+	void move_camera_target_down();
+	void move_camera_target_left();
+	void move_camera_target_right();
 
 protected:
 	void initializeGL();
@@ -37,6 +50,7 @@ protected:
 	render_object buffer_mesh(mesh*);
 	void clear_buffers(render_object);
 	void set_material(material*);
+
 private:
 	tree_mesh_group tree = {};
 	render_object branches {};
@@ -44,5 +58,7 @@ private:
 	render_object fruit = {};
 	int view_width = 0;
 	int view_height = 0;
+	vec3 camera_position;
+	vec3 camera_target;
 };
 

@@ -61,7 +61,8 @@ SOURCES       = main.cpp \
 		l_system.cpp \
 		LSystemWidget.cpp \
 		RenderWidget.cpp \
-		LSystemEditorWindow.cpp moc_LSystemEditorWindow.cpp
+		LSystemEditorWindow.cpp moc_RenderWidget.cpp \
+		moc_LSystemEditorWindow.cpp
 OBJECTS       = main.o \
 		maths.o \
 		string_functions.o \
@@ -74,6 +75,7 @@ OBJECTS       = main.o \
 		LSystemWidget.o \
 		RenderWidget.o \
 		LSystemEditorWindow.o \
+		moc_RenderWidget.o \
 		moc_LSystemEditorWindow.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
@@ -386,9 +388,20 @@ compiler_moc_predefs_clean:
 moc_predefs.h: /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 	g++ -pipe -O2 -Wall -W -dM -E -o moc_predefs.h /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: moc_LSystemEditorWindow.cpp
+compiler_moc_header_make_all: moc_RenderWidget.cpp moc_LSystemEditorWindow.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_LSystemEditorWindow.cpp
+	-$(DEL_FILE) moc_RenderWidget.cpp moc_LSystemEditorWindow.cpp
+moc_RenderWidget.cpp: turtle.h \
+		maths.h \
+		mesh.h \
+		string_functions.h \
+		polygon_stack.h \
+		turtle_stack.h \
+		RenderWidget.h \
+		moc_predefs.h \
+		/usr/lib/qt5/bin/moc
+	/usr/lib/qt5/bin/moc $(DEFINES) --include ./moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/ip/Documents/forest-walk -I/home/ip/Documents/forest-walk -I/opt/local/include -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtOpenGL -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include RenderWidget.h -o moc_RenderWidget.cpp
+
 moc_LSystemEditorWindow.cpp: maths.h \
 		string_functions.h \
 		mesh.h \
@@ -529,6 +542,9 @@ LSystemEditorWindow.o: LSystemEditorWindow.cpp LSystemEditorWindow.h \
 		LSystemWidget.h \
 		RenderWidget.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o LSystemEditorWindow.o LSystemEditorWindow.cpp
+
+moc_RenderWidget.o: moc_RenderWidget.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_RenderWidget.o moc_RenderWidget.cpp
 
 moc_LSystemEditorWindow.o: moc_LSystemEditorWindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_LSystemEditorWindow.o moc_LSystemEditorWindow.cpp

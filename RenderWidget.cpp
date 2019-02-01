@@ -6,6 +6,8 @@ GLWidget::GLWidget(QWidget* parent): QGLWidget(parent)
 	tree.branch_mesh = create_mesh(16*4096, 16*4096);
 	tree.leaf_mesh = create_mesh(16*4096, 16*4096);
 	tree.fruit_mesh = create_mesh(16*4096, 16*4096);
+	camera_position = vec3{0.0f, 2.5f, 3.0f};
+	camera_target = vec3{0.0f, 1.5f, 0.0f};
 }
 
 GLWidget::~GLWidget()
@@ -111,7 +113,9 @@ void GLWidget::render_scene(int view_width, int view_height)
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
-	gluLookAt(0.0f, 2.5f, 3.0f, 0.0f, 1.5f, 0.0f, 0.0f, 1.0f, 0.0f);
+	gluLookAt(	camera_position.x, camera_position.y, camera_position.z, 
+			camera_target.x, camera_target.y, camera_target.z,
+			0.0f, 1.0f, 0.0f);
 	glColor3f(1.0f, 0.0f, 0.0f);
 
 	glEnable(GL_LIGHTING);
@@ -149,4 +153,50 @@ void GLWidget::render_scene(int view_width, int view_height)
 	}
 	glPopMatrix();
 	glFlush();
+}
+
+void GLWidget::move_camera_up()
+{
+	camera_position.y += 0.125;
+	update();
+}
+
+void GLWidget::move_camera_down()
+{
+	camera_position.y -= 0.125;
+	update();
+}
+
+void GLWidget::move_camera_left()
+{
+	camera_position = rotate_about_axis(camera_position, vec3{0.0f, -1.0f, 0.0f}, 22.5f);
+	update();
+}
+
+void GLWidget::move_camera_right()
+{
+	camera_position = rotate_about_axis(camera_position, vec3{0.0f, 1.0f, 0.0f}, 22.5f);
+	update();
+}
+
+void GLWidget::move_camera_target_up()
+{
+	camera_target.y += 0.125f;
+	update();
+}
+
+void GLWidget::move_camera_target_down()
+{
+	camera_target.y -= 0.125f;
+	update();
+}
+
+void GLWidget::move_camera_target_left()
+{
+	
+}
+
+void GLWidget::move_camera_target_right()
+{
+
 }

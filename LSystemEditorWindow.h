@@ -1,5 +1,6 @@
 #pragma once
 #include <QBoxLayout>
+#include <QGridLayout>
 #include <QPushButton>
 #include "maths.h"
 #include "string_functions.h"
@@ -20,8 +21,6 @@ public slots:
 	void update_render();
 	void reset();
 private:
-	QPushButton* derive_button;
-	QPushButton* reset_button;
 	GLWidget* gl_widget;
 	QBoxLayout* layout;
 	LSystemWidget* l_system_widget;
