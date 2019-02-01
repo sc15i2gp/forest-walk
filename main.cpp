@@ -8,6 +8,7 @@
 #include "string_functions.h"
 #include "mesh.h"
 #include "turtle.h"
+#include "l_system.h"
 
 struct render_object
 {
@@ -104,14 +105,26 @@ void GLWidget::render_scene(int view_width, int view_height)
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
-	gluLookAt(0.0f, 2.5f, 3.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+	gluLookAt(0.0f, 2.5f, 3.0f, 0.0f, 1.5f, 0.0f, 0.0f, 1.0f, 0.0f);
 	glColor3f(1.0f, 0.0f, 0.0f);
 
+	l_system l;
+	l.max_l_context_size = 0;
+	l.max_r_context_size = 0;
+	add_production(&l, "<A>", "+(30)FB");
+	add_production(&l, "<B>", "-(60)FC");
+	add_production(&l, "<C>", "+(60)FB");
+	print_l_system(&l, "Test");
+
+	char s[256];
+	strcpy(s, "FA");
+
+	for(int i = 0; i < 2; i++) derive_str(&l, s);
 	tree_mesh_group tree;
 	tree.leaf_mesh = create_mesh(2048, 2048);
 	tree.branch_mesh = create_mesh(2048, 2048);
 	tree.fruit_mesh = create_mesh(1024, 1024);
-	run_turtle("F(1.0,0.5){.+(30)F(0.5).-(120)F(0.5).}", &tree);
+	run_turtle(s, &tree);
 	render_object branch = buffer_mesh(&tree.branch_mesh);
 	render_object leaf = buffer_mesh(&tree.leaf_mesh);
 	

@@ -46,7 +46,7 @@ void turtle::roll_right(float angle)
 
 void push_fruit_sphere_to_tree_mesh(mesh* fruit_mesh, turtle* t, float radius, int v)
 {
-	
+	//TODO
 }
 
 void push_leaf_polygon_to_tree_mesh(mesh* leaf_mesh, turtle* t, polygon* p)

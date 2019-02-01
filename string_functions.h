@@ -10,6 +10,7 @@ bool is_operator(char*);
 bool is_real(char*); 
 bool is_minus(char);
 int length_of_real(char*); 
+int length_of_operator(char*);
 bool are_operators_equal(char*,char*); 
 
 float read_real(char*);

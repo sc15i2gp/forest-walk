@@ -54,12 +54,20 @@ SOURCES       = main.cpp \
 		maths.cpp \
 		string_functions.cpp \
 		mesh.cpp \
-		turtle.cpp 
+		turtle.cpp \
+		arithmetic_tokeniser.cpp \
+		expression_evaluator.cpp \
+		char_queue.cpp \
+		l_system.cpp 
 OBJECTS       = main.o \
 		maths.o \
 		string_functions.o \
 		mesh.o \
-		turtle.o
+		turtle.o \
+		arithmetic_tokeniser.o \
+		expression_evaluator.o \
+		char_queue.o \
+		l_system.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf \
@@ -136,11 +144,19 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		forest-walk.pro maths.h \
 		string_functions.h \
 		mesh.h \
-		turtle.h main.cpp \
+		turtle.h \
+		arithmetic_tokeniser.h \
+		expression_evaluator.h \
+		char_queue.h \
+		l_system.h main.cpp \
 		maths.cpp \
 		string_functions.cpp \
 		mesh.cpp \
-		turtle.cpp
+		turtle.cpp \
+		arithmetic_tokeniser.cpp \
+		expression_evaluator.cpp \
+		char_queue.cpp \
+		l_system.cpp
 QMAKE_TARGET  = forest-walk
 DESTDIR       = 
 TARGET        = forest-walk
@@ -324,8 +340,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents maths.h string_functions.h mesh.h turtle.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp maths.cpp string_functions.cpp mesh.cpp turtle.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents maths.h string_functions.h mesh.h turtle.h arithmetic_tokeniser.h expression_evaluator.h char_queue.h l_system.h $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp maths.cpp string_functions.cpp mesh.cpp turtle.cpp arithmetic_tokeniser.cpp expression_evaluator.cpp char_queue.cpp l_system.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -375,7 +391,17 @@ compiler_clean: compiler_moc_predefs_clean
 
 main.o: main.cpp maths.h \
 		string_functions.h \
-		mesh.h
+		mesh.h \
+		turtle.h \
+		polygon_stack.h \
+		turtle_stack.h \
+		l_system.h \
+		expression_evaluator.h \
+		float_stack.h \
+		arithmetic_tokeniser.h \
+		arithmetic_token_stack.h \
+		char_queue.h \
+		char_queue_stack.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 maths.o: maths.cpp maths.h
@@ -395,6 +421,33 @@ turtle.o: turtle.cpp turtle.h \
 		polygon_stack.h \
 		turtle_stack.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o turtle.o turtle.cpp
+
+arithmetic_tokeniser.o: arithmetic_tokeniser.cpp arithmetic_tokeniser.h \
+		string_functions.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o arithmetic_tokeniser.o arithmetic_tokeniser.cpp
+
+expression_evaluator.o: expression_evaluator.cpp expression_evaluator.h \
+		maths.h \
+		float_stack.h \
+		arithmetic_tokeniser.h \
+		string_functions.h \
+		arithmetic_token_stack.h \
+		char_queue.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o expression_evaluator.o expression_evaluator.cpp
+
+char_queue.o: char_queue.cpp char_queue.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o char_queue.o char_queue.cpp
+
+l_system.o: l_system.cpp l_system.h \
+		string_functions.h \
+		expression_evaluator.h \
+		maths.h \
+		float_stack.h \
+		arithmetic_tokeniser.h \
+		arithmetic_token_stack.h \
+		char_queue.h \
+		char_queue_stack.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o l_system.o l_system.cpp
 
 ####### Install
 
