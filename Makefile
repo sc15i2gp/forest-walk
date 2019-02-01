@@ -51,9 +51,15 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = main.cpp \
-		maths.cpp 
+		maths.cpp \
+		string_functions.cpp \
+		mesh.cpp \
+		turtle.cpp 
 OBJECTS       = main.o \
-		maths.o
+		maths.o \
+		string_functions.o \
+		mesh.o \
+		turtle.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf \
@@ -127,8 +133,14 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exceptions.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
-		forest-walk.pro maths.h main.cpp \
-		maths.cpp
+		forest-walk.pro maths.h \
+		string_functions.h \
+		mesh.h \
+		turtle.h main.cpp \
+		maths.cpp \
+		string_functions.cpp \
+		mesh.cpp \
+		turtle.cpp
 QMAKE_TARGET  = forest-walk
 DESTDIR       = 
 TARGET        = forest-walk
@@ -312,8 +324,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents maths.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp maths.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents maths.h string_functions.h mesh.h turtle.h $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp maths.cpp string_functions.cpp mesh.cpp turtle.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -361,11 +373,28 @@ compiler_clean: compiler_moc_predefs_clean
 
 ####### Compile
 
-main.o: main.cpp maths.h
+main.o: main.cpp maths.h \
+		string_functions.h \
+		mesh.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 maths.o: maths.cpp maths.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o maths.o maths.cpp
+
+string_functions.o: string_functions.cpp string_functions.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o string_functions.o string_functions.cpp
+
+mesh.o: mesh.cpp mesh.h \
+		maths.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mesh.o mesh.cpp
+
+turtle.o: turtle.cpp turtle.h \
+		maths.h \
+		mesh.h \
+		string_functions.h \
+		polygon_stack.h \
+		turtle_stack.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o turtle.o turtle.cpp
 
 ####### Install
 

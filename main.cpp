@@ -7,6 +7,7 @@
 #include "maths.h"
 #include "string_functions.h"
 #include "mesh.h"
+#include "turtle.h"
 
 struct render_object
 {
@@ -70,124 +71,16 @@ render_object GLWidget::buffer_mesh(mesh* m)
 	glGenBuffers(1, &buffered_mesh.index_buffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffered_mesh.index_buffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m->number_of_indices*sizeof(GLuint), m->indices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	buffered_mesh.number_of_indices = m->number_of_indices;
 	return buffered_mesh;
 }
-void push_cylinder_to_mesh(mesh* m, float r, float h, int v)
-{
-	vec3 t_position = {0.0, 0.0, 0.0};
-	vec3 t_orientation_left = {-1.0, 0.0, 0.0};
-	vec3 t_orientation_heading = {0.0, 1.0, 0.0};
-        int number_of_vertex_positions = 2*(v+1); //2 for each circle, +1 for the central vertex
-        int number_of_triangles = 4*v;
-        int number_of_indices = 3*number_of_triangles;
-        int number_of_faces = 2+v;
-        int number_of_vertex_rows = 6*v + 2;
-        int length_of_vertex_row = 2; //position + normal vectors
-        vec3* positions = (vec3*)malloc(sizeof(vec3)*number_of_vertex_positions);
-        float v_angle = 360.0f/(float)v;
-        //First circle vertex positions counter clockwise from (r, 0)
-        for(int i = 0; i < v; i++)
-        {
-                positions[i] = t_position + rotate_about_axis(r*(-t_orientation_left), t_orientation_heading, i*v_angle);
-        }
-        positions[v] = t_position;
-
-        //Copy positions of vertices and increase height for second circle
-        for(int i = 0; i < v+1; i++)
-        {
-                positions[v+1+i] = positions[i] + h*t_orientation_heading;
-        }
-
-        vec3* normals = (vec3*)malloc(sizeof(vec3)*number_of_faces);
-
-        for(int i = 0; i < v; i++)
-        {
-                vec3 edge = positions[(i+1)%v] - positions[i];
-                vec3 normal = cross(edge, t_orientation_heading);
-                normal = normalise(normal);
-                normals[i] = normal;
-        }
-        normals[v] = -t_orientation_heading;
-      	normals[v+1] = t_orientation_heading;
-
-        int vertex_data_size = sizeof(vec3)*length_of_vertex_row*number_of_vertex_rows;
-        vec3* vertex_data = (vec3*)malloc(vertex_data_size);
-        vec3* vertex_row = vertex_data;
-
-        //Bottom circle
-        for(int i = 0; i < v+1; i++)
-        {
-                vertex_row[0] = positions[i];
-                vertex_row[1] = normals[v];
-                vertex_row += length_of_vertex_row;
-        }
-        //Mid section
-        for(int i = 0; i < v; i++)
-        {
-                vertex_row[0] = positions[i];
-                vertex_row[1] = normals[i];
-                vertex_row += length_of_vertex_row;
-                vertex_row[0] = positions[(i+1)%v];
-                vertex_row[1] = normals[i];
-                vertex_row += length_of_vertex_row;
-                vertex_row[0] = positions[v+1+(i+1)%v];
-                vertex_row[1] = normals[i];
-                vertex_row += length_of_vertex_row;
-                vertex_row[0] = positions[v+i+1];
-                vertex_row[1] = normals[i];
-                vertex_row += length_of_vertex_row;
-        }
-        //Top circle
-        for(int i = 0; i < v+1; i++)
-        {
-                vertex_row[0] = positions[v+i+1];
-                vertex_row[1] = normals[v+1];
-                vertex_row += length_of_vertex_row;
-        }
-
-        //Indices
-        int indices_size = sizeof(GLuint)*number_of_indices;
-        GLuint* indices = (GLuint*)malloc(indices_size);
-        GLuint* triangle_indices = indices;
-        //Bottom circle
-        for(int i = 0; i < v; i++)
-        {
-                triangle_indices[0] = i;
-                triangle_indices[1] = v;
-                triangle_indices[2] = (i+1)%v;
-                triangle_indices += 3;
-        }
-        //Mid section
-        GLuint rect_indices[] = {0, 1, 2, 2, 3, 0};
-        for(int i = 0; i < v; i++)
-        {
-                for(int j = 0; j < 6; j++)
-                {
-                        triangle_indices[j] = rect_indices[j] + v + 1 + 4*i;
-                }
-                triangle_indices += 6;
-        }
-        //Top circle
-        for(int i = 0; i < v; i++)
-        {
-                int offset = 5*v + 1;
-                triangle_indices[0] = offset + i;
-                triangle_indices[1] = offset + v;
-                triangle_indices[2] = offset + (i+1)%v;
-                triangle_indices += 3;
-        }
-
-        m->push_vertex_data(vertex_data, number_of_vertex_rows, indices, number_of_indices);
-        free(positions);
-        free(normals);
-        free(indices);
-        free(vertex_data);
-}
 
 void GLWidget::render(render_object object)
-{	
+{
 	glBindBuffer(GL_ARRAY_BUFFER, object.vertex_buffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object.index_buffer);
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, 6*sizeof(float), (void*)0);
 	glEnableClientState(GL_NORMAL_ARRAY);
@@ -211,15 +104,20 @@ void GLWidget::render_scene(int view_width, int view_height)
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
-	gluLookAt(0.0f, 2.0f, 1.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+	gluLookAt(0.0f, 2.5f, 3.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 	glColor3f(1.0f, 0.0f, 0.0f);
 
-	mesh cylinder_mesh = create_mesh(1024, 1024);
-	push_cylinder_to_mesh(&cylinder_mesh, 0.5, 1.0, 16);
-
-	render_object cylinder = buffer_mesh(&cylinder_mesh);
+	tree_mesh_group tree;
+	tree.leaf_mesh = create_mesh(2048, 2048);
+	tree.branch_mesh = create_mesh(2048, 2048);
+	tree.fruit_mesh = create_mesh(1024, 1024);
+	run_turtle("F(1.0,0.5){.+(30)F(0.5).-(120)F(0.5).}", &tree);
+	render_object branch = buffer_mesh(&tree.branch_mesh);
+	render_object leaf = buffer_mesh(&tree.leaf_mesh);
 	
-	destroy_mesh(cylinder_mesh);
+	destroy_mesh(tree.branch_mesh);
+	destroy_mesh(tree.leaf_mesh);
+	destroy_mesh(tree.fruit_mesh);
 
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
@@ -231,11 +129,19 @@ void GLWidget::render_scene(int view_width, int view_height)
 		{0.0, 0.0f, 0.0f},
 		2.0f
 	};
+	material leaf_material =
+	{
+		{0.004f, 0.196f, 0.125f},
+		{0.227f, 0.373f, 0.043f},
+		{0.0f, 0.01f, 0.0f},
+		2.0f
+	};
 	glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
 	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 180.0);
 	set_material(&wood_material);
-	render(cylinder);
-	
+	render(branch);
+	set_material(&leaf_material);
+	render(leaf);
 	glPopMatrix();
 	glFlush();
 }
