@@ -24,6 +24,7 @@ public:
 	void init();
 	~AppWindow();
 public slots:
+	void reset_production_list();
 	void remove_production_text_fields(int);
 	void add_production_text_fields();
 	void update_render();
@@ -31,6 +32,7 @@ public slots:
 
 private:
 	void shift_production_text_fields(int);
+	void remove_production_by_index(int);
 	int number_of_production_layouts = 0;
 	QBoxLayout* l_system_production_layouts[16];
 	int production_layout_ids[16] = {};

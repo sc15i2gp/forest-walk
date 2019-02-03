@@ -6,13 +6,44 @@ AppWindow::AppWindow(QWidget* parent): QWidget(parent)
 	signal_map = new QSignalMapper(this);
 }
 
+void AppWindow::reset_production_list()
+{
+	printf("Resetting with %d productions\n", number_of_production_layouts);
+	l_system_widget->clear_production_set();
+	for(int i = 0; i < number_of_production_layouts; i++)
+	{
+		QBoxLayout* p_l = l_system_production_layouts[i];
+		char l_context[64]; 
+		char strict[64];
+		char r_context[64];
+		char successor[64];
+		char condition[64];
+		char probability[8];
+		strcpy(l_context, ((QLineEdit*)p_l->itemAt(0)->widget())->text().toStdString().c_str());
+		strcpy(strict, ((QLineEdit*)p_l->itemAt(2)->widget())->text().toStdString().c_str());
+		strcpy(r_context, ((QLineEdit*)p_l->itemAt(4)->widget())->text().toStdString().c_str());
+		strcpy(successor, ((QLineEdit*)p_l->itemAt(6)->widget())->text().toStdString().c_str());
+		strcpy(condition, ((QLineEdit*)p_l->itemAt(8)->widget())->text().toStdString().c_str());
+		strcpy(probability, ((QLineEdit*)p_l->itemAt(10)->widget())->text().toStdString().c_str());
+		l_system_widget->add_production_to_set(l_context, strict, r_context, successor, condition, probability);
+	}
+	for(int i = 0; i < number_of_production_layouts; i++)
+	{
+		remove_production_by_index(i);
+		l_system_production_layouts[i] = NULL;
+		production_layout_ids[i] = 0;
+	}
+	number_of_production_layouts = 0;
+	add_production_list();
+	l_system_widget->print();
+}
+
 void AppWindow::add_production_text_fields()
 {
 	static int layout_id = 1;
 	if(number_of_production_layouts < 16)
 	{
 		QBoxLayout* l_system_production_layout = new QBoxLayout(QBoxLayout::LeftToRight, NULL);
-		//TODO: Provide parent widget which forces scroll bars in the scroll area, not using this*
 		QLineEdit* pre_l_context = new QLineEdit(this);
 		QLineEdit* predecessor = new QLineEdit(this);
 		QLineEdit* pre_r_context = new QLineEdit(this);
@@ -20,14 +51,21 @@ void AppWindow::add_production_text_fields()
 		QLineEdit* condition = new QLineEdit(this);
 		QLineEdit* probability = new QLineEdit(this);
 		QPushButton* remove = new QPushButton("-", this);
+		remove->setMaximumWidth(55);
+		remove->setMinimumWidth(20);
 		predecessor->setFixedWidth(120);
 		condition->setFixedWidth(80);
 		probability->setFixedWidth(60);
 		l_system_production_layout->addWidget(pre_l_context);
+		l_system_production_layout->addWidget(new QLabel("<"));
 		l_system_production_layout->addWidget(predecessor);
+		l_system_production_layout->addWidget(new QLabel(">"));
 		l_system_production_layout->addWidget(pre_r_context);
+		l_system_production_layout->addWidget(new QLabel("-->"));
 		l_system_production_layout->addWidget(successor);
+		l_system_production_layout->addWidget(new QLabel(":"));
 		l_system_production_layout->addWidget(condition);
+		l_system_production_layout->addWidget(new QLabel("|"));
 		l_system_production_layout->addWidget(probability);
 		l_system_production_layout->addWidget(remove);
 		l_system_productions_list_layout->addLayout(l_system_production_layout);
@@ -45,11 +83,22 @@ void AppWindow::add_production_text_fields()
 
 void AppWindow::shift_production_text_fields(int removed_index)
 {
-	for(int i = removed_index; i < number_of_production_layouts - 1; i++)
+	for(int i = removed_index; i < number_of_production_layouts; i++)
 	{
 		production_layout_ids[i] = production_layout_ids[i+1];
 		l_system_production_layouts[i] = l_system_production_layouts[i+1];
 	}
+}
+
+void AppWindow::remove_production_by_index(int i)
+{
+	QBoxLayout* p_l = l_system_production_layouts[i];
+	for(int j = 0; j < p_l->count(); j++)
+	{
+		p_l->itemAt(j)->widget()->setVisible(false);
+	}
+	l_system_productions_list_layout->removeItem(p_l);
+	delete p_l;
 }
 
 void AppWindow::remove_production_text_fields(int production_id)
@@ -58,15 +107,9 @@ void AppWindow::remove_production_text_fields(int production_id)
 	{
 		if(production_layout_ids[i] == production_id)
 		{
-			QBoxLayout* p_l = l_system_production_layouts[i];
-			for(int j = 0; j < p_l->count(); j++)
-			{
-				p_l->itemAt(j)->widget()->setVisible(false);
-			}
-			l_system_productions_list_layout->removeItem(p_l);
-			delete p_l;
-			shift_production_text_fields(i);
+			remove_production_by_index(i);
 			number_of_production_layouts--;
+			shift_production_text_fields(i);
 			break;
 		}
 	}
@@ -94,15 +137,15 @@ void AppWindow::add_production_list()
 		QBoxLayout* p_l = l_system_production_layouts[i];
 		QLineEdit* e = (QLineEdit*)p_l->itemAt(0)->widget();
 		e->setText(l_system_widget->l_context(i));
-		e = (QLineEdit*)p_l->itemAt(1)->widget();
-		e->setText(l_system_widget->predecessor(i));
 		e = (QLineEdit*)p_l->itemAt(2)->widget();
-		e->setText(l_system_widget->r_context(i));
-		e = (QLineEdit*)p_l->itemAt(3)->widget();
-		e->setText(l_system_widget->successor(i));
+		e->setText(l_system_widget->predecessor(i));
 		e = (QLineEdit*)p_l->itemAt(4)->widget();
+		e->setText(l_system_widget->r_context(i));
+		e = (QLineEdit*)p_l->itemAt(6)->widget();
+		e->setText(l_system_widget->successor(i));
+		e = (QLineEdit*)p_l->itemAt(8)->widget();
 		e->setText(l_system_widget->condition(i));
-		e = (QLineEdit*)p_l->itemAt(5)->widget();
+		e = (QLineEdit*)p_l->itemAt(10)->widget();
 		char prob[8] = {};
 		snprintf(prob, 8, "%.3f", l_system_widget->probability(i));
 		e->setText(prob);
@@ -150,13 +193,15 @@ void AppWindow::init()
 	layout->addWidget(axiom_label);
 	QPushButton* add_production_button = new QPushButton("+");
 	layout->addWidget(add_production_button);
+	QPushButton* reload_productions_button = new QPushButton("Reload productions");
+	layout->addWidget(reload_productions_button);
 
 	QScrollArea* l_system_scroll_area = new QScrollArea(this);
 	QGroupBox* l_system_production_box = new QGroupBox(l_system_scroll_area);
 	l_system_productions_list_layout = new QVBoxLayout;
 	l_system_production_box->setLayout(l_system_productions_list_layout);
 	l_system_productions_list_layout->setSizeConstraint(QLayout::SetFixedSize);
-	l_system_production_box->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
+	l_system_production_box->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 	l_system_scroll_area->setWidget(l_system_production_box);
 	l_system_scroll_area->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
 	layout->addWidget(l_system_scroll_area);
@@ -174,6 +219,7 @@ void AppWindow::init()
 	connect(camera_move_backwards, SIGNAL(clicked()), gl_widget, SLOT(move_camera_backwards()));
 
 	connect(add_production_button, SIGNAL(clicked()), this, SLOT(add_production_text_fields()));
+	connect(reload_productions_button, SIGNAL(clicked()), this, SLOT(reset_production_list()));
 
 	connect(gl_widget, SIGNAL(initialised()), this->l_system_widget, SLOT(reset()));
 	connect(this->l_system_widget, SIGNAL(l_system_loaded()), this, SLOT(add_production_list()));

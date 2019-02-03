@@ -24,6 +24,9 @@ public:
 	char* condition(int);
 	float probability(int);
 	char* _axiom();
+	void add_production_to_set(char*,char*,char*,char*,char*,char*);
+	void clear_production_set();
+	void print();
 public slots:
 	void reset();
 

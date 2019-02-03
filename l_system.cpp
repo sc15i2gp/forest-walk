@@ -33,32 +33,27 @@ production* get_next_available_production(l_system* l)
 	return p;
 }
 
-void add_production(l_system* l, char* predecessor, char* successor, char* condition, float probability)
+void add_production(l_system* l, char* pre_l_context, char* pre_strict, char* pre_r_context, char* successor, char* condition, char* probability)
 {
+	printf("Adding production\n");
+	float p = atof(probability);
+	add_production(l, pre_l_context, pre_strict, pre_r_context, successor, condition, p);
+}
+
+void add_production(l_system* l, char* pre_l_context, char* pre_strict, char* pre_r_context, char* successor, char* condition, float probability)
+{
+	printf("Actual add production function\n");
 	production* p = get_next_available_production(l);
 	assert(p);
-	int pre_length = number_of_modules(predecessor);
-
-	//TODO: Calculate max context sizes	
-	//TODO: Check for strict predecessor existance
-	//TODO: Make putting '<' and '>' into predecessors part of add_production
-	char* l_context_end = predecessor;
-	for(; *l_context_end != '<'; l_context_end++);
-	memcpy(p->predecessor.l_context, predecessor, l_context_end - predecessor);
-
-	char* strict_begin = l_context_end + 1;
-	char* strict_end = strict_begin;
-	for(; *strict_end != '>'; strict_end++);
-	memcpy(p->predecessor.strict, strict_begin, strict_end - strict_begin);
-
-	char* r_context_begin = strict_end + 1;
-	char* r_context_end = r_context_begin;
-	for(; *r_context_end != 0; r_context_end++);
-	memcpy(p->predecessor.r_context, r_context_begin, r_context_end - r_context_begin);
-
-	memcpy(p->successor, successor, strlen(successor)+1);
-
 	
+	strcpy(p->predecessor.l_context, pre_l_context);
+	strcpy(p->predecessor.strict, pre_strict);
+	strcpy(p->predecessor.r_context, pre_r_context);
+	strcpy(p->successor, successor);
+	strcpy(p->condition, condition);
+	p->probability = probability;
+
+	//Convert successor expressions to rpn
 	char* successor_module = p->successor;
 	for(int i = 0; i < number_of_modules(p->successor); i++)
 	{
@@ -72,13 +67,43 @@ void add_production(l_system* l, char* predecessor, char* successor, char* condi
 		}
 		successor_module = find_next_module(successor_module);
 	}
-	if(condition)
+	//Convert condition to rpn
+	int condition_length = strlen(p->condition);
+	if(condition_length > 0)
 	{
-		int condition_length = strlen(condition);
-		memcpy(p->condition, condition, condition_length+1);
 		convert_expression_to_rpn(p->condition, condition_length);
 	}
-	p->probability = probability;
+
+	//Context sizes
+	int l_context_size = number_of_modules(p->predecessor.l_context);
+	int r_context_size = number_of_modules(p->predecessor.r_context);
+	if(l_context_size > l->max_l_context_size) l->max_l_context_size = l_context_size;
+	if(r_context_size > l->max_r_context_size) l->max_r_context_size = r_context_size;
+}
+
+void add_production(l_system* l, char* predecessor, char* successor, char* condition, float probability)
+{
+	int pre_length = number_of_modules(predecessor);
+
+	char l_context[64] = {};
+	char strict[64] = {};
+	char r_context[64] = {};
+
+	char* l_context_end = predecessor;
+	for(; *l_context_end != '<'; l_context_end++);
+	memcpy(l_context, predecessor, l_context_end - predecessor);
+
+	char* strict_begin = l_context_end + 1;
+	char* strict_end = strict_begin;
+	for(; *strict_end != '>'; strict_end++);
+	memcpy(strict, strict_begin, strict_end - strict_begin);
+
+	char* r_context_begin = strict_end + 1;
+	char* r_context_end = r_context_begin;
+	for(; *r_context_end != 0; r_context_end++);
+	memcpy(r_context, r_context_begin, r_context_end - r_context_begin);
+
+	if(!condition) add_production(l, l_context, strict, r_context, successor, "\0", probability);
 }
 
 bool should_ignore_in_context(char* module)

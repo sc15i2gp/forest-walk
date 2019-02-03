@@ -37,4 +37,6 @@ struct l_system
 void print_production(production*);
 void print_l_system(l_system*, const char* name);
 void add_production(l_system*,char* pre, char* succ, char* cond = NULL, float = 1.0);
+void add_production(l_system* l, char* pre_l_context, char* pre_strict, char* pre_r_context, char* successor, char* condition, float probability);
+void add_production(l_system* l, char* pre_l_context, char* pre_strict, char* pre_r_context, char* successor, char* condition, char* probability);
 void derive_str(l_system*,char*);
