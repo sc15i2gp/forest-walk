@@ -24,6 +24,7 @@ void GLWidget::initializeGL()
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glEnable(GL_DEPTH_TEST);
+	emit initialised();
 }
 
 void GLWidget::resizeGL(int w, int h)

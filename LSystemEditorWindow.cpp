@@ -72,7 +72,44 @@ void AppWindow::remove_production_text_fields(int production_id)
 	}
 }
 
-void AppWindow::init_GLwidget()
+void AppWindow::add_production_list()
+{
+	char* axiom = l_system_widget->_axiom();
+	if(strlen(axiom) == 0)
+	{
+		axiom_label->setText("No axiom");
+	}
+	else
+	{
+		char axiom_text[128];
+		char* a = axiom_text;
+		strcpy(a, "Axiom: ");
+		a += strlen("Axiom: ");
+		strcpy(a, axiom);
+		axiom_label->setText(axiom_text);
+	}
+	for(int i = 0; i < l_system_widget->number_of_productions(); i++)
+	{
+		add_production_text_fields();
+		QBoxLayout* p_l = l_system_production_layouts[i];
+		QLineEdit* e = (QLineEdit*)p_l->itemAt(0)->widget();
+		e->setText(l_system_widget->l_context(i));
+		e = (QLineEdit*)p_l->itemAt(1)->widget();
+		e->setText(l_system_widget->predecessor(i));
+		e = (QLineEdit*)p_l->itemAt(2)->widget();
+		e->setText(l_system_widget->r_context(i));
+		e = (QLineEdit*)p_l->itemAt(3)->widget();
+		e->setText(l_system_widget->successor(i));
+		e = (QLineEdit*)p_l->itemAt(4)->widget();
+		e->setText(l_system_widget->condition(i));
+		e = (QLineEdit*)p_l->itemAt(5)->widget();
+		char prob[8] = {};
+		snprintf(prob, 8, "%.3f", l_system_widget->probability(i));
+		e->setText(prob);
+	}
+}
+
+void AppWindow::init()
 {
 	gl_widget = new GLWidget(this);
 	QPushButton* derive_button = new QPushButton("Derive", this);
@@ -108,6 +145,9 @@ void AppWindow::init_GLwidget()
 	camera_controls_layout->addLayout(camera_move_grid);
 	camera_controls_layout->addLayout(target_move_grid);
 	
+	axiom_label = new QLabel("No axiom", this);
+	axiom_label->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
+	layout->addWidget(axiom_label);
 	QPushButton* add_production_button = new QPushButton("+");
 	layout->addWidget(add_production_button);
 
@@ -115,11 +155,6 @@ void AppWindow::init_GLwidget()
 	QGroupBox* l_system_production_box = new QGroupBox(l_system_scroll_area);
 	l_system_productions_list_layout = new QVBoxLayout;
 	l_system_production_box->setLayout(l_system_productions_list_layout);
-	for(int i = 0; i < 8; i++)
-	{
-		add_production_text_fields();
-	}
-	//for(int i = 0; i < 4; i++) add_production_text_fields();
 	l_system_productions_list_layout->setSizeConstraint(QLayout::SetFixedSize);
 	l_system_production_box->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
 	l_system_scroll_area->setWidget(l_system_production_box);
@@ -127,7 +162,7 @@ void AppWindow::init_GLwidget()
 	layout->addWidget(l_system_scroll_area);
 
 	connect(derive_button, SIGNAL(clicked()), this, SLOT(update_render()));
-	connect(reset_button, SIGNAL(clicked()), this, SLOT(reset()));
+	connect(reset_button, SIGNAL(clicked()), l_system_widget, SLOT(reset()));
 
 	connect(camera_move_up, SIGNAL(clicked()), gl_widget, SLOT(move_camera_up()));
 	connect(camera_move_down, SIGNAL(clicked()), gl_widget, SLOT(move_camera_down()));
@@ -139,6 +174,10 @@ void AppWindow::init_GLwidget()
 	connect(camera_move_backwards, SIGNAL(clicked()), gl_widget, SLOT(move_camera_backwards()));
 
 	connect(add_production_button, SIGNAL(clicked()), this, SLOT(add_production_text_fields()));
+
+	connect(gl_widget, SIGNAL(initialised()), this->l_system_widget, SLOT(reset()));
+	connect(this->l_system_widget, SIGNAL(l_system_loaded()), this, SLOT(add_production_list()));
+	l_system_widget->load_l_system();
 }
 
 AppWindow::~AppWindow()
@@ -149,11 +188,5 @@ AppWindow::~AppWindow()
 void AppWindow::update_render()
 {
 	l_system_widget->l_system_derivation();
-	gl_widget->update();
-}
-
-void AppWindow::reset()
-{
-	l_system_widget->reset();
 	gl_widget->update();
 }

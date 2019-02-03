@@ -41,6 +41,9 @@ public slots:
 	void move_camera_forwards();
 	void move_camera_backwards();
 
+signals:
+	void initialised();
+
 protected:
 	void initializeGL();
 	void resizeGL(int w, int h);

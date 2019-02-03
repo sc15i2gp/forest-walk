@@ -8,7 +8,7 @@ int main(int argc, char** argv)
 	AppWindow* window = new AppWindow(NULL);
 	window->resize(900, 800);
 	window->show();
-	window->init_GLwidget();
+	window->init();
 	app.exec();
 	delete window;
 	return 0;
