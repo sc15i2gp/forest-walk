@@ -49,6 +49,7 @@ void AppWindow::add_production_text_fields()
 		QLineEdit* successor = new QLineEdit(this);
 		QLineEdit* condition = new QLineEdit(this);
 		QLineEdit* probability = new QLineEdit(this);
+		probability->setText("1.000");
 		QPushButton* remove = new QPushButton("-", this);
 		remove->setMaximumWidth(55);
 		remove->setMinimumWidth(20);
