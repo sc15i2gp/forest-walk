@@ -24,6 +24,7 @@ public:
 	void init();
 	~AppWindow();
 public slots:
+	void change_axiom();
 	void reset_production_list();
 	void remove_production_text_fields(int);
 	void add_production_text_fields();
@@ -41,5 +42,5 @@ private:
 	QBoxLayout* layout;
 	QVBoxLayout* l_system_productions_list_layout;
 	LSystemWidget* l_system_widget;
-	QLabel* axiom_label;
+	QLineEdit* axiom_edit;
 };

@@ -8,7 +8,6 @@ AppWindow::AppWindow(QWidget* parent): QWidget(parent)
 
 void AppWindow::reset_production_list()
 {
-	printf("Resetting with %d productions\n", number_of_production_layouts);
 	l_system_widget->clear_production_set();
 	for(int i = 0; i < number_of_production_layouts; i++)
 	{
@@ -35,7 +34,7 @@ void AppWindow::reset_production_list()
 	}
 	number_of_production_layouts = 0;
 	add_production_list();
-	l_system_widget->print();
+	l_system_widget->reset();
 }
 
 void AppWindow::add_production_text_fields()
@@ -90,6 +89,13 @@ void AppWindow::shift_production_text_fields(int removed_index)
 	}
 }
 
+void AppWindow::change_axiom()
+{
+	const char* new_axiom = axiom_edit->text().toStdString().c_str();
+	l_system_widget->set_axiom(new_axiom);
+	l_system_widget->reset();
+}
+
 void AppWindow::remove_production_by_index(int i)
 {
 	QBoxLayout* p_l = l_system_production_layouts[i];
@@ -118,19 +124,8 @@ void AppWindow::remove_production_text_fields(int production_id)
 void AppWindow::add_production_list()
 {
 	char* axiom = l_system_widget->_axiom();
-	if(strlen(axiom) == 0)
-	{
-		axiom_label->setText("No axiom");
-	}
-	else
-	{
-		char axiom_text[128];
-		char* a = axiom_text;
-		strcpy(a, "Axiom: ");
-		a += strlen("Axiom: ");
-		strcpy(a, axiom);
-		axiom_label->setText(axiom_text);
-	}
+	axiom_edit->setText(axiom);
+	
 	for(int i = 0; i < l_system_widget->number_of_productions(); i++)
 	{
 		add_production_text_fields();
@@ -160,6 +155,7 @@ void AppWindow::init()
 	QBoxLayout* camera_controls_layout = new QBoxLayout(QBoxLayout::LeftToRight, NULL);
 	l_system_widget = new LSystemWidget(this, gl_widget);
 	layout->addWidget(gl_widget);
+	gl_widget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Ignored);
 	layout->addWidget(derive_button);
 	layout->addWidget(reset_button);
 	layout->addLayout(camera_controls_layout);
@@ -188,9 +184,12 @@ void AppWindow::init()
 	camera_controls_layout->addLayout(camera_move_grid);
 	camera_controls_layout->addLayout(target_move_grid);
 	
-	axiom_label = new QLabel("No axiom", this);
-	axiom_label->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
-	layout->addWidget(axiom_label);
+	QBoxLayout* axiom_layout = new QBoxLayout(QBoxLayout::LeftToRight);
+	layout->addLayout(axiom_layout);
+	QLabel* axiom_label = new QLabel("Axiom:", this);
+	axiom_layout->addWidget(axiom_label);
+	axiom_edit = new QLineEdit(this);
+	axiom_layout->addWidget(axiom_edit);
 	QPushButton* add_production_button = new QPushButton("+");
 	layout->addWidget(add_production_button);
 	QPushButton* reload_productions_button = new QPushButton("Reload productions");
@@ -203,7 +202,8 @@ void AppWindow::init()
 	l_system_productions_list_layout->setSizeConstraint(QLayout::SetFixedSize);
 	l_system_production_box->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 	l_system_scroll_area->setWidget(l_system_production_box);
-	l_system_scroll_area->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+	l_system_scroll_area->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
+	l_system_scroll_area->setMinimumHeight(150);
 	layout->addWidget(l_system_scroll_area);
 
 	connect(derive_button, SIGNAL(clicked()), this, SLOT(update_render()));
@@ -223,6 +223,7 @@ void AppWindow::init()
 
 	connect(gl_widget, SIGNAL(initialised()), this->l_system_widget, SLOT(reset()));
 	connect(this->l_system_widget, SIGNAL(l_system_loaded()), this, SLOT(add_production_list()));
+	connect(axiom_edit, SIGNAL(editingFinished()), this, SLOT(change_axiom()));
 	l_system_widget->load_l_system();
 }
 

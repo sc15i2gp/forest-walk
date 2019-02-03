@@ -69,9 +69,14 @@ void LSystemWidget::load_l_system()
 	add_production(&l_system_in_use, "<A>", "BC");
 	add_production(&l_system_in_use, "<B>", "ABC");
 	add_production(&l_system_in_use, "<C>", "+F-F");
-	strcpy(axiom, "FA");
+	set_axiom("FA");
 	reset_current_string();
 	emit l_system_loaded();
+}
+
+void LSystemWidget::set_axiom(const char* new_axiom)
+{
+	strcpy(axiom, new_axiom);
 }
 
 void LSystemWidget::reset_current_string()

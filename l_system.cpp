@@ -35,14 +35,12 @@ production* get_next_available_production(l_system* l)
 
 void add_production(l_system* l, char* pre_l_context, char* pre_strict, char* pre_r_context, char* successor, char* condition, char* probability)
 {
-	printf("Adding production\n");
 	float p = atof(probability);
 	add_production(l, pre_l_context, pre_strict, pre_r_context, successor, condition, p);
 }
 
 void add_production(l_system* l, char* pre_l_context, char* pre_strict, char* pre_r_context, char* successor, char* condition, float probability)
 {
-	printf("Actual add production function\n");
 	production* p = get_next_available_production(l);
 	assert(p);
 	
