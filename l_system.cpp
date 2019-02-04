@@ -102,6 +102,7 @@ void add_production(l_system* l, char* predecessor, char* successor, char* condi
 	memcpy(r_context, r_context_begin, r_context_end - r_context_begin);
 
 	if(!condition) add_production(l, l_context, strict, r_context, successor, "\0", probability);
+	else add_production(l, l_context, strict, r_context, successor, condition, probability);
 }
 
 bool should_ignore_in_context(char* module)

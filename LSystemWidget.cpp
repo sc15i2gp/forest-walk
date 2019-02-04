@@ -64,12 +64,15 @@ char* LSystemWidget::_axiom()
 	return axiom;
 }
 
+char* LSystemWidget::current_str()
+{
+	return current_string;
+}
+
 void LSystemWidget::load_l_system()
 {
-	add_production(&l_system_in_use, "<A>", "BC");
-	add_production(&l_system_in_use, "<B>", "ABC");
-	add_production(&l_system_in_use, "<C>", "+F-F");
-	set_axiom("FA");
+	add_production(&l_system_in_use, "<I(d)>", "[+(60)F(0.5,0.125,1.25)][-(60)F(0.5,0.125,1.25)]F(1.0,0.25,1.25)I(d-1)", "d>0");
+	set_axiom("F(1.0,0.5,1.25)I(3)");
 	reset_current_string();
 	emit l_system_loaded();
 }

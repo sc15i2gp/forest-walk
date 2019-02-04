@@ -6,18 +6,24 @@ AppWindow::AppWindow(QWidget* parent): QWidget(parent)
 	signal_map = new QSignalMapper(this);
 }
 
+void AppWindow::reset()
+{
+	l_system_widget->reset();
+	current_str_label->setText(l_system_widget->current_str());
+}
+
 void AppWindow::reset_production_list()
 {
 	l_system_widget->clear_production_set();
 	for(int i = 0; i < number_of_production_layouts; i++)
 	{
 		QBoxLayout* p_l = l_system_production_layouts[i];
-		char l_context[64]; 
-		char strict[64];
-		char r_context[64];
-		char successor[64];
-		char condition[64];
-		char probability[8];
+		char l_context[256]; 
+		char strict[256];
+		char r_context[256];
+		char successor[256];
+		char condition[256];
+		char probability[16];
 		strcpy(l_context, ((QLineEdit*)p_l->itemAt(0)->widget())->text().toStdString().c_str());
 		strcpy(strict, ((QLineEdit*)p_l->itemAt(2)->widget())->text().toStdString().c_str());
 		strcpy(r_context, ((QLineEdit*)p_l->itemAt(4)->widget())->text().toStdString().c_str());
@@ -90,10 +96,20 @@ void AppWindow::shift_production_text_fields(int removed_index)
 	}
 }
 
+#include <iostream>
 void AppWindow::change_axiom()
 {
 	const char* new_axiom = axiom_edit->text().toStdString().c_str();
-	l_system_widget->set_axiom(new_axiom);
+	std::string str = axiom_edit->text().toStdString();
+	char a[64] = {};
+	char* b = a;
+	//NOTE: This element-wise copy is necessary because, if axiom_edit's text > 16 chars, then c_str() ptr contains garbage for some reason
+	for(std::string::iterator it = str.begin(); it != str.end(); it++)
+	{
+		*b = *it;
+		b++;
+	}
+	l_system_widget->set_axiom(a);
 	l_system_widget->reset();
 }
 
@@ -146,6 +162,7 @@ void AppWindow::add_production_list()
 		snprintf(prob, 8, "%.3f", l_system_widget->probability(i));
 		e->setText(prob);
 	}
+	current_str_label->setText(l_system_widget->current_str());
 }
 
 void AppWindow::init()
@@ -191,6 +208,12 @@ void AppWindow::init()
 	axiom_layout->addWidget(axiom_label);
 	axiom_edit = new QLineEdit(this);
 	axiom_layout->addWidget(axiom_edit);
+	
+	current_str_label = new QLabel("N/A");
+	//layout->addWidget(current_str_label);
+	current_str_label->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Maximum);
+	current_str_label->setWordWrap(true);	
+
 	QPushButton* add_production_button = new QPushButton("+");
 	layout->addWidget(add_production_button);
 	QPushButton* reload_productions_button = new QPushButton("Reload productions");
@@ -208,7 +231,7 @@ void AppWindow::init()
 	layout->addWidget(l_system_scroll_area);
 
 	connect(derive_button, SIGNAL(clicked()), this, SLOT(update_render()));
-	connect(reset_button, SIGNAL(clicked()), l_system_widget, SLOT(reset()));
+	connect(reset_button, SIGNAL(clicked()), this, SLOT(reset()));
 
 	connect(camera_move_up, SIGNAL(clicked()), gl_widget, SLOT(move_camera_up()));
 	connect(camera_move_down, SIGNAL(clicked()), gl_widget, SLOT(move_camera_down()));
@@ -237,4 +260,5 @@ void AppWindow::update_render()
 {
 	l_system_widget->l_system_derivation();
 	gl_widget->update();
+	current_str_label->setText(l_system_widget->current_str());
 }

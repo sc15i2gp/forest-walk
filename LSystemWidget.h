@@ -28,6 +28,7 @@ public:
 	void clear_production_set();
 	void print();
 	void set_axiom(const char*);
+	char* current_str();
 public slots:
 	void reset();
 

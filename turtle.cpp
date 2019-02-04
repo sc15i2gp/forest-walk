@@ -206,7 +206,7 @@ void run_turtle(char* input, tree_mesh_group* tree, float default_distance, floa
 	
 	int input_length = number_of_modules(input);
 	char* module = input;
-	
+
 	int polygon_depth = 0;
 	bool polygon_mode = false;
 	for(int i = 0; i < input_length; i++)
