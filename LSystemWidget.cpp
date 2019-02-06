@@ -69,12 +69,31 @@ char* LSystemWidget::current_str()
 	return current_string;
 }
 
-void LSystemWidget::load_l_system()
+
+void LSystemWidget::load(const char* path)
 {
-	add_production(&l_system_in_use, "<I(d)>", "[+(60)F(0.5,0.125,1.25)][-(60)F(0.5,0.125,1.25)]F(1.0,0.25,1.25)I(d-1)", "d>0");
-	set_axiom("F(1.0,0.5,1.25)I(3)");
-	reset_current_string();
-	emit l_system_loaded();
+	if(!path)
+	{
+		//This path will only be traversed when the program is starting up
+		add_production(&l_system_in_use, "<I(d)>", "[+(60)F(0.5,0.125,1.25)][-(60)F(0.5,0.125,1.25)]F(1.0,0.25,1.25)I(d-1)", "d>0");
+		set_axiom("F(1.0,0.5,1.25)I(3)");
+		reset_current_string();
+		emit l_system_loaded();
+	}
+	else if(strlen(path) > 0)
+	{
+		load_l_system(&l_system_in_use, path, axiom);
+		emit l_system_loaded();
+	}
+}
+
+void LSystemWidget::save(const char* path)
+{
+	if(strlen(path) > 0)
+	{
+		//TODO: Move this to l_system.cpp
+		save_l_system(&l_system_in_use, path, axiom);
+	}
 }
 
 void LSystemWidget::set_axiom(const char* new_axiom)

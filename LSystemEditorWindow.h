@@ -8,6 +8,7 @@
 #include <QGroupBox>
 #include <QVBoxLayout>
 #include <QLabel>
+#include <QFileDialog>
 #include "maths.h"
 #include "string_functions.h"
 #include "mesh.h"
@@ -31,10 +32,14 @@ public slots:
 	void add_production_text_fields();
 	void update_render();
 	void add_production_list();
+	void enable_save();
+	void open_save_dialog();
+	void open_load_dialog();
 
 private:
 	void shift_production_text_fields(int);
 	void remove_production_by_index(int);
+	void clear_production_layouts();
 	int number_of_production_layouts = 0;
 	QBoxLayout* l_system_production_layouts[16];
 	int production_layout_ids[16] = {};
@@ -45,4 +50,5 @@ private:
 	LSystemWidget* l_system_widget;
 	QLineEdit* axiom_edit;
 	QLabel* current_str_label;
+	QPushButton* save_button;
 };

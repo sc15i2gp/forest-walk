@@ -12,6 +12,17 @@ void AppWindow::reset()
 	current_str_label->setText(l_system_widget->current_str());
 }
 
+void AppWindow::clear_production_layouts()
+{
+	for(int i = 0; i < number_of_production_layouts; i++)
+	{
+		remove_production_by_index(i);
+		l_system_production_layouts[i] = NULL;
+		production_layout_ids[i] = 0;
+	}
+	number_of_production_layouts = 0;
+}
+
 void AppWindow::reset_production_list()
 {
 	l_system_widget->clear_production_set();
@@ -32,13 +43,7 @@ void AppWindow::reset_production_list()
 		strcpy(probability, ((QLineEdit*)p_l->itemAt(10)->widget())->text().toStdString().c_str());
 		l_system_widget->add_production_to_set(l_context, strict, r_context, successor, condition, probability);
 	}
-	for(int i = 0; i < number_of_production_layouts; i++)
-	{
-		remove_production_by_index(i);
-		l_system_production_layouts[i] = NULL;
-		production_layout_ids[i] = 0;
-	}
-	number_of_production_layouts = 0;
+	clear_production_layouts();
 	add_production_list();
 	l_system_widget->reset();
 }
@@ -57,7 +62,7 @@ void AppWindow::add_production_text_fields()
 		QLineEdit* probability = new QLineEdit(this);
 		probability->setText("1.000");
 		QPushButton* remove = new QPushButton("-", this);
-		remove->setMaximumWidth(55);
+		remove->setMaximumWidth(50);
 		remove->setMinimumWidth(20);
 		predecessor->setFixedWidth(120);
 		condition->setFixedWidth(80);
@@ -82,6 +87,12 @@ void AppWindow::add_production_text_fields()
 		connect(remove, SIGNAL(clicked()), signal_map, SLOT(map()));
 		signal_map->setMapping(remove, layout_id);
 		connect(signal_map, SIGNAL(mapped(int)), this, SLOT(remove_production_text_fields(int)));
+		connect(successor, SIGNAL(textEdited(const QString&)), this, SLOT(enable_save()));
+		connect(pre_l_context, SIGNAL(textEdited(const QString&)), this, SLOT(enable_save()));
+		connect(pre_r_context, SIGNAL(textEdited(const QString&)), this, SLOT(enable_save()));
+		connect(predecessor, SIGNAL(textEdited(const QString&)), this, SLOT(enable_save()));
+		connect(condition, SIGNAL(textEdited(const QString&)), this, SLOT(enable_save()));
+		connect(probability, SIGNAL(textEdited(const QString&)), this, SLOT(enable_save()));
 		number_of_production_layouts++;
 		layout_id++;
 	}
@@ -140,6 +151,7 @@ void AppWindow::remove_production_text_fields(int production_id)
 
 void AppWindow::add_production_list()
 {
+	clear_production_layouts();
 	char* axiom = l_system_widget->_axiom();
 	axiom_edit->setText(axiom);
 	
@@ -170,12 +182,14 @@ void AppWindow::init()
 	gl_widget = new GLWidget(this);
 	QPushButton* derive_button = new QPushButton("Derive", this);
 	QPushButton* reset_button  = new QPushButton("Reset", this);
+	QBoxLayout* simulation_interact_layout = new QBoxLayout(QBoxLayout::LeftToRight);
 	QBoxLayout* camera_controls_layout = new QBoxLayout(QBoxLayout::LeftToRight, NULL);
 	l_system_widget = new LSystemWidget(this, gl_widget);
 	layout->addWidget(gl_widget);
 	gl_widget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Ignored);
-	layout->addWidget(derive_button);
-	layout->addWidget(reset_button);
+	simulation_interact_layout->addWidget(derive_button);
+	simulation_interact_layout->addWidget(reset_button);
+	layout->addLayout(simulation_interact_layout);
 	layout->addLayout(camera_controls_layout);
 
 	QGridLayout* camera_move_grid = new QGridLayout;
@@ -214,10 +228,12 @@ void AppWindow::init()
 	current_str_label->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Maximum);
 	current_str_label->setWordWrap(true);	
 
-	QPushButton* add_production_button = new QPushButton("+");
-	layout->addWidget(add_production_button);
+	QBoxLayout* production_interact_layout = new QBoxLayout(QBoxLayout::LeftToRight);
+	QPushButton* add_production_button = new QPushButton("Add production");
+	production_interact_layout->addWidget(add_production_button);
 	QPushButton* reload_productions_button = new QPushButton("Reload productions");
-	layout->addWidget(reload_productions_button);
+	production_interact_layout->addWidget(reload_productions_button);
+	layout->addLayout(production_interact_layout);
 
 	QScrollArea* l_system_scroll_area = new QScrollArea(this);
 	QGroupBox* l_system_production_box = new QGroupBox(l_system_scroll_area);
@@ -230,6 +246,13 @@ void AppWindow::init()
 	l_system_scroll_area->setMinimumHeight(150);
 	layout->addWidget(l_system_scroll_area);
 
+	QBoxLayout* file_io_layout = new QBoxLayout(QBoxLayout::LeftToRight);
+	save_button = new QPushButton("Save L-system");
+	QPushButton* load_button = new QPushButton("Load L-system");
+	save_button->setEnabled(false);
+	file_io_layout->addWidget(save_button);
+	file_io_layout->addWidget(load_button);
+	layout->addLayout(file_io_layout);
 	connect(derive_button, SIGNAL(clicked()), this, SLOT(update_render()));
 	connect(reset_button, SIGNAL(clicked()), this, SLOT(reset()));
 
@@ -248,7 +271,30 @@ void AppWindow::init()
 	connect(gl_widget, SIGNAL(initialised()), this->l_system_widget, SLOT(reset()));
 	connect(this->l_system_widget, SIGNAL(l_system_loaded()), this, SLOT(add_production_list()));
 	connect(axiom_edit, SIGNAL(editingFinished()), this, SLOT(change_axiom()));
-	l_system_widget->load_l_system();
+	connect(save_button, SIGNAL(clicked()), this, SLOT(open_save_dialog()));
+	connect(load_button, SIGNAL(clicked()), this, SLOT(open_load_dialog()));
+	l_system_widget->load();
+}
+
+void AppWindow::open_save_dialog()
+{
+	QString file = QFileDialog::getSaveFileName(this, 
+			tr("Save L-system"), ".lsys",
+			tr("L-system (*.lsys);;All Files(*)"));
+	l_system_widget->save(file.toStdString().c_str());
+}
+
+void AppWindow::open_load_dialog()
+{
+	QString file = QFileDialog::getOpenFileName(this, 
+			tr("Load L-system"), "",
+			tr("L-system (*.lsys);;All Files(*)"));
+	l_system_widget->load(file.toStdString().c_str());
+}
+
+void AppWindow::enable_save()
+{
+	save_button->setEnabled(true);
 }
 
 AppWindow::~AppWindow()

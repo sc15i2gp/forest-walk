@@ -5,6 +5,74 @@ bool has_condition(production* p)
 	return p->condition[0] != 0;
 }
 
+void copy_l_system_unit(char* src, char* dest, int& start, int& end)
+{
+	while(src[end] != '|' && src[end] != '\n') end++;
+	if(end-start > 0) memcpy(dest, src+start, end-start);
+	dest[end-start] = 0;
+	end++;
+	start = end;
+}
+
+void load_l_system(l_system* l, const char* path, char* axiom)
+{
+	l->p_set_size = 0;
+	FILE* f = fopen(path, "r");
+	fseek(f, 0, SEEK_END);
+	int size = ftell(f);
+	fseek(f, 0, SEEK_SET);
+	char* buffer = (char*)malloc(size+1);
+	fread(buffer, 1, size, f);
+	fclose(f);
+	buffer[size] = 0;
+	int start = 0;
+	int end = 0;
+
+	copy_l_system_unit(buffer, axiom, start, end);
+	for(int i = 0;; i++)
+	{//For each production in the file
+		production* p = l->p_set+i;
+		copy_l_system_unit(buffer, p->predecessor.l_context, start, end);
+		copy_l_system_unit(buffer, p->predecessor.strict, start, end);
+		copy_l_system_unit(buffer, p->predecessor.r_context, start, end);
+		copy_l_system_unit(buffer, p->successor, start, end);
+		copy_l_system_unit(buffer, p->condition, start, end);
+		char prob[16] = {};
+		copy_l_system_unit(buffer, prob, start, end);
+		p->probability = atof(prob);
+		l->p_set_size++;
+		if(buffer[start] == 0 || start >= size - 1) break;
+	}
+	free(buffer);
+}
+
+void save_l_system(l_system* l, const char* path, char* axiom)
+{
+	FILE* f = fopen(path, "w");
+	fprintf(f, axiom);
+	fprintf(f, "\n");
+	
+	for(int i = 0; i < l->p_set_size; i++)
+	{
+		production* p = l->p_set + i;
+		fprintf(f, p->predecessor.l_context);
+		fprintf(f, "|");
+		fprintf(f, p->predecessor.strict);
+		fprintf(f, "|");
+		fprintf(f, p->predecessor.r_context);
+		fprintf(f, "|");
+		fprintf(f, p->successor);
+		fprintf(f, "|");
+		fprintf(f, p->condition);
+		fprintf(f, "|");
+		char prob[16] = {};
+		snprintf(prob, 16, "%f", p->probability);
+		fprintf(f, prob);
+		fprintf(f, "\n");
+	}
+	fclose(f);
+}
+
 void print_production(production* p)
 {
 	if(p)

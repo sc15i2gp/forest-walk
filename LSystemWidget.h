@@ -15,7 +15,8 @@ public:
 
 	void reset_current_string();
 	void l_system_derivation();
-	void load_l_system();
+	void load(const char* = NULL);
+	void save(const char*);
 	int number_of_productions();
 	char* predecessor(int);
 	char* l_context(int);
@@ -29,6 +30,7 @@ public:
 	void print();
 	void set_axiom(const char*);
 	char* current_str();
+	
 public slots:
 	void reset();
 
