@@ -2,6 +2,7 @@
 LSystemWidget::LSystemWidget(QWidget* parent, GLWidget* gl_widget): QWidget(parent)
 {
 	this->renderer = gl_widget;
+	this->current_string = (char*)malloc(MAX_STRING_SIZE);
 }
 
 void LSystemWidget::clear_production_set()

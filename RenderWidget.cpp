@@ -3,11 +3,11 @@
 GLWidget::GLWidget(QWidget* parent): QGLWidget(parent)
 {
 	//NOTE: If there is a bug in the rendering, make sure enough memory is allocated
-	tree.branch_mesh = create_mesh(16*4096, 16*4096);
+	tree.branch_mesh = create_mesh(1024*4096, 1024*4096);
 	tree.leaf_mesh = create_mesh(16*4096, 16*4096);
 	tree.fruit_mesh = create_mesh(16*4096, 16*4096);
-	camera_position = vec3{0.0f, 2.5f, 3.0f};
-	camera_target = vec3{0.0f, 1.5f, 0.0f};
+	camera_position = vec3{0.0f, 2.5f, 6.0f};
+	camera_target = vec3{0.0f, 2.5f, 0.0f};
 }
 
 GLWidget::~GLWidget()
@@ -158,13 +158,13 @@ void GLWidget::render_scene(int view_width, int view_height)
 
 void GLWidget::move_camera_up()
 {
-	camera_position.y += 0.125;
+	camera_position.y += 1.5;
 	update();
 }
 
 void GLWidget::move_camera_down()
 {
-	camera_position.y -= 0.125;
+	camera_position.y -= 1.5;
 	update();
 }
 
@@ -182,26 +182,26 @@ void GLWidget::move_camera_right()
 
 void GLWidget::move_camera_target_up()
 {
-	camera_target.y += 0.125f;
+	camera_target.y += 1.5f;
 	update();
 }
 
 void GLWidget::move_camera_target_down()
 {
-	camera_target.y -= 0.125f;
+	camera_target.y -= 1.5f;
 	update();
 }
 
 void GLWidget::move_camera_forwards()
 {
 	vec3 forwards = normalise(camera_target - camera_position);
-	camera_position = camera_position + 0.125f*forwards;
+	camera_position = camera_position + 2.0f*forwards;
 	update();
 }
 
 void GLWidget::move_camera_backwards()
 {
 	vec3 backwards = normalise(camera_position - camera_target);
-	camera_position = camera_position + 0.125f*backwards;
+	camera_position = camera_position + 2.0f*backwards;
 	update();
 }

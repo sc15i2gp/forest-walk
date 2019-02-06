@@ -24,7 +24,7 @@ int number_of_parameters(char*);
 char* find_parameter(char*, int = 0);
 float read_real_parameter_value(char*, int = 0); 
 bool is_parameter_expression(char*, int = 0); 
-void write_into_parameter(char*,int,float, int = 3); 
+void write_into_parameter(char*,int,float, int = 5); 
 void replace_parameter_tokens_with_values(char*,char*,char*); 
 int length_of_parameter(char* module, int param_index); //Does not include padding whitespace before actual parameter string but does include whitespace padding up to , or )
 

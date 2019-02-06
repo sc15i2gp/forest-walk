@@ -286,6 +286,21 @@ void run_turtle(char* input, tree_mesh_group* tree, float default_distance, floa
 				t.roll_forward(angle);
 				break;
 			}
+			case '\\':
+			{
+				float angle = default_angle;
+				if(module_param_count > 0) angle = read_real_parameter_value(module);
+				t.roll_left(angle);
+				break;
+			}
+			case '/':
+			{
+				float angle = default_angle;
+				if(module_param_count > 0) angle = read_real_parameter_value(module);
+				t.roll_right(angle);
+				break; 
+			}
+
 		}
 		module = find_next_module(module);
 	}
