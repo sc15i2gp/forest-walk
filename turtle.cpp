@@ -198,6 +198,7 @@ void run_turtle(char* input, tree_mesh_group* tree, float default_distance, floa
 	t.orientation.heading = vec3{0.0f, 1.0f, 0.0f};
 	t.orientation.left = vec3{-1.0, 0.0, 0.0};
 	t.orientation.up = vec3{0.0, 0.0, 1.0};
+	t.width = default_radius;
 
 	polygon p = {};
 
@@ -235,6 +236,9 @@ void run_turtle(char* input, tree_mesh_group* tree, float default_distance, floa
 			case '.':
 				p.push_vertex(t.position);
 				break;
+			case '!':
+				t.width = read_real_parameter_value(module);
+				break;
 			case '@':
 			{
 				float radius = default_radius;
@@ -244,7 +248,7 @@ void run_turtle(char* input, tree_mesh_group* tree, float default_distance, floa
 			}
 			case 'F':
 			{
-				float radius = default_radius;
+				float radius = t.width;
 				float length = default_distance;
 				if(module_param_count > 0)
 				{

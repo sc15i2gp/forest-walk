@@ -20,6 +20,7 @@ struct turtle
 		vec3 up;
 	} orientation;
 	vec3 position;
+	float width;
 	void move_forward(float); //F
 	void turn_left(float); //+
 	void turn_right(float); //-
