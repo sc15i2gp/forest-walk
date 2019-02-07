@@ -4,9 +4,11 @@
 struct mesh
 {
 	int vertex_data_length = 0;
+	int max_vertex_data_length = 0;
 	vec3* vertex_data;
 
 	int number_of_indices = 0;
+	int max_number_of_indices = 0;
 	GLuint* indices;
 	void push_vertex_data(vec3*,int, GLuint*,int);
 };

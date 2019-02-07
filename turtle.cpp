@@ -184,7 +184,6 @@ void push_branch_cylinder_to_tree_mesh(mesh* branch_mesh, turtle* t, float r, fl
                 triangle_indices[2] = offset + (i+1)%v;
                 triangle_indices += 3;
         }
-
         branch_mesh->push_vertex_data(vertex_data, number_of_vertex_rows, indices, number_of_indices);
         free(positions);
         free(normals);
@@ -253,7 +252,6 @@ void run_turtle(char* input, tree_mesh_group* tree, float default_distance, floa
 				if(module_param_count > 0)
 				{
 					length = read_real_parameter_value(module);
-					if(module_param_count > 1) radius = read_real_parameter_value(module, 1);
 				}
 				if(!polygon_mode)
 				{

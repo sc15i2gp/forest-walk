@@ -2,6 +2,17 @@
 
 void mesh::push_vertex_data(vec3* new_vertex_data, int new_vertex_data_length, GLuint* new_indices, int number_of_new_indices)
 {
+	if(this->vertex_data_length + new_vertex_data_length > this->max_vertex_data_length)
+	{
+		printf("%s (%d) error: mesh vertex data buffer is full\n",__func__,__LINE__);
+		return;
+	}
+	if(this->number_of_indices + number_of_new_indices > this->max_number_of_indices)
+	{
+		printf("%s (%d) error: mesh index buffer is full\n",__func__,__LINE__);
+		return;
+	}
+
 	int index_offset = this->vertex_data_length;
 	for(int i = 0; i < 2*new_vertex_data_length; i += 2)
 	{
@@ -24,7 +35,7 @@ mesh create_mesh(int vertex_data_buffer_length, int index_buffer_length)
 {
 	vec3* vertex_data_buffer = (vec3*)malloc(sizeof(vec3)*vertex_data_buffer_length);
 	GLuint* index_buffer = (GLuint*)malloc(sizeof(GLuint)*index_buffer_length);
-	return mesh{0, vertex_data_buffer, 0, index_buffer};
+	return mesh{0, vertex_data_buffer_length/2, vertex_data_buffer, 0, index_buffer_length, index_buffer};
 }
 
 void destroy_mesh(mesh m)

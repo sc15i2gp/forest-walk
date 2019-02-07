@@ -69,10 +69,10 @@ bool char_queue::push(char* str, int str_length)
 	{
 		int initial_end = end;
 		int initial_unused = unused;
-		printf("INITIAL END %d\n", initial_end);
+		//printf("INITIAL END %d\n", initial_end);
 		end = 0;
 		unused = CHAR_QUEUE_MAX - initial_end;
-		printf("unused %d\n", unused);
+		//printf("unused %d\n", unused);
 		if(length_free() < str_length)
 		{
 			end = initial_end;

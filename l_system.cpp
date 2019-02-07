@@ -349,14 +349,14 @@ production* pick_production(l_system* l, char* strict_predecessor, char_queue* l
 	return p;
 }
 
-
+#define MAX_DERIVED_OUTPUT_SIZE 0x400000
 void derive_str(l_system* l, char* input_str)
 {
 	char* start = input_str;
 	prune_branches(input_str);
 	//printf("Deriving %s\n", input_str);
 	//TODO far future: Move this to function parameter
-	char* output_buffer = (char*)malloc(0x400000); 
+	char* output_buffer = (char*)malloc(MAX_DERIVED_OUTPUT_SIZE); 
 	char* output_loc = output_buffer;
 	char_queue l_context_queue;
 	char_queue r_context_queue;
@@ -433,14 +433,30 @@ void derive_str(l_system* l, char* input_str)
 			}
 
 			//FAILURE POINT: If output_queue is full
-			memcpy(output_loc, successor, strlen(successor));
-			output_loc += strlen(successor);
+			if(output_loc + strlen(successor) < output_buffer + MAX_DERIVED_OUTPUT_SIZE)
+			{
+				memcpy(output_loc, successor, strlen(successor));
+				output_loc += strlen(successor);
+			}
+			else
+			{
+				printf("%s (%d) error: output queue is full\n",__func__,__LINE__);
+				return;
+			}
 		}
 		else
 		{
 			//FAILURE POINT: If output_queue is full
-			memcpy(output_loc, current_module, length_of_module(current_module));
-			output_loc += length_of_module(current_module);
+			if(output_loc + length_of_module(current_module) < output_buffer + MAX_DERIVED_OUTPUT_SIZE)
+			{
+				memcpy(output_loc, current_module, length_of_module(current_module));
+				output_loc += length_of_module(current_module);
+			}
+			else
+			{
+				printf("%s (%d) error: output queue is full\n",__func__,__LINE__);
+				return;
+			}
 		}
 		r_context_queue.pop_all(); //TODO: Fix infinte loop
 		r_context_push_count = 0;
@@ -474,5 +490,4 @@ void derive_str(l_system* l, char* input_str)
 	int output_length = output_loc - output_buffer;
 	memcpy(input_str, output_buffer, output_length);
 	free(output_buffer);
-	//copy_string_and_null_char(input_str, derived_str);
 }
