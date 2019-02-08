@@ -62,9 +62,12 @@ void AppWindow::add_production_text_fields()
 		QLineEdit* probability = new QLineEdit(this);
 		probability->setText("1.000");
 		QPushButton* remove = new QPushButton("-", this);
+		successor->setFixedWidth(350);
 		remove->setMaximumWidth(50);
 		remove->setMinimumWidth(20);
-		predecessor->setFixedWidth(120);
+		predecessor->setFixedWidth(80);
+		pre_l_context->setFixedWidth(60);
+		pre_r_context->setFixedWidth(60);
 		condition->setFixedWidth(80);
 		probability->setFixedWidth(60);
 		l_system_production_layout->addWidget(pre_l_context);
@@ -79,6 +82,7 @@ void AppWindow::add_production_text_fields()
 		l_system_production_layout->addWidget(new QLabel("|"));
 		l_system_production_layout->addWidget(probability);
 		l_system_production_layout->addWidget(remove);
+		l_system_production_layout->setSizeConstraint(QLayout::SetMinimumSize);
 		l_system_productions_list_layout->addLayout(l_system_production_layout);
 
 		l_system_production_layouts[number_of_production_layouts] = l_system_production_layout;
