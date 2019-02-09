@@ -44,9 +44,57 @@ void turtle::roll_right(float angle)
 	this->orientation.left = rotate_about_axis(this->orientation.left, this->orientation.heading, angle);
 }
 
-void push_fruit_sphere_to_tree_mesh(mesh* fruit_mesh, turtle* t, float radius, int v)
+void push_fruit_sphere_to_tree_mesh(mesh* fruit_mesh, turtle* t, float radius, int stack_count, int sector_count)
 {
-	//TODO
+	vec3 center_pos = t->position + radius*t->orientation.heading;
+	vec3 pole_pos = t->position - center_pos;
+	int number_of_positions = sector_count*(stack_count+1);
+	int number_of_triangles = 2*stack_count*sector_count;
+	int number_of_indices = 3*number_of_triangles;
+	vec3* vertex_data_buffer = (vec3*)malloc(sizeof(vec3)*2*number_of_positions);
+	vec3* vertex_data = vertex_data_buffer;
+	
+	GLuint* index_buffer = (GLuint*)malloc(sizeof(GLuint)*number_of_indices);
+	GLuint* index = index_buffer;
+	
+	float stack_angle_step = 180/stack_count;
+	float sector_angle_step = 360/sector_count;
+
+	for(int i = 0; i <= stack_count; i++)
+	{//For each stack
+		float stack_angle = i*stack_angle_step;
+		vec3 stack_p = rotate_about_axis(pole_pos, t->orientation.up, stack_angle);
+		for(int j = 0; j < sector_count; j++)
+		{//For each sector
+			float sector_angle = j*sector_angle_step;
+			vec3 sphere_pos = rotate_about_axis(stack_p, t->orientation.heading, sector_angle);
+			vertex_data[0] = center_pos + sphere_pos;
+			vertex_data[1] = normalise(sphere_pos);
+			vertex_data += 2;
+		}
+	}
+
+	for(int i = 0; i < stack_count; i++)
+	{//for each stack
+		for(int j = 0; j < sector_count; j++)
+		{//for each quad in the stack
+			int stack_offset_0 = sector_count*i;
+			int stack_offset_1 = sector_count*(i+1);
+			int sector_offset_0 = j;
+			int sector_offset_1 = (j+1)%sector_count;
+			index[0] = stack_offset_0 + sector_offset_0;
+			index[1] = stack_offset_1 + sector_offset_0;
+			index[2] = stack_offset_1 + sector_offset_1;
+			index[3] = stack_offset_1 + sector_offset_1;
+			index[4] = stack_offset_0 + sector_offset_1;
+			index[5] = stack_offset_0 + sector_offset_0;
+			index += 6;
+		}
+	}
+
+	fruit_mesh->push_vertex_data(vertex_data_buffer, number_of_positions, index_buffer, number_of_indices);
+	free(vertex_data_buffer);
+	free(index_buffer);
 }
 
 void push_leaf_polygon_to_tree_mesh(mesh* leaf_mesh, turtle* t, polygon* p)
@@ -259,7 +307,7 @@ void run_turtle(char* input, tree_mesh_group* tree, float default_distance, floa
 			{
 				float radius = default_radius;
 				if(module_param_count > 0) radius = read_real_parameter_value(module);
-				push_fruit_sphere_to_tree_mesh(&tree->fruit_mesh, &t, radius, 8);
+				push_fruit_sphere_to_tree_mesh(&tree->fruit_mesh, &t, radius, 16, 16);
 				break;
 			}
 			case 'F':
