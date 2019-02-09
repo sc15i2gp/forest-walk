@@ -57,8 +57,8 @@ void push_fruit_sphere_to_tree_mesh(mesh* fruit_mesh, turtle* t, float radius, i
 	GLuint* index_buffer = (GLuint*)malloc(sizeof(GLuint)*number_of_indices);
 	GLuint* index = index_buffer;
 	
-	float stack_angle_step = 180/stack_count;
-	float sector_angle_step = 360/sector_count;
+	float stack_angle_step = (float)180/(float)stack_count;
+	float sector_angle_step = (float)360/(float)sector_count;
 
 	for(int i = 0; i <= stack_count; i++)
 	{//For each stack
@@ -307,7 +307,7 @@ void run_turtle(char* input, tree_mesh_group* tree, float default_distance, floa
 			{
 				float radius = default_radius;
 				if(module_param_count > 0) radius = read_real_parameter_value(module);
-				push_fruit_sphere_to_tree_mesh(&tree->fruit_mesh, &t, radius, 16, 16);
+				push_fruit_sphere_to_tree_mesh(&tree->fruit_mesh, &t, radius, 128, 128);
 				break;
 			}
 			case 'F':
