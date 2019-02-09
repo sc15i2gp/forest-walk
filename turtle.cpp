@@ -191,6 +191,16 @@ void push_branch_cylinder_to_tree_mesh(mesh* branch_mesh, turtle* t, float r, fl
         free(vertex_data);
 }
 
+polygon reverse(polygon& p)
+{
+	polygon _p;
+	for(int i = p.vertex_count - 1; i >= 0; i--)
+	{
+		_p.push_vertex(p.positions[i]);
+	}
+	return _p;
+}
+
 void run_turtle(char* input, tree_mesh_group* tree, float default_distance, float default_radius, float default_angle)
 {
 	turtle t = {};
@@ -227,11 +237,18 @@ void run_turtle(char* input, tree_mesh_group* tree, float default_distance, floa
 				polygon_depth++;
 				break;
 			case '}':
-				push_leaf_polygon_to_tree_mesh(&tree->leaf_mesh, &t, &p);
+			{
+				polygon _p_0 = p;
+				polygon _p_1 = reverse(p);
+				for(int i = 0; i < _p_0.vertex_count;i++) _p_0.positions[i] = _p_0.positions[i] - 0.001f*t.orientation.up;
+				for(int i = 0; i < _p_1.vertex_count;i++) _p_1.positions[i] = _p_1.positions[i] + 0.001f*t.orientation.up;
+				push_leaf_polygon_to_tree_mesh(&tree->leaf_mesh, &t, &_p_0);
+				push_leaf_polygon_to_tree_mesh(&tree->leaf_mesh, &t, &_p_1);
 				p = p_stack.pop_state();
 				polygon_depth--;
 				if(polygon_depth == 0) polygon_mode = false;
 				break;
+			}
 			case '.':
 				p.push_vertex(t.position);
 				break;

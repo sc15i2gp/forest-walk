@@ -176,7 +176,7 @@ int char_queue::flush_chars(char* dest, int cpy_length)
 	int to_return = 0;
 	if(cpy_end >= CHAR_QUEUE_MAX - unused)
 	{
-		printf("FLUSHING ACROSS BORDER\n");
+		//printf("FLUSHING ACROSS BORDER\n");
 		int push_count_difference = 0;
 		int final_cpy_length = 0;
 		int char_index = start;
@@ -208,12 +208,12 @@ int char_queue::flush_chars(char* dest, int cpy_length)
 	}
 	else
 	{
-		printf("NOT FLUSHING ACROSS BORDER\n");
+		//printf("NOT FLUSHING ACROSS BORDER\n");
 		int final_cpy_length = 0;
 		int push_count_difference = 0;
 		int char_index = start;
-		printf("COPY END %d\n", cpy_end);
-		printf("CHAR INDEX = ");
+		//printf("COPY END %d\n", cpy_end);
+		//printf("CHAR INDEX = ");
 		//TODO: Fix this
 		while(char_index + push_length_array[char_index] < cpy_end)
 		{
@@ -226,7 +226,7 @@ int char_queue::flush_chars(char* dest, int cpy_length)
 		int last_push_difference = push_length_array[char_index] - cpy_deficit;
 		char_index += cpy_deficit;
 		final_cpy_length += cpy_deficit;
-		printf("\n");
+		//printf("\n");
 		memcpy(dest, char_array + start, final_cpy_length);
 		to_return = final_cpy_length;
 		start += final_cpy_length;
