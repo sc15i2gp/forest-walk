@@ -12,6 +12,9 @@
 #define CONDITION_MAX 256
 
 #define R_CONTEXT_MAX 64
+
+#define MAX_DERIVED_OUTPUT_SIZE 0x800000
+
 struct production
 {
 	struct

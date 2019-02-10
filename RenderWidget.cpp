@@ -3,9 +3,9 @@
 GLWidget::GLWidget(QWidget* parent): QGLWidget(parent)
 {
 	//NOTE: If there is a bug in the rendering, make sure enough memory is allocated
-	tree.branch_mesh = create_mesh(1024*4096, 1024*4096);
-	tree.leaf_mesh = create_mesh(512*4096, 51*4096);
-	tree.fruit_mesh = create_mesh(256*4096, 256*4096);
+	tree.branch_mesh = create_mesh(2048*4096, 2048*4096);
+	tree.leaf_mesh = create_mesh(2048*4096, 2048*4096);
+	tree.fruit_mesh = create_mesh(2048*4096, 2048*4096);
 	camera_position = vec3{0.0f, 2.5f, 6.0f};
 	camera_target = vec3{0.0f, 2.5f, 0.0f};
 }

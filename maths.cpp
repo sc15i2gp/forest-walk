@@ -80,5 +80,5 @@ vec3 operator-(vec3 v1, vec3 v2)
 
 void print_vector(vec3 v)
 {
-	printf("%f %f %f\n", v.x, v.y, v.z);
+	printf("%f %f %f ", v.x, v.y, v.z);
 }

@@ -307,7 +307,14 @@ void run_turtle(char* input, tree_mesh_group* tree, float default_distance, floa
 			{
 				float radius = default_radius;
 				if(module_param_count > 0) radius = read_real_parameter_value(module);
-				push_fruit_sphere_to_tree_mesh(&tree->fruit_mesh, &t, radius, 128, 128);
+				push_fruit_sphere_to_tree_mesh(&tree->fruit_mesh, &t, radius, 32, 32);
+				break;
+			}
+			case 'f':
+			{
+				float dist = default_distance;
+				if(module_param_count > 0) dist = read_real_parameter_value(module);
+				t.move_forward(dist);
 				break;
 			}
 			case 'F':

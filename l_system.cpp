@@ -349,7 +349,6 @@ production* pick_production(l_system* l, char* strict_predecessor, char_queue* l
 	return p;
 }
 
-#define MAX_DERIVED_OUTPUT_SIZE 0x400000
 void derive_str(l_system* l, char* input_str)
 {
 	char* start = input_str;
