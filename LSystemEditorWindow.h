@@ -35,6 +35,7 @@ public slots:
 	void enable_save();
 	void open_save_dialog();
 	void open_load_dialog();
+	void reload_global_parameters();
 
 private:
 	void shift_production_text_fields(int);
@@ -51,4 +52,6 @@ private:
 	QLineEdit* axiom_edit;
 	QLabel* current_str_label;
 	QPushButton* save_button;
+	QLineEdit* param_symbols[8] = {};
+	QLineEdit* param_values[8] = {};
 };

@@ -16,6 +16,7 @@ bool are_operators_equal(char*,char*);
 float read_real(char*);
 
 int overwrite_string(char*,char*,int,int); 
+void overwrite_token_occurrences(char*,char,char*); 
 
 //Module string functions
 void print_module(char* module);

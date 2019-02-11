@@ -27,6 +27,8 @@ public:
 	char* _axiom();
 	void add_production_to_set(char*,char*,char*,char*,char*,char*);
 	void clear_production_set();
+	void clear_global_parameters();
+	void _add_global_parameter(char, char*);
 	void print();
 	void set_axiom(const char*);
 	char* current_str();

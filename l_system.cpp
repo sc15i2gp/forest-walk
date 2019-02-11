@@ -173,6 +173,17 @@ void add_production(l_system* l, char* predecessor, char* successor, char* condi
 	else add_production(l, l_context, strict, r_context, successor, condition, probability);
 }
 
+void add_global_parameter(l_system* l, char token, char* initial_value)
+{
+	char* default_value = "0.000";
+	if(!initial_value) initial_value = default_value;
+	param_mapping* mapping = l->param_map;
+	//FAILURE POINT: mapping >= param_map + PARAM_MAP_MAX
+	while(mapping->symbol > 0) mapping++;
+	mapping->symbol = token;
+	strcpy(mapping->real_str, initial_value);
+}
+
 bool should_ignore_in_context(char* module)
 {
 	char symbol = *module;
@@ -245,15 +256,25 @@ bool r_contexts_match(char* context, char_queue* context_queue)
 	return true;
 }
 
-bool condition_met(production* p, char* strict_predecessor, char_queue* l_context_queue, char_queue* r_context_queue)
+void replace_global_parameter_tokens_with_values(param_mapping* param_map, char* to_overwrite)
+{
+	for(int i = 0; param_map[i].symbol > 0; i++)
+	{
+		overwrite_token_occurrences(to_overwrite, param_map[i].symbol, param_map[i].real_str);
+	}
+}
+
+bool condition_met(production* p, char* strict_predecessor, char_queue* l_context_queue, char_queue* r_context_queue, param_mapping* param_map)
 {
 	if(has_condition(p))
 	{
+		//GLOBAL PARAMETER INSERTED HERE
 		char condition[CONDITION_MAX] = {};
 		strcpy(condition, p->condition);
 		input_l_context_parameter_values(p->predecessor.l_context, l_context_queue, condition);
 		input_r_context_parameter_values(p->predecessor.r_context, r_context_queue, condition);
 		replace_parameter_tokens_with_values(p->predecessor.strict, strict_predecessor, condition);
+		replace_global_parameter_tokens_with_values(param_map, condition);
 		float result = compute_rpn_string_result(condition, strlen(condition));
 		return result > 0;
 	}
@@ -264,11 +285,11 @@ bool condition_met(production* p, char* strict_predecessor, char_queue* l_contex
 //L Context: A(1)B(2) Predecessor L Context: B(c)
 //R Context: D(2)[E(12)]EF Predecessor R Context: D(a)[E(r+15)]
 
-bool matches(production* p, char* strict_predecessor, char_queue* l_context_queue, char_queue* r_context_queue)
+bool matches(production* p, char* strict_predecessor, char_queue* l_context_queue, char_queue* r_context_queue, param_mapping* param_map)
 {
 	if(l_contexts_match(p->predecessor.l_context, l_context_queue) && r_contexts_match(p->predecessor.r_context, r_context_queue))
 	{
-		return modules_match(strict_predecessor, p->predecessor.strict) && condition_met(p, strict_predecessor, l_context_queue, r_context_queue);
+		return modules_match(strict_predecessor, p->predecessor.strict) && condition_met(p, strict_predecessor, l_context_queue, r_context_queue, param_map);
 	}
 	return false;
 }
@@ -320,7 +341,7 @@ production* pick_production(l_system* l, char* strict_predecessor, char_queue* l
 	for(int j = 0; j < l->p_set_size; j++)
 	{
 		production* p_j = l->p_set+j;
-		bool production_matches = matches(p_j, strict_predecessor, l_context_queue, r_context_queue);
+		bool production_matches = matches(p_j, strict_predecessor, l_context_queue, r_context_queue, l->param_map);
 		if(production_matches && is_context_sensitive(p_j) && p_j->probability == 1.0) 
 		{
 			//Deterministic context sensitive
@@ -407,13 +428,14 @@ void derive_str(l_system* l, char* input_str)
 		{
 			//FAILURE POINT: If p->successor > 512
 			//NOTE: Would be good if successor could be strcpy'd straight to output_queue
+			//GLOBAL PARAMETER INSERTED HERE
 			char successor[512] = {};
 			strcpy(successor, p->successor);
 
 			input_l_context_parameter_values(p->predecessor.l_context, &l_context_queue, successor);
 			input_r_context_parameter_values(p->predecessor.r_context, &r_context_queue, successor);
 			replace_parameter_tokens_with_values(p->predecessor.strict, current_module, successor);
-
+			replace_global_parameter_tokens_with_values(l->param_map, successor);
 			int successor_length = number_of_modules(successor);
 			char* successor_module = successor;
 			for(int j = 0; j < successor_length; j++)

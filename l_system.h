@@ -28,13 +28,22 @@ struct production
 	float probability;
 };
 
+//Parameter map symbol -> real string
+struct param_mapping
+{
+	char symbol;
+	char real_str[31];
+};
+
 #define P_SET_MAX 32
+#define PARAM_MAP_MAX 8
 struct l_system
 {
 	production p_set[P_SET_MAX] = {};
 	int p_set_size = 0;
 	int max_l_context_size = 0;
 	int max_r_context_size = 0;
+	param_mapping param_map[PARAM_MAP_MAX] = {};
 };
 
 void print_production(production*);
@@ -42,6 +51,7 @@ void print_l_system(l_system*, const char* name);
 void add_production(l_system*,char* pre, char* succ, char* cond = NULL, float = 1.0);
 void add_production(l_system* l, char* pre_l_context, char* pre_strict, char* pre_r_context, char* successor, char* condition, float probability);
 void add_production(l_system* l, char* pre_l_context, char* pre_strict, char* pre_r_context, char* successor, char* condition, char* probability);
+void add_global_parameter(l_system*, char token, char* initial_value = NULL);
 void derive_str(l_system*,char*);
 void load_l_system(l_system*,const char*, char* axiom_buffer);
 void save_l_system(l_system*,const char*, char* axiom_buffer);

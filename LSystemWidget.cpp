@@ -25,6 +25,16 @@ void LSystemWidget::add_production_to_set(char* l_context, char* strict, char* r
 	add_production(&l_system_in_use, l_context, strict, r_context, successor, condition, probability);
 }
 
+void LSystemWidget::clear_global_parameters()
+{
+	for(int i = 0; i < PARAM_MAP_MAX; i++) l_system_in_use.param_map[i].symbol = 0;
+}
+
+void LSystemWidget::_add_global_parameter(char symbol, char* value)
+{
+	add_global_parameter(&l_system_in_use, symbol, value);
+}
+
 void LSystemWidget::print()
 {
 	print_l_system(&l_system_in_use, "Widget");

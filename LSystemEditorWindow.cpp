@@ -111,19 +111,23 @@ void AppWindow::shift_production_text_fields(int removed_index)
 	}
 }
 
-#include <iostream>
+void copy_std_string_to_array(std::string str, char* c)
+{
+	//NOTE: This element-wise copy is necessary because, if axiom_edit's text > 16 chars, then c_str() ptr contains garbage for some reason
+	for(std::string::iterator it = str.begin(); it != str.end(); it++)
+	{
+		*c = *it;
+		c++;
+	}
+}
+
 void AppWindow::change_axiom()
 {
 	const char* new_axiom = axiom_edit->text().toStdString().c_str();
 	std::string str = axiom_edit->text().toStdString();
 	char a[64] = {};
 	char* b = a;
-	//NOTE: This element-wise copy is necessary because, if axiom_edit's text > 16 chars, then c_str() ptr contains garbage for some reason
-	for(std::string::iterator it = str.begin(); it != str.end(); it++)
-	{
-		*b = *it;
-		b++;
-	}
+	copy_std_string_to_array(str, b);
 	l_system_widget->set_axiom(a);
 	l_system_widget->reset();
 }
@@ -181,6 +185,21 @@ void AppWindow::add_production_list()
 	current_str_label->setText(l_system_widget->current_str());
 }
 
+void AppWindow::reload_global_parameters()
+{
+	l_system_widget->clear_global_parameters();
+	for(int i = 0; i < 8; i++)
+	{
+		QLineEdit* param_symbol = param_symbols[i];
+		QLineEdit* param_value = param_values[i];
+		char symbol = param_symbol->text().toStdString()[0];
+		const char* value = param_value->text().toStdString().c_str();
+		char _value[16];
+		copy_std_string_to_array(param_value->text().toStdString(), _value);
+		if(symbol > 0) l_system_widget->_add_global_parameter(symbol, _value);
+	}
+}
+
 void AppWindow::init()
 {
 	gl_widget = new GLWidget(this);
@@ -232,6 +251,32 @@ void AppWindow::init()
 	current_str_label->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Maximum);
 	current_str_label->setWordWrap(true);	
 
+	QBoxLayout* param_layout_0 = new QBoxLayout(QBoxLayout::LeftToRight);
+	QBoxLayout* param_layout_1 = new QBoxLayout(QBoxLayout::LeftToRight);
+	QBoxLayout* p_layouts[2] = {param_layout_0, param_layout_1};
+	for(int i = 0; i < 2; i++)
+	{
+		QLabel* pipe_label = new QLabel("|", this);
+		pipe_label->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
+		p_layouts[i]->addWidget(pipe_label);
+		for(int j = 0; j < 4; j++)
+		{
+			pipe_label = new QLabel("|", this);
+			pipe_label->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
+			QLineEdit* param_symbol = new QLineEdit(this);
+			QLineEdit* param_value = new QLineEdit(this);
+			param_value->setText("0.000");
+			p_layouts[i]->addWidget(param_symbol);
+			p_layouts[i]->addWidget(new QLabel(":",this));
+			p_layouts[i]->addWidget(param_value);
+			p_layouts[i]->addWidget(pipe_label);
+			param_symbols[4*i+j] = param_symbol;
+			param_values[4*i+j] = param_value;
+			connect(param_symbol, SIGNAL(editingFinished()), this, SLOT(reload_global_parameters()));
+			connect(param_value, SIGNAL(editingFinished()), this, SLOT(reload_global_parameters()));
+		}
+		layout->addLayout(p_layouts[i]);
+	}
 	QBoxLayout* production_interact_layout = new QBoxLayout(QBoxLayout::LeftToRight);
 	QPushButton* add_production_button = new QPushButton("Add production");
 	production_interact_layout->addWidget(add_production_button);
