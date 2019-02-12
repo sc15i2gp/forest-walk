@@ -22,8 +22,8 @@ struct arithmetic_tokeniser
 {
 	char* arithmetic_str;
 	int str_length;
-	int current_pos = 0;
-	arithmetic_token current_token = {token_begin, NULL, 0};
+	int current_pos;
+	arithmetic_token current_token; 
 	
 	void set_current_token(token_type, char*, int);
 	arithmetic_token get_next_token();

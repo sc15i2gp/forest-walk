@@ -3,12 +3,12 @@
 #include "maths.h"
 struct mesh
 {
-	int vertex_data_length = 0;
-	int max_vertex_data_length = 0;
+	int vertex_data_length;
+	int max_vertex_data_length;
 	vec3* vertex_data;
 
-	int number_of_indices = 0;
-	int max_number_of_indices = 0;
+	int number_of_indices;
+	int max_number_of_indices;
 	GLuint* indices;
 	void push_vertex_data(vec3*,int, GLuint*,int);
 };

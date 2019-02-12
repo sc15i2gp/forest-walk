@@ -39,11 +39,11 @@ struct param_mapping
 #define PARAM_MAP_MAX 8
 struct l_system
 {
-	production p_set[P_SET_MAX] = {};
-	int p_set_size = 0;
-	int max_l_context_size = 0;
-	int max_r_context_size = 0;
-	param_mapping param_map[PARAM_MAP_MAX] = {};
+	production p_set[P_SET_MAX];
+	int p_set_size;
+	int max_l_context_size;
+	int max_r_context_size;
+	param_mapping param_map[PARAM_MAP_MAX];
 };
 
 void print_production(production*);

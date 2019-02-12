@@ -1,4 +1,5 @@
 TEMPLATE = app
+CONFIG += c++11
 TARGET = forest-walk
 INCLUDEPATH += . /opt/local/include
 

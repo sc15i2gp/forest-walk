@@ -117,7 +117,7 @@ void GLWidget::render_scene(int view_width, int view_height)
 
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
-	GLfloat light_pos[] = {0.0, -3.0, 1.0};
+	GLfloat light_pos[] = {0.0, 3.0, 1.0};
 	material wood_material = 
 	{
 		{0.115f, 0.0845f, 0.0815f},
@@ -163,36 +163,42 @@ void GLWidget::render_scene(int view_width, int view_height)
 void GLWidget::move_camera_up()
 {
 	camera_position.y += 1.5;
+	parentWidget()->update();
 	update();
 }
 
 void GLWidget::move_camera_down()
 {
 	camera_position.y -= 1.5;
+	parentWidget()->update();
 	update();
 }
 
 void GLWidget::move_camera_left()
 {
 	camera_position = rotate_about_axis(camera_position, vec3{0.0f, -1.0f, 0.0f}, 22.5f);
+	parentWidget()->update();
 	update();
 }
 
 void GLWidget::move_camera_right()
 {
 	camera_position = rotate_about_axis(camera_position, vec3{0.0f, 1.0f, 0.0f}, 22.5f);
+	parentWidget()->update();
 	update();
 }
 
 void GLWidget::move_camera_target_up()
 {
 	camera_target.y += 1.5f;
+	parentWidget()->update();
 	update();
 }
 
 void GLWidget::move_camera_target_down()
 {
 	camera_target.y -= 1.5f;
+	parentWidget()->update();
 	update();
 }
 
@@ -200,6 +206,7 @@ void GLWidget::move_camera_forwards()
 {
 	vec3 forwards = normalise(camera_target - camera_position);
 	camera_position = camera_position + 2.0f*forwards;
+	parentWidget()->update();
 	update();
 }
 
@@ -207,5 +214,6 @@ void GLWidget::move_camera_backwards()
 {
 	vec3 backwards = normalise(camera_position - camera_target);
 	camera_position = camera_position + 2.0f*backwards;
+	parentWidget()->update();
 	update();
 }
