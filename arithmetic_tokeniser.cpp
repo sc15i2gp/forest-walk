@@ -59,15 +59,7 @@ arithmetic_token arithmetic_tokeniser::get_next_token()
 		if(current_pos < str_length)
 		{
 			if(is_minus(*t) && current_token.type == token_operator && is_real(t))
-			{
-				set_current_token(token_real, t, length_of_real(t));
-			}
-			else if((is_operator(t) && current_token.type == token_real) || !is_real(t))
-			{
-				set_current_token(token_operator, t, length_of_operator(t));
-			}
-			else if(is_real(t))
-			{
+			{//If the current char is - and denotes a negative number
 				set_current_token(token_real, t, length_of_real(t));
 			}
 			else if(*t == '(')
@@ -77,6 +69,14 @@ arithmetic_token arithmetic_tokeniser::get_next_token()
 			else if(*t == ')')
 			{
 				set_current_token(token_close_paren, t, 1);
+			}
+			else if((is_operator(t) && (current_token.type == token_real || current_token.type == token_close_paren)) || !is_real(t))
+			{//If current char is operator, first half of if necessary to see if - should be part of a real or not
+				set_current_token(token_operator, t, length_of_operator(t));
+			}
+			else if(is_real(t))
+			{
+				set_current_token(token_real, t, length_of_real(t));
 			}
 			else
 			{

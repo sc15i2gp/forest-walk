@@ -200,13 +200,14 @@ float read_real_parameter_value(char* module, int param_number)
 int length_of_parameter(char* module, int param_number)
 {
 	char* param = find_parameter(module, param_number);
-	int length = 0;
-	while(*param != ',' && *param != ')')
+	int paren_depth = 0;
+	char* param_end = param;
+	for(; (*param_end != ',' && *param_end != ')') || paren_depth > 0; param_end++)
 	{
-		length++;
-		param++;
+		if(*param_end == '(') paren_depth++;
+		else if(*param_end == ')') paren_depth--;
 	}
-	return length;
+	return param_end - param;
 }
 
 bool is_parameter_expression(char* module, int param_number)
@@ -258,14 +259,16 @@ int length_of_module(char* module)
 {
 	if(module[0] == 0) return 0;
 	else if(module[1] == '(')
-	{
-		int length = 1;
-		while(*module != ')')
+	{//If module is parameterised
+		//Find closing parenthesis
+		int paren_depth = 0;
+		char* module_end = module + 2;
+		for(; *module_end != ')' || paren_depth > 0; module_end++)
 		{
-			module++;
-			length++;
+			if(*module_end == '(') paren_depth++;
+			if(*module_end == ')') paren_depth--;
 		}
-		return length;
+		return (module_end - module)+1;
 	}
 	else return 1;
 }
