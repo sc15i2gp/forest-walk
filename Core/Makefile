@@ -60,7 +60,8 @@ SOURCES       = main.cpp \
 		char_queue.cpp \
 		l_system.cpp \
 		RenderWidget.cpp \
-		ForestWalkWindow.cpp moc_RenderWidget.cpp
+		ForestWalkWindow.cpp \
+		ChartWidget.cpp moc_RenderWidget.cpp
 OBJECTS       = main.o \
 		maths.o \
 		string_functions.o \
@@ -72,6 +73,7 @@ OBJECTS       = main.o \
 		l_system.o \
 		RenderWidget.o \
 		ForestWalkWindow.o \
+		ChartWidget.o \
 		moc_RenderWidget.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
@@ -155,7 +157,8 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		char_queue.h \
 		l_system.h \
 		RenderWidget.h \
-		ForestWalkWindow.h main.cpp \
+		ForestWalkWindow.h \
+		ChartWidget.h main.cpp \
 		maths.cpp \
 		string_functions.cpp \
 		mesh.cpp \
@@ -165,7 +168,8 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		char_queue.cpp \
 		l_system.cpp \
 		RenderWidget.cpp \
-		ForestWalkWindow.cpp
+		ForestWalkWindow.cpp \
+		ChartWidget.cpp
 QMAKE_TARGET  = forest-walk
 DESTDIR       = 
 TARGET        = forest-walk
@@ -349,8 +353,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents maths.h string_functions.h mesh.h turtle.h arithmetic_tokeniser.h expression_evaluator.h char_queue.h l_system.h RenderWidget.h ForestWalkWindow.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp maths.cpp string_functions.cpp mesh.cpp turtle.cpp arithmetic_tokeniser.cpp expression_evaluator.cpp char_queue.cpp l_system.cpp RenderWidget.cpp ForestWalkWindow.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents maths.h string_functions.h mesh.h turtle.h arithmetic_tokeniser.h expression_evaluator.h char_queue.h l_system.h RenderWidget.h ForestWalkWindow.h ChartWidget.h $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp maths.cpp string_functions.cpp mesh.cpp turtle.cpp arithmetic_tokeniser.cpp expression_evaluator.cpp char_queue.cpp l_system.cpp RenderWidget.cpp ForestWalkWindow.cpp ChartWidget.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -409,7 +413,14 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean
 
 ####### Compile
 
-main.o: main.cpp ForestWalkWindow.h
+main.o: main.cpp ForestWalkWindow.h \
+		RenderWidget.h \
+		turtle.h \
+		maths.h \
+		mesh.h \
+		string_functions.h \
+		polygon_stack.h \
+		turtle_stack.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 maths.o: maths.cpp maths.h
@@ -466,8 +477,18 @@ RenderWidget.o: RenderWidget.cpp RenderWidget.h \
 		turtle_stack.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o RenderWidget.o RenderWidget.cpp
 
-ForestWalkWindow.o: ForestWalkWindow.cpp ForestWalkWindow.h
+ForestWalkWindow.o: ForestWalkWindow.cpp ForestWalkWindow.h \
+		RenderWidget.h \
+		turtle.h \
+		maths.h \
+		mesh.h \
+		string_functions.h \
+		polygon_stack.h \
+		turtle_stack.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ForestWalkWindow.o ForestWalkWindow.cpp
+
+ChartWidget.o: ChartWidget.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ChartWidget.o ChartWidget.cpp
 
 moc_RenderWidget.o: moc_RenderWidget.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_RenderWidget.o moc_RenderWidget.cpp

@@ -49,7 +49,6 @@ protected:
 	void resizeGL(int w, int h);
 	void paintGL();
 	void render_scene(int,int);
-	void render_chart(int,int);
 	void render(render_object);
 	render_object buffer_mesh(mesh*);
 	void clear_buffers(render_object);

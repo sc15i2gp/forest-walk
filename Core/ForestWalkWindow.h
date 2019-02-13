@@ -2,7 +2,7 @@
 #include <QBoxLayout>
 #include <QWidget>
 #include <QPushButton>
-#include "RenderWidget.h"
+#include "ChartWidget.h"
 
 class AppWindow: public QWidget
 {
@@ -11,5 +11,5 @@ public:
 	void init();
 private:
 	QBoxLayout* layout;
-	GLWidget* gl_widget;
+	ChartGLWidget* gl_widget;
 };
