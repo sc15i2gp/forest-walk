@@ -54,6 +54,10 @@ void ChartGLWidget::paintGL()
 	else glViewport(0.0f, 0.0f,view_height,view_height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_BLEND);
+	glDisable(GL_DEPTH_TEST);
+	glAlphaFunc(GL_LESS, 0.2f);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
