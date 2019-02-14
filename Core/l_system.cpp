@@ -111,7 +111,7 @@ void add_production(l_system* l, char* pre_l_context, char* pre_strict, char* pr
 {
 	production* p = get_next_available_production(l);
 	assert(p);
-	
+
 	strcpy(p->predecessor.l_context, pre_l_context);
 	strcpy(p->predecessor.strict, pre_strict);
 	strcpy(p->predecessor.r_context, pre_r_context);
@@ -342,31 +342,20 @@ production* pick_production(l_system* l, char* strict_predecessor, char_queue* l
 	{
 		production* p_j = l->p_set+j;
 		bool production_matches = matches(p_j, strict_predecessor, l_context_queue, r_context_queue, l->param_map);
-		if(production_matches && is_context_sensitive(p_j) && p_j->probability == 1.0) 
+		if(production_matches && p_j->probability == 1.0) 
 		{
 			//Deterministic context sensitive
 			p = p_j;
 			return p;
 		}
-		else if(production_matches && is_context_sensitive(p_j))
+		else if(production_matches)
 		{
 			//Non deterministic context sensitive
 			int p_index = sample_non_deterministic_productions(p_j, j);
 			p = l->p_set + p_index;
 			return p;
 		}
-		else if(production_matches && !is_context_sensitive(p_j) && context_free_candidate < 0)
-		{
-			//Context free
-			if(p_j->probability == 1.0) context_free_candidate = j; // Deterministic
-			else //Non deterministic
-			{
-				int p_index = sample_non_deterministic_productions(p_j, j);
-				context_free_candidate = p_index;
-			}
-		}
 	}
-	if(!p && context_free_candidate >= 0) p = l->p_set+context_free_candidate;
 	return p;
 }
 

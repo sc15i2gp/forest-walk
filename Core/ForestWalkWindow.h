@@ -3,13 +3,16 @@
 #include <QWidget>
 #include <QPushButton>
 #include "ChartWidget.h"
+#include "MLSystemWidget.h"
 
 class AppWindow: public QWidget
 {
 public:
 	AppWindow(QWidget* parent);
 	void init();
+	void reset();
 private:
 	QBoxLayout* layout;
 	ChartGLWidget* gl_widget;
+	MLSystemWidget* m_l_widget;
 };
