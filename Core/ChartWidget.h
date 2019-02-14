@@ -12,11 +12,14 @@ public:
 	ChartGLWidget(QWidget* parent);
 	~ChartGLWidget();
 
+	void render_circle(float, float, float, vec3 colour);
 protected:
 	void initializeGL();
+	void buffer_circle_texture();
 	void resizeGL(int w, int h);
 	void paintGL();
 	int view_width = 0;
 	int view_height = 0;
-	GLubyte* texture_data;
+	GLubyte* texture_data = 0;
+	GLuint texture_buffer = 0;
 };
