@@ -27,6 +27,7 @@ public:
 	void render_circle(point*);
 	void push_point(float,float,float,int);
 	void clear_points();
+	void set_forest_bounds(float width, float height);
 signals:
 	void initialised();
 
@@ -35,6 +36,8 @@ protected:
 	void buffer_circle_texture();
 	void resizeGL(int w, int h);
 	void paintGL();
+	float forest_width = 0.0f;
+	float forest_height = 0.0f;
 	int view_width = 0;
 	int view_height = 0;
 	GLubyte* texture_data = 0;

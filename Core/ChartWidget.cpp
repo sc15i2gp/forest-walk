@@ -42,11 +42,17 @@ void ChartGLWidget::initializeGL()
 {
 	initializeGLFunctions();
 	buffer_circle_texture();
-	glClearColor(1.0, 1.0, 1.0, 1.0);
+	glClearColor(0.9, 0.9, 0.9, 1.0);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glEnable(GL_DEPTH_TEST);
 	emit initialised();
+}
+
+void ChartGLWidget::set_forest_bounds(float width, float height)
+{
+	forest_width = width;
+	forest_height = height;
 }
 
 void ChartGLWidget::resizeGL(int w, int h)
@@ -55,7 +61,7 @@ void ChartGLWidget::resizeGL(int w, int h)
 	view_height = h;
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0.0f, 100.0f, 0.0f, 100.0f, -1.0f, 1.0f);
+	glOrtho(0.0f, forest_width, 0.0f, forest_height, -1.0f, 1.0f);
 }
 
 void ChartGLWidget::clear_points()
@@ -76,7 +82,7 @@ void ChartGLWidget::push_point(float x, float y, float r, int c)
 void ChartGLWidget::render_circle(point* p)
 {	
 	vec3 colour; 
-	if(p->c > 0) colour = {0.608f,0.9f,0.16f};
+	if(p->c > 0) colour = {0.508f,0.8f,0.13f};
 	else colour = {1.0f, 0.0f, 0.2f};
 	glPushMatrix();
 	glTranslatef(p->x, p->y, 0.0f);

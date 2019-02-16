@@ -2,12 +2,15 @@
 
 MLSystemWidget::MLSystemWidget(QWidget* parent, ChartGLWidget* c): QWidget(parent)
 {
+	float forest_width = 400.0f;
+	float forest_height = 400.0f;
 	chart = c;
-	m_l_sys = create_m_l_system(8192);
+	chart->set_forest_bounds(forest_width, forest_height);
+	m_l_sys = create_m_l_system(8192, forest_width, forest_height);
 	add_production(&m_l_sys, "<T(x,y,r)>?(c)", "", "c == 0", 1.0f);
 	add_production(&m_l_sys, "<T(x,y,r)>", "T(x,y,r)", "r >= R", 1.0f);
 	add_global_parameter(&m_l_sys, 'R', "5.0");
-	add_production(&m_l_sys, "<T(x,y,r)>?(c)", "T(x,y,r + 1.15*r)", NULL, 1.0f);
+	add_production(&m_l_sys, "<T(x,y,r)>?(c)", "T(x,y,r + 1.01*r)", NULL, 1.0f);
 	seed = (long int)time(NULL);
 	connect(chart, SIGNAL(initialised()), this, SLOT(init_system()));
 }
@@ -22,11 +25,11 @@ void MLSystemWidget::init_system()
 	clear_str_set(&m_l_sys);
 	chart->clear_points();
 	srand(seed);
-	for(int i = 0; i < 32; i++)
+	for(int i = 0; i < 8192; i++)
 	{
-		float x = rand() % 100;
-		float y = rand() % 100;
-		float r = (float)(rand() % 100)/100.0f + 0.1f;
+		float x = rand() % 400;
+		float y = rand() % 400;
+		float r = (float)(rand() % 400)/600.0f + 0.1f;
 		add_str(&m_l_sys, x, y, r, 1);
 	}
 	push_str_set_to_chart_and_render();

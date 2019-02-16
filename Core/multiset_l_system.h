@@ -2,14 +2,33 @@
 #include "l_system.h"
 
 #define SET_STR_MAX_SIZE 64
+struct tree_node
+{
+	int str_ref;
+	tree_node* next;
+};
+
+struct tree_grid
+{
+	tree_node* node_array;
+	bool* in_use;
+
+	float bucket_width;
+	float bucket_height;
+	float forest_width;
+	float forest_height;
+	tree_node** grid;
+};
+
 struct m_l_system
 {
 	l_system base_sys;
 	char* str_set;
 	int str_set_size;
+	tree_grid trees;
 };
 
-m_l_system create_m_l_system(int str_set_max);
+m_l_system create_m_l_system(int str_set_max, float forest_width, float forest_height, float bucket_width = 20.0f, float bucket_height = 20.0f);
 void print_str_set(m_l_system*);
 void clear_str_set(m_l_system*);
 char* get_str_from_set(m_l_system*, int);
