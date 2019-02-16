@@ -405,7 +405,8 @@ void derive_str(l_system* l, char* input_str)
 		printf("L_CONTEXT ");
 		print_queue_contents(&l_context_queue);
 		printf("R_CONTEXT ");
-		print_queue_contents(&r_context_queue);*/
+		print_queue_contents(&r_context_queue);
+		*/
 		//Pick production
 	       	production* p = pick_production(l, current_module, &l_context_queue, &r_context_queue);
 		/*

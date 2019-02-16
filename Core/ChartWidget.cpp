@@ -2,11 +2,13 @@
 
 ChartGLWidget::ChartGLWidget(QWidget* parent): QGLWidget(parent)
 {
+	points = (point*)malloc(sizeof(point)*MAX_TREE_COUNT);
 }
 
 ChartGLWidget::~ChartGLWidget()
 {
 	if(texture_data) free(texture_data);
+	if(points) free(points);
 }
 
 void ChartGLWidget::buffer_circle_texture()
@@ -44,6 +46,7 @@ void ChartGLWidget::initializeGL()
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glEnable(GL_DEPTH_TEST);
+	emit initialised();
 }
 
 void ChartGLWidget::resizeGL(int w, int h)
@@ -55,21 +58,35 @@ void ChartGLWidget::resizeGL(int w, int h)
 	glOrtho(0.0f, 100.0f, 0.0f, 100.0f, -1.0f, 1.0f);
 }
 
-void ChartGLWidget::render_circle(float x, float y, float radius, vec3 colour)
+void ChartGLWidget::clear_positions_and_radii()
+{
+	number_of_points = 0;
+}
+
+void ChartGLWidget::push_position_and_radius(float x, float y, float r)
+{
+	point* p = points + number_of_points;
+	p->x = x;
+	p->y = y;
+	p->r = r;
+	number_of_points++;
+}
+
+void ChartGLWidget::render_circle(point* p, vec3 colour)
 {	
 	glPushMatrix();
-	glTranslatef(x, y, 0.0f);
+	glTranslatef(p->x, p->y, 0.0f);
 	glBindTexture(GL_TEXTURE_2D, texture_buffer);
 	glColor3f(colour.x, colour.y, colour.z);
 	glBegin(GL_POLYGON);
 	glTexCoord2f(0.0f, 1.0f);
-	glVertex3f(-radius, -radius, 0.0f); //Bottom left
+	glVertex3f(-p->r, -p->r, 0.0f); //Bottom left
 	glTexCoord2f(1.0f, 1.0f);
-	glVertex3f(radius, -radius, 0.0f); //Bottom right
+	glVertex3f(p->r, -p->r, 0.0f); //Bottom right
 	glTexCoord2f(1.0f, 0.0f);
-	glVertex3f(radius, radius, 0.0f); //Top right
+	glVertex3f(p->r, p->r, 0.0f); //Top right
 	glTexCoord2f(0.0f, 0.0f);
-	glVertex3f(-radius, radius, 0.0f); //Top left
+	glVertex3f(-p->r, p->r, 0.0f); //Top left
 	glEnd();
 	glPopMatrix();
 }
@@ -87,8 +104,10 @@ void ChartGLWidget::paintGL()
 	glPushMatrix();
 	glLoadIdentity();
 	vec3 colour = {0.608f,0.9f,0.16f};
-	render_circle(50.0f,50.0f, 10.0f, colour);
-	render_circle(13.4f, 96.0f, 1.0f, colour);
+	for(int i = 0; i < number_of_points; i++)
+	{
+		render_circle(points+i,colour);
+	}
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glDisable(GL_TEXTURE_2D);
 	glPopMatrix();

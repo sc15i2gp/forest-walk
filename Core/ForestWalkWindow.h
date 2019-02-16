@@ -10,7 +10,6 @@ class AppWindow: public QWidget
 public:
 	AppWindow(QWidget* parent);
 	void init();
-	void reset();
 private:
 	QBoxLayout* layout;
 	ChartGLWidget* gl_widget;

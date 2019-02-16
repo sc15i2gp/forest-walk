@@ -36,9 +36,14 @@ char* get_str_from_set(m_l_system* m_l_sys, int index)
 	return m_l_sys->str_set + SET_STR_MAX_SIZE*index;
 }
 
-void add_str(m_l_system* m_l_sys, int x, float r, int c)
+void clear_str_set(m_l_system* m_l_sys)
 {
-	snprintf(get_str_from_set(m_l_sys, m_l_sys->str_set_size), SET_STR_MAX_SIZE, "T(%d,%f)?(%d)\0", x, r, c);
+	m_l_sys->str_set_size = 0;
+}
+
+void add_str(m_l_system* m_l_sys, float x, float y, float r, int c)
+{
+	snprintf(get_str_from_set(m_l_sys, m_l_sys->str_set_size), SET_STR_MAX_SIZE, "T(%f,%f,%f)?(%d)\0", x, y, r, c);
 	m_l_sys->str_set_size++;
 }
 
