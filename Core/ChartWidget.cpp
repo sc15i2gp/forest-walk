@@ -58,22 +58,26 @@ void ChartGLWidget::resizeGL(int w, int h)
 	glOrtho(0.0f, 100.0f, 0.0f, 100.0f, -1.0f, 1.0f);
 }
 
-void ChartGLWidget::clear_positions_and_radii()
+void ChartGLWidget::clear_points()
 {
 	number_of_points = 0;
 }
 
-void ChartGLWidget::push_position_and_radius(float x, float y, float r)
+void ChartGLWidget::push_point(float x, float y, float r, int c)
 {
 	point* p = points + number_of_points;
 	p->x = x;
 	p->y = y;
 	p->r = r;
+	p->c = c;
 	number_of_points++;
 }
 
-void ChartGLWidget::render_circle(point* p, vec3 colour)
+void ChartGLWidget::render_circle(point* p)
 {	
+	vec3 colour; 
+	if(p->c > 0) colour = {0.608f,0.9f,0.16f};
+	else colour = {1.0f, 0.0f, 0.2f};
 	glPushMatrix();
 	glTranslatef(p->x, p->y, 0.0f);
 	glBindTexture(GL_TEXTURE_2D, texture_buffer);
@@ -103,10 +107,9 @@ void ChartGLWidget::paintGL()
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
-	vec3 colour = {0.608f,0.9f,0.16f};
 	for(int i = 0; i < number_of_points; i++)
 	{
-		render_circle(points+i,colour);
+		render_circle(points+i);
 	}
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glDisable(GL_TEXTURE_2D);

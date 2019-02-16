@@ -14,6 +14,7 @@ struct point
 	float x;
 	float y;
 	float r;
+	int c;
 };
 
 class ChartGLWidget: public QGLWidget, protected QGLFunctions
@@ -23,9 +24,9 @@ public:
 	ChartGLWidget(QWidget* parent);
 	~ChartGLWidget();
 
-	void render_circle(point*,vec3 colour);
-	void push_position_and_radius(float,float,float);
-	void clear_positions_and_radii();
+	void render_circle(point*);
+	void push_point(float,float,float,int);
+	void clear_points();
 signals:
 	void initialised();
 

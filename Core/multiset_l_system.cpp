@@ -49,9 +49,16 @@ void add_str(m_l_system* m_l_sys, float x, float y, float r, int c)
 
 void derive_set(m_l_system* m_l_sys)
 {
+	//Grow/remove trees
 	for(int i = 0; i < m_l_sys->str_set_size; i++)
 	{
 		char* str = m_l_sys->str_set+i*SET_STR_MAX_SIZE;
 		derive_str((l_system*)m_l_sys, str);
 	}
+	//Check whether trees are dominated
+	/*
+	for(int i = 0; i < m_l_sys->str_set_size; i++)
+	{
+
+	}*/
 }

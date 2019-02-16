@@ -20,9 +20,9 @@ MLSystemWidget::~MLSystemWidget()
 void MLSystemWidget::init_system()
 {
 	clear_str_set(&m_l_sys);
-	chart->clear_positions_and_radii();
+	chart->clear_points();
 	srand(seed);
-	for(int i = 0; i < 8192; i++)
+	for(int i = 0; i < 32; i++)
 	{
 		float x = rand() % 100;
 		float y = rand() % 100;
@@ -43,7 +43,7 @@ void MLSystemWidget::push_str_set_to_chart_and_render()
 			float y = read_real_parameter_value(str, 1);
 			float r = read_real_parameter_value(str, 2);
 			int c = (int)read_real_parameter_value(find_next_module(str));
-			chart->push_position_and_radius(x,y,r);
+			chart->push_point(x,y,r,c);
 		}
 	}
 	parentWidget()->update();
@@ -52,7 +52,7 @@ void MLSystemWidget::push_str_set_to_chart_and_render()
 
 void MLSystemWidget::run_derivation()
 {
-	chart->clear_positions_and_radii();
+	chart->clear_points();
 	derive_set(&m_l_sys);
 	//print_l_system(&m_l_sys.base_sys, "multiset");
 	//print_str_set(&m_l_sys);
