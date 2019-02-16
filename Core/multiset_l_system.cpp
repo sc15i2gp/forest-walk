@@ -47,18 +47,56 @@ void add_str(m_l_system* m_l_sys, float x, float y, float r, int c)
 	m_l_sys->str_set_size++;
 }
 
+bool trees_intersect(char* t, char* u)
+{
+	float t_x = read_real_parameter_value(t, 0);
+	float t_y = read_real_parameter_value(t, 1);
+	float t_r = read_real_parameter_value(t, 2);
+	float u_x = read_real_parameter_value(u, 0);
+	float u_y = read_real_parameter_value(u, 1);
+	float u_r = read_real_parameter_value(u, 2);
+
+	float dist = sqrt((t_x - u_x)*(t_x - u_x) + (t_y - u_y)*(t_y - u_y));
+	float total_radius = t_r + u_r;
+	return dist < total_radius;
+}
+
+void set_dominated_tree(char* t)
+{
+	char* q_module = find_next_module(t);
+	write_into_parameter(q_module, 0, 0.0f);
+}
+
+void determine_dominated_tree(char* t, char* u)
+{
+	float t_r = read_real_parameter_value(t, 2);
+	float u_r = read_real_parameter_value(u, 2);
+	if(t_r < u_r) set_dominated_tree(t);
+	else set_dominated_tree(u);
+}
+
 void derive_set(m_l_system* m_l_sys)
 {
 	//Grow/remove trees
 	for(int i = 0; i < m_l_sys->str_set_size; i++)
 	{
-		char* str = m_l_sys->str_set+i*SET_STR_MAX_SIZE;
+		char* str = get_str_from_set(m_l_sys, i);
 		derive_str((l_system*)m_l_sys, str);
 	}
 	//Check whether trees are dominated
-	/*
 	for(int i = 0; i < m_l_sys->str_set_size; i++)
 	{
-
-	}*/
+		char* str_0 = get_str_from_set(m_l_sys, i);
+		for(int j = i+1; j < m_l_sys->str_set_size; j++)
+		{
+			char* str_1 = get_str_from_set(m_l_sys, j);
+			if(number_of_modules(str_0) > 1 && number_of_modules(str_1) > 1)
+			{
+				if(trees_intersect(str_0, str_1))
+				{
+					determine_dominated_tree(str_0, str_1);
+				}
+			}
+		}
+	}
 }

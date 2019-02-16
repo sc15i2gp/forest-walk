@@ -5,7 +5,7 @@ MLSystemWidget::MLSystemWidget(QWidget* parent, ChartGLWidget* c): QWidget(paren
 	chart = c;
 	m_l_sys = create_m_l_system(8192);
 	add_production(&m_l_sys, "<T(x,y,r)>?(c)", "", "c == 0", 1.0f);
-	add_production(&m_l_sys, "<T(x,y,r)>", "T(x,y,R)", "r >= R", 1.0f);
+	add_production(&m_l_sys, "<T(x,y,r)>", "T(x,y,r)", "r >= R", 1.0f);
 	add_global_parameter(&m_l_sys, 'R', "5.0");
 	add_production(&m_l_sys, "<T(x,y,r)>?(c)", "T(x,y,r + 1.15*r)", NULL, 1.0f);
 	seed = (long int)time(NULL);
