@@ -20,7 +20,7 @@ GLWidget::~GLWidget()
 void GLWidget::initializeGL()
 {
 	initializeGLFunctions();
-	glClearColor(0.1, 0.1, 0.1, 0.0);
+	glClearColor(0.494f, 0.753f, 0.933f, 0.0f);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glEnable(GL_DEPTH_TEST);
@@ -113,16 +113,15 @@ void GLWidget::render_scene(int view_width, int view_height)
 	gluLookAt(	camera_position.x, camera_position.y, camera_position.z, 
 			camera_target.x, camera_target.y, camera_target.z,
 			0.0f, 1.0f, 0.0f);
-	glColor3f(1.0f, 0.0f, 0.0f);
 
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 	GLfloat light_pos[] = {0.0, 3.0, 1.0};
 	material wood_material = 
 	{
-		{0.115f, 0.0845f, 0.0815f},
-		{0.251f, 0.196f, 0.086f},
-		{0.0, 0.0f, 0.0f},
+		{0.620f, 0.455f, 0.259f},
+		{0.757f, 0.604f, 0.420f},
+		{0.0f, 0.0f, 0.0f},
 		2.0f
 	};
 	material leaf_material =
