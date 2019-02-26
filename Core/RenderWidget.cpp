@@ -8,6 +8,12 @@ GLWidget::GLWidget(QWidget* parent): QGLWidget(parent)
 	tree.fruit_mesh = create_mesh(2048*4096, 2048*4096);
 	camera_position = vec3{0.0f, 2.5f, 6.0f};
 	camera_target = vec3{0.0f, 2.5f, 0.0f};
+	//Ball init
+	Ball_Init(&tree_ball_data);
+	Ball_Init(&light_ball_data);
+	//Ball place
+	Ball_Place(&tree_ball_data, qOne, 1.0f);
+	Ball_Place(&light_ball_data, qOne, 1.0f);
 }
 
 GLWidget::~GLWidget()
@@ -110,17 +116,14 @@ void GLWidget::render_scene(int view_width, int view_height)
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
-	gluLookAt(	camera_position.x, camera_position.y, camera_position.z, 
-			camera_target.x, camera_target.y, camera_target.z,
-			0.0f, 1.0f, 0.0f);
 
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
-	GLfloat light_pos[] = {0.0, 3.0, 1.0};
+	GLfloat light_pos[] = {0.0, 0.0, 1.0, 0.0};
 	material wood_material = 
 	{
-		{0.620f, 0.455f, 0.259f},
-		{0.757f, 0.604f, 0.420f},
+		{0.420f, 0.355f, 0.159f},
+		{0.471f, 0.325f, 0.247f},
 		{0.0f, 0.0f, 0.0f},
 		2.0f
 	};
@@ -138,8 +141,21 @@ void GLWidget::render_scene(int view_width, int view_height)
 		{1.0f, 0.914f, 0.898f},
 		16.0f
 	};
+
+	GLfloat current_ball_value[16];
+	Ball_Value(&light_ball_data, current_ball_value);
+	glLoadIdentity();
+	glMultMatrixf(current_ball_value);
 	glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
 	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 180.0);
+	
+	glLoadIdentity();
+	glTranslatef(0.0f, -0.2f, -1.0f);
+	glTranslatef(translate_x,translate_y,translate_z);
+	//ball value
+	Ball_Value(&tree_ball_data, current_ball_value);
+	//glMultMatrixf
+	glMultMatrixf(current_ball_value);
 	if(branches.vertex_buffer)
 	{
 		set_material(&wood_material);
@@ -159,60 +175,93 @@ void GLWidget::render_scene(int view_width, int view_height)
 	glFlush();
 }
 
-void GLWidget::move_camera_up()
+void GLWidget::mousePressEvent(QMouseEvent* e)
 {
-	camera_position.y += 1.5;
-	parentWidget()->update();
-	update();
+	last_pressed_mouse_button = e->button();
+	float s_x = width();
+	float s_y = height();
+	HVect ball_vec;
+	ball_vec.x = (2.0f*e->x() - s_x)/s_x;
+	ball_vec.y = (s_y - 2.0f*e->y())/s_y;
+	//tree_ball_vec.y = (2.0f*e->y() - s)/s;
+	switch(last_pressed_mouse_button)
+	{
+		case Qt::LeftButton:
+			Ball_Mouse(&tree_ball_data, ball_vec);
+			Ball_BeginDrag(&tree_ball_data);
+			parentWidget()->update();
+			update();
+			break;
+		case Qt::RightButton:
+			last_x = ball_vec.x;
+			last_y = ball_vec.y;
+			parentWidget()->update();
+			update();
+			break;
+		case Qt::MiddleButton:
+			Ball_Mouse(&light_ball_data, ball_vec);
+			Ball_BeginDrag(&light_ball_data);
+			parentWidget()->update();
+			update();
+			break;
+	}
 }
 
-void GLWidget::move_camera_down()
+void GLWidget::mouseReleaseEvent(QMouseEvent* e)
 {
-	camera_position.y -= 1.5;
-	parentWidget()->update();
-	update();
+	switch(last_pressed_mouse_button)
+	{
+		case Qt::LeftButton:
+			Ball_EndDrag(&tree_ball_data);
+			parentWidget()->update();
+			update();
+			break;
+		case Qt::RightButton:
+			parentWidget()->update();
+			update();
+			break;
+		case Qt::MiddleButton:
+			Ball_EndDrag(&light_ball_data);
+			parentWidget()->update();
+			update();
+	}
 }
 
-void GLWidget::move_camera_left()
+void GLWidget::mouseMoveEvent(QMouseEvent* e)
 {
-	camera_position = rotate_about_axis(camera_position, vec3{0.0f, -1.0f, 0.0f}, 22.5f);
-	parentWidget()->update();
-	update();
+	float s_x = width();
+	float s_y = height();
+	HVect ball_vec;
+	ball_vec.x = (2.0f*e->x() - s_x)/s_x;
+	ball_vec.y = (s_y - 2.0f*e->y())/s_y;
+	switch(last_pressed_mouse_button)
+	{
+		case Qt::LeftButton:
+			Ball_Mouse(&tree_ball_data, ball_vec);
+			Ball_Update(&tree_ball_data);
+			parentWidget()->update();
+			update();
+			break;
+		case Qt::RightButton:
+			translate_x += ball_vec.x - last_x;
+			translate_y += ball_vec.y - last_y;
+			last_x = ball_vec.x;
+			last_y = ball_vec.y;
+			parentWidget()->update();
+			update();
+			break;
+		case Qt::MiddleButton:
+			Ball_Mouse(&light_ball_data, ball_vec);
+			Ball_Update(&light_ball_data);
+			parentWidget()->update();
+			update();
+			break;
+	}
 }
 
-void GLWidget::move_camera_right()
+void GLWidget::wheelEvent(QWheelEvent* e)
 {
-	camera_position = rotate_about_axis(camera_position, vec3{0.0f, 1.0f, 0.0f}, 22.5f);
-	parentWidget()->update();
-	update();
-}
-
-void GLWidget::move_camera_target_up()
-{
-	camera_target.y += 1.5f;
-	parentWidget()->update();
-	update();
-}
-
-void GLWidget::move_camera_target_down()
-{
-	camera_target.y -= 1.5f;
-	parentWidget()->update();
-	update();
-}
-
-void GLWidget::move_camera_forwards()
-{
-	vec3 forwards = normalise(camera_target - camera_position);
-	camera_position = camera_position + 2.0f*forwards;
-	parentWidget()->update();
-	update();
-}
-
-void GLWidget::move_camera_backwards()
-{
-	vec3 backwards = normalise(camera_position - camera_target);
-	camera_position = camera_position + 2.0f*backwards;
+	translate_z += 0.5f*(e->angleDelta().y()/120);
 	parentWidget()->update();
 	update();
 }

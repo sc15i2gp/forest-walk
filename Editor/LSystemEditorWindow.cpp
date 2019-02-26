@@ -213,6 +213,7 @@ void AppWindow::init()
 	simulation_interact_layout->addWidget(derive_button);
 	simulation_interact_layout->addWidget(reset_button);
 	layout->addLayout(simulation_interact_layout);
+	/*
 	layout->addLayout(camera_controls_layout);
 
 	QGridLayout* camera_move_grid = new QGridLayout;
@@ -238,7 +239,7 @@ void AppWindow::init()
 
 	camera_controls_layout->addLayout(camera_move_grid);
 	camera_controls_layout->addLayout(target_move_grid);
-	
+	*/
 	QBoxLayout* axiom_layout = new QBoxLayout(QBoxLayout::LeftToRight);
 	layout->addLayout(axiom_layout);
 	QLabel* axiom_label = new QLabel("Axiom:", this);
@@ -305,6 +306,7 @@ void AppWindow::init()
 	connect(derive_button, SIGNAL(clicked()), this, SLOT(update_render()));
 	connect(reset_button, SIGNAL(clicked()), this, SLOT(reset()));
 
+	/*
 	connect(camera_move_up, SIGNAL(clicked()), gl_widget, SLOT(move_camera_up()));
 	connect(camera_move_down, SIGNAL(clicked()), gl_widget, SLOT(move_camera_down()));
 	connect(camera_move_left, SIGNAL(clicked()), gl_widget, SLOT(move_camera_left()));
@@ -313,7 +315,7 @@ void AppWindow::init()
 	connect(camera_target_move_down, SIGNAL(clicked()), gl_widget, SLOT(move_camera_target_down()));
 	connect(camera_move_forwards, SIGNAL(clicked()), gl_widget, SLOT(move_camera_forwards()));
 	connect(camera_move_backwards, SIGNAL(clicked()), gl_widget, SLOT(move_camera_backwards()));
-
+*/
 	connect(add_production_button, SIGNAL(clicked()), this, SLOT(add_production_text_fields()));
 	connect(reload_productions_button, SIGNAL(clicked()), this, SLOT(reset_production_list()));
 

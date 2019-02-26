@@ -3,6 +3,8 @@
 #include <QWidget>
 #include <QGLFunctions>
 #include <GL/glu.h>
+#include <QMouseEvent>
+#include "Ball.h"
 #include "turtle.h"
 #include "mesh.h"
 
@@ -29,17 +31,10 @@ public:
 	~GLWidget();
 	
 	void load_tree_model(char*);
-
-public slots:	
-	void move_camera_up();
-	void move_camera_down();
-	void move_camera_left();
-	void move_camera_right();
-	
-	void move_camera_target_up();
-	void move_camera_target_down();
-	void move_camera_forwards();
-	void move_camera_backwards();
+	void mousePressEvent(QMouseEvent* e);
+	void mouseReleaseEvent(QMouseEvent* e);
+	void mouseMoveEvent(QMouseEvent* e);
+	void wheelEvent(QWheelEvent* e);
 
 signals:
 	void initialised();
@@ -63,5 +58,13 @@ private:
 	int view_height = 0;
 	vec3 camera_position;
 	vec3 camera_target;
+	BallData tree_ball_data;
+	BallData light_ball_data;
+	int last_pressed_mouse_button = -1;
+	float last_x = 0.0f;
+	float last_y = 0.0f;
+	float translate_x = 0.0f;
+	float translate_y = 0.0f;
+	float translate_z = 0.0f;
 };
 

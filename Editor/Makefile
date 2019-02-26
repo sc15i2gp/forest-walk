@@ -61,7 +61,10 @@ SOURCES       = main.cpp \
 		../Core/l_system.cpp \
 		LSystemWidget.cpp \
 		../Core/RenderWidget.cpp \
-		LSystemEditorWindow.cpp moc_LSystemWidget.cpp \
+		LSystemEditorWindow.cpp \
+		../Core/Ball.cpp \
+		../Core/BallMath.cpp \
+		../Core/BallAux.cpp moc_LSystemWidget.cpp \
 		moc_RenderWidget.cpp \
 		moc_LSystemEditorWindow.cpp
 OBJECTS       = main.o \
@@ -76,6 +79,9 @@ OBJECTS       = main.o \
 		LSystemWidget.o \
 		RenderWidget.o \
 		LSystemEditorWindow.o \
+		Ball.o \
+		BallMath.o \
+		BallAux.o \
 		moc_LSystemWidget.o \
 		moc_RenderWidget.o \
 		moc_LSystemEditorWindow.o
@@ -162,7 +168,10 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		../Core/l_system.h \
 		LSystemWidget.h \
 		../Core/RenderWidget.h \
-		LSystemEditorWindow.h main.cpp \
+		LSystemEditorWindow.h \
+		../Core/Ball.h \
+		../Core/BallMath.h \
+		../Core/BallAux.h main.cpp \
 		../Core/maths.cpp \
 		../Core/string_functions.cpp \
 		../Core/mesh.cpp \
@@ -173,7 +182,10 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		../Core/l_system.cpp \
 		LSystemWidget.cpp \
 		../Core/RenderWidget.cpp \
-		LSystemEditorWindow.cpp
+		LSystemEditorWindow.cpp \
+		../Core/Ball.cpp \
+		../Core/BallMath.cpp \
+		../Core/BallAux.cpp
 QMAKE_TARGET  = l_system_editor
 DESTDIR       = 
 TARGET        = l_system_editor
@@ -357,8 +369,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../Core/maths.h ../Core/string_functions.h ../Core/mesh.h ../Core/turtle.h ../Core/arithmetic_tokeniser.h ../Core/expression_evaluator.h ../Core/char_queue.h ../Core/l_system.h LSystemWidget.h ../Core/RenderWidget.h LSystemEditorWindow.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp ../Core/maths.cpp ../Core/string_functions.cpp ../Core/mesh.cpp ../Core/turtle.cpp ../Core/arithmetic_tokeniser.cpp ../Core/expression_evaluator.cpp ../Core/char_queue.cpp ../Core/l_system.cpp LSystemWidget.cpp ../Core/RenderWidget.cpp LSystemEditorWindow.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../Core/maths.h ../Core/string_functions.h ../Core/mesh.h ../Core/turtle.h ../Core/arithmetic_tokeniser.h ../Core/expression_evaluator.h ../Core/char_queue.h ../Core/l_system.h LSystemWidget.h ../Core/RenderWidget.h LSystemEditorWindow.h ../Core/Ball.h ../Core/BallMath.h ../Core/BallAux.h $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp ../Core/maths.cpp ../Core/string_functions.cpp ../Core/mesh.cpp ../Core/turtle.cpp ../Core/arithmetic_tokeniser.cpp ../Core/expression_evaluator.cpp ../Core/char_queue.cpp ../Core/l_system.cpp LSystemWidget.cpp ../Core/RenderWidget.cpp LSystemEditorWindow.cpp ../Core/Ball.cpp ../Core/BallMath.cpp ../Core/BallAux.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -562,6 +574,18 @@ LSystemEditorWindow.o: LSystemEditorWindow.cpp LSystemEditorWindow.h \
 		LSystemWidget.h \
 		../Core/RenderWidget.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o LSystemEditorWindow.o LSystemEditorWindow.cpp
+
+Ball.o: ../Core/Ball.cpp ../Core/Ball.h \
+		../Core/BallAux.h \
+		../Core/BallMath.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Ball.o ../Core/Ball.cpp
+
+BallMath.o: ../Core/BallMath.cpp ../Core/BallMath.h \
+		../Core/BallAux.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o BallMath.o ../Core/BallMath.cpp
+
+BallAux.o: ../Core/BallAux.cpp ../Core/BallAux.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o BallAux.o ../Core/BallAux.cpp
 
 moc_LSystemWidget.o: moc_LSystemWidget.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_LSystemWidget.o moc_LSystemWidget.cpp

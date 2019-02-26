@@ -3,5 +3,6 @@
 *.stash
 *.swp
 forest-walk
+Editor/l_system_editor
 gen_stack_code
 moc_*
