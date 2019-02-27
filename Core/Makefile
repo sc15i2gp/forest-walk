@@ -59,12 +59,10 @@ SOURCES       = main.cpp \
 		expression_evaluator.cpp \
 		char_queue.cpp \
 		l_system.cpp \
-		RenderWidget.cpp \
 		ForestWalkWindow.cpp \
 		ChartWidget.cpp \
 		multiset_l_system.cpp \
-		MLSystemWidget.cpp moc_RenderWidget.cpp \
-		moc_ChartWidget.cpp \
+		MLSystemWidget.cpp moc_ChartWidget.cpp \
 		moc_MLSystemWidget.cpp
 OBJECTS       = main.o \
 		maths.o \
@@ -75,12 +73,10 @@ OBJECTS       = main.o \
 		expression_evaluator.o \
 		char_queue.o \
 		l_system.o \
-		RenderWidget.o \
 		ForestWalkWindow.o \
 		ChartWidget.o \
 		multiset_l_system.o \
 		MLSystemWidget.o \
-		moc_RenderWidget.o \
 		moc_ChartWidget.o \
 		moc_MLSystemWidget.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
@@ -164,7 +160,6 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		expression_evaluator.h \
 		char_queue.h \
 		l_system.h \
-		RenderWidget.h \
 		ForestWalkWindow.h \
 		ChartWidget.h \
 		multiset_l_system.h \
@@ -177,7 +172,6 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		expression_evaluator.cpp \
 		char_queue.cpp \
 		l_system.cpp \
-		RenderWidget.cpp \
 		ForestWalkWindow.cpp \
 		ChartWidget.cpp \
 		multiset_l_system.cpp \
@@ -365,8 +359,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents maths.h string_functions.h mesh.h turtle.h arithmetic_tokeniser.h expression_evaluator.h char_queue.h l_system.h RenderWidget.h ForestWalkWindow.h ChartWidget.h multiset_l_system.h MLSystemWidget.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp maths.cpp string_functions.cpp mesh.cpp turtle.cpp arithmetic_tokeniser.cpp expression_evaluator.cpp char_queue.cpp l_system.cpp RenderWidget.cpp ForestWalkWindow.cpp ChartWidget.cpp multiset_l_system.cpp MLSystemWidget.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents maths.h string_functions.h mesh.h turtle.h arithmetic_tokeniser.h expression_evaluator.h char_queue.h l_system.h ForestWalkWindow.h ChartWidget.h multiset_l_system.h MLSystemWidget.h $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp maths.cpp string_functions.cpp mesh.cpp turtle.cpp arithmetic_tokeniser.cpp expression_evaluator.cpp char_queue.cpp l_system.cpp ForestWalkWindow.cpp ChartWidget.cpp multiset_l_system.cpp MLSystemWidget.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -397,20 +391,9 @@ compiler_moc_predefs_clean:
 moc_predefs.h: /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 	g++ -pipe -O2 -std=gnu++11 -Wall -W -dM -E -o moc_predefs.h /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: moc_RenderWidget.cpp moc_ChartWidget.cpp moc_MLSystemWidget.cpp
+compiler_moc_header_make_all: moc_ChartWidget.cpp moc_MLSystemWidget.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_RenderWidget.cpp moc_ChartWidget.cpp moc_MLSystemWidget.cpp
-moc_RenderWidget.cpp: turtle.h \
-		maths.h \
-		mesh.h \
-		string_functions.h \
-		polygon_stack.h \
-		turtle_stack.h \
-		RenderWidget.h \
-		moc_predefs.h \
-		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include ./moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/ip/Documents/forest-walk/Core -I/home/ip/Documents/forest-walk/Core -I/opt/local/include -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtOpenGL -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include RenderWidget.h -o moc_RenderWidget.cpp
-
+	-$(DEL_FILE) moc_ChartWidget.cpp moc_MLSystemWidget.cpp
 moc_ChartWidget.cpp: maths.h \
 		ChartWidget.h \
 		moc_predefs.h \
@@ -507,15 +490,6 @@ l_system.o: l_system.cpp l_system.h \
 		char_queue_stack.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o l_system.o l_system.cpp
 
-RenderWidget.o: RenderWidget.cpp RenderWidget.h \
-		turtle.h \
-		maths.h \
-		mesh.h \
-		string_functions.h \
-		polygon_stack.h \
-		turtle_stack.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o RenderWidget.o RenderWidget.cpp
-
 ForestWalkWindow.o: ForestWalkWindow.cpp ForestWalkWindow.h \
 		ChartWidget.h \
 		maths.h \
@@ -560,9 +534,6 @@ MLSystemWidget.o: MLSystemWidget.cpp MLSystemWidget.h \
 		char_queue.h \
 		char_queue_stack.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MLSystemWidget.o MLSystemWidget.cpp
-
-moc_RenderWidget.o: moc_RenderWidget.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_RenderWidget.o moc_RenderWidget.cpp
 
 moc_ChartWidget.o: moc_ChartWidget.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_ChartWidget.o moc_ChartWidget.cpp

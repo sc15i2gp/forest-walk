@@ -37,7 +37,7 @@ void MLSystemWidget::init_system()
 
 void MLSystemWidget::push_str_set_to_chart_and_render()
 {
-	for(int i = 0; i < m_l_sys.str_set_size; i++)
+	for(int i = 0; i < m_l_sys.max_str_set_size; i++)
 	{
 		char* str = get_str_from_set(&m_l_sys, i);
 		if(number_of_modules(str) > 1)

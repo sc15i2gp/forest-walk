@@ -4,12 +4,16 @@ m_l_system create_m_l_system(int str_set_max)
 {
 	m_l_system new_sys = {};
 	new_sys.str_set = (char*)malloc(SET_STR_MAX_SIZE*str_set_max);
+	new_sys.str_in_use = (bool*)malloc(sizeof(bool)*str_set_max);
+	memset(new_sys.str_in_use, 0, sizeof(bool)*str_set_max);
 	new_sys.str_set_size = 0;
+	new_sys.max_str_set_size = str_set_max;
 	return new_sys;
 }
 
 void destroy_m_l_system(m_l_system* m_l_sys)
 {
+	free(m_l_sys->str_in_use);
 	free(m_l_sys->str_set);
 }
 
@@ -39,12 +43,20 @@ char* get_str_from_set(m_l_system* m_l_sys, int index)
 void clear_str_set(m_l_system* m_l_sys)
 {
 	m_l_sys->str_set_size = 0;
+	memset(m_l_sys->str_in_use, 0, sizeof(bool)*m_l_sys->max_str_set_size);
 }
 
 void add_str(m_l_system* m_l_sys, float x, float y, float r, int c)
 {
-	snprintf(get_str_from_set(m_l_sys, m_l_sys->str_set_size), SET_STR_MAX_SIZE, "T(%f,%f,%f)?(%d)\0", x, y, r, c);
+	int i = 0;
+	for(; i < m_l_sys->max_str_set_size; i++)
+	{
+		if(!m_l_sys->str_in_use[i]) break;
+	}
+	if(i == m_l_sys->max_str_set_size) return;
+	snprintf(get_str_from_set(m_l_sys, i), SET_STR_MAX_SIZE, "T(%f,%f,%f)?(%d)\0", x, y, r, c);
 	m_l_sys->str_set_size++;
+	m_l_sys->str_in_use[i] = true;
 }
 
 bool trees_intersect(char* t, char* u)
@@ -75,19 +87,32 @@ void determine_dominated_tree(char* t, char* u)
 	else set_dominated_tree(u);
 }
 
+void remove_str_from_set(m_l_system* m_l_sys, int str_index)
+{
+	if(m_l_sys->str_in_use[str_index])
+	{
+		m_l_sys->str_in_use[str_index] = false;
+		m_l_sys->str_set_size--;
+	}
+}
+
 void derive_set(m_l_system* m_l_sys)
 {
+	printf("Number of trees: %d\n", m_l_sys->str_set_size);
 	//Grow/remove trees
-	for(int i = 0; i < m_l_sys->str_set_size; i++)
+	for(int i = 0; i < m_l_sys->max_str_set_size; i++)
 	{
-		char* str = get_str_from_set(m_l_sys, i);
-		derive_str((l_system*)m_l_sys, str);
+		if(m_l_sys->str_in_use[i])
+		{
+			char* str = get_str_from_set(m_l_sys, i);
+			derive_str((l_system*)m_l_sys, str);
+		}
 	}
 	//Check whether trees are dominated
-	for(int i = 0; i < m_l_sys->str_set_size; i++)
+	for(int i = 0; i < m_l_sys->max_str_set_size; i++)
 	{
 		char* str_0 = get_str_from_set(m_l_sys, i);
-		for(int j = i+1; j < m_l_sys->str_set_size; j++)
+		for(int j = i+1; j < m_l_sys->max_str_set_size; j++)
 		{
 			char* str_1 = get_str_from_set(m_l_sys, j);
 			if(number_of_modules(str_0) > 1 && number_of_modules(str_1) > 1)
@@ -99,4 +124,11 @@ void derive_set(m_l_system* m_l_sys)
 			}
 		}
 	}
+	//Remove "empty" strings from set
+	for(int i = 0; i < m_l_sys->max_str_set_size; i++)
+	{
+		char* str = get_str_from_set(m_l_sys, i);
+		if(number_of_modules(str) <= 1) remove_str_from_set(m_l_sys, i);
+	}
+	printf("Final number of trees: %d\n", m_l_sys->str_set_size);
 }
