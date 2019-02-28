@@ -1,14 +1,11 @@
 #pragma once
 #include "l_system.h"
+#include "str_set.h"
 
-#define SET_STR_MAX_SIZE 64
 struct m_l_system
 {
 	l_system base_sys;
-	char* str_set;
-	bool* str_in_use;
-	int str_set_size;
-	int max_str_set_size;
+	str_m_set str_set;
 };
 
 m_l_system create_m_l_system(int str_set_max); 

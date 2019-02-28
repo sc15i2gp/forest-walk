@@ -37,9 +37,10 @@ void MLSystemWidget::init_system()
 
 void MLSystemWidget::push_str_set_to_chart_and_render()
 {
-	for(int i = 0; i < m_l_sys.max_str_set_size; i++)
+	str_m_set* s = &(m_l_sys.str_set);
+	for(int i = 0; i < s->size(); i++)
 	{
-		char* str = get_str_from_set(&m_l_sys, i);
+		char* str = s->find_str(i);
 		if(number_of_modules(str) > 1)
 		{
 			float x = read_real_parameter_value(str, 0);
