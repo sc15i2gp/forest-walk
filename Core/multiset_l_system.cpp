@@ -169,6 +169,17 @@ void derive_set(m_l_system* m_l_sys)
 	{
 		if(m_l_sys->str_set.is_allocated(i)) derive_str((l_system*)m_l_sys, m_l_sys->str_set.find_str(i));
 	}
+	for(int i = 0; i < m_l_sys->str_set.size(); i++)
+	{
+		if(m_l_sys->str_set.is_allocated(i))
+		{
+			int index = -1;
+			char* new_str = m_l_sys->str_set.find_str_and_alloc(&index);
+			new_str[0] = 0;
+			prune_branches(m_l_sys->str_set.find_str(i),new_str);
+			if(strlen(new_str) == 0) m_l_sys->str_set.free(index);
+		}
+	}
 	tree_domination_check(m_l_sys);
 	remove_dead_trees(m_l_sys);
 	printf("Final number of trees in str set: %d\n", m_l_sys->str_set.number_allocated());

@@ -37,4 +37,4 @@ bool module_strings_match(char*,char*); //Used for comparing context strings
 
 //Branched string functions
 char* find_end_of_branch(char*); 
-void prune_branches(char*); 
+void prune_branches(char*,char* = NULL); 

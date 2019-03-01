@@ -340,7 +340,7 @@ char* find_end_of_branch(char* branch)
 	return branch;
 }
 
-void prune_branches(char* branched_str)
+void prune_branches(char* branched_str, char* dest)
 {
 	char* module = branched_str;
 	int str_length = number_of_modules(branched_str);
@@ -358,6 +358,16 @@ void prune_branches(char* branched_str)
 				if(branch_depth == 0) break;
 				length_to_prune += length_of_module(branch_end);
 				branch_end = find_next_module(branch_end);
+			}
+			if(dest)
+			{
+				memcpy(dest, module+1, length_to_prune-1);
+				dest[length_to_prune] = 0;
+			}
+			if(*(module-1) == '[')
+			{
+				module--;
+				length_to_prune += 2;
 			}
 			overwrite_string(module, "", 0, length_to_prune);
 		}
