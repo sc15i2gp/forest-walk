@@ -4,11 +4,13 @@ m_l_system create_m_l_system(int str_set_max)
 {
 	m_l_system new_sys = {};
 	new_sys.str_set = create_str_m_set(str_set_max);
+	new_sys.t_grid = create_tree_grid(str_set_max);
 	return new_sys;
 }
 
 void destroy_m_l_system(m_l_system* m_l_sys)
 {
+	destroy_tree_grid(&m_l_sys->t_grid);
 	destroy_str_m_set(&m_l_sys->str_set);
 }
 
@@ -25,6 +27,7 @@ void add_global_parameter(m_l_system* m_l_sys, char token, char* initial_val)
 void clear_str_set(m_l_system* m_l_sys)
 {
 	m_l_sys->str_set.free_all();
+	m_l_sys->t_grid.remove_all_trees();
 }
 
 bool trees_intersect(char* t, char* u)
@@ -92,14 +95,49 @@ void check_for_tree_intersection(m_l_system* m_l_sys, int t_0, int t_1)
 	}
 }
 
+void check_grid_buckets_for_intersections(m_l_system* m_l_sys, tree_node* b_0, tree_node* b_1)
+{
+	for(tree_node* bucket_0 = b_0; bucket_0; bucket_0 = bucket_0->next)
+	{
+		for(tree_node* bucket_1 = b_1; bucket_1; bucket_1 = bucket_1->next)
+		{
+			if(bucket_0->str_ref != bucket_1->str_ref)
+			{
+				check_for_tree_intersection(m_l_sys, bucket_0->str_ref, bucket_1->str_ref);
+			}
+		}
+	}
+}
+
 void tree_domination_check(m_l_system* m_l_sys)
 {
+	/*
 	//Check whether trees are dominated
 	for(int i = 0; i < m_l_sys->str_set.size(); i++)
 	{
 		for(int j = i+1; j < m_l_sys->str_set.size(); j++)
 		{
 			check_for_tree_intersection(m_l_sys, i,j);
+		}
+	}
+	*/
+	for(int y_0 = 0; y_0 < m_l_sys->t_grid.height(); y_0++)
+	{
+		for(int x_0 = 0; x_0 < m_l_sys->t_grid.width(); x_0++)
+		{
+			for(int y_1 = y_0-1; y_1 < y_0+2; y_1++)
+			{
+				for(int x_1 = x_0-1; x_1 < x_0+2; x_1++)
+				{
+					if(	x_1 >= 0 && x_1 < m_l_sys->t_grid.width() &&
+						y_1 >= 0 && y_1 < m_l_sys->t_grid.height())
+					{
+						tree_node* b_0 = m_l_sys->t_grid.bucket(x_0, y_0);
+						tree_node* b_1 = m_l_sys->t_grid.bucket(x_1, y_1);
+						check_grid_buckets_for_intersections(m_l_sys, b_0, b_1);
+					}
+				}
+			}
 		}
 	}
 }
@@ -110,7 +148,7 @@ void add_str(m_l_system* m_l_sys, float x, float y, float r, int c)
 	char* str = m_l_sys->str_set.find_str_and_alloc(&str_index);
 	assert(str);
 	snprintf(str, SET_STR_MAX_SIZE, "T(%f,%f,%f)?(%d)\0", x, y, r, c);
-	//m_l_sys->t_grid.insert_tree(str_index, x, y);
+	m_l_sys->t_grid.insert_tree(str_index, x, y);
 	tree_domination_check(m_l_sys, str_index);//Only go through current string set once for added string
 }
 
@@ -122,7 +160,7 @@ void remove_dead_trees(m_l_system* m_l_sys)
 		char* str = m_l_sys->str_set.find_str(i);
 		if(number_of_modules(str) <= 1)
 		{
-			//m_l_sys->t_grid.remove_tree(i);
+			m_l_sys->t_grid.remove_tree(i);
 			m_l_sys->str_set.free(i);
 		}
 	}
@@ -130,7 +168,8 @@ void remove_dead_trees(m_l_system* m_l_sys)
 
 void derive_set(m_l_system* m_l_sys)
 {
-	printf("Number of trees: %d\n", m_l_sys->str_set.number_allocated());
+	printf("Number of trees in str set: %d\n", m_l_sys->str_set.number_allocated());
+	printf("Number of trees in grid: %d\n", m_l_sys->t_grid.number_of_trees());
 	//Derive strs in str_set
 	for(int i = 0; i < m_l_sys->str_set.size(); i++)
 	{
@@ -138,5 +177,6 @@ void derive_set(m_l_system* m_l_sys)
 	}
 	tree_domination_check(m_l_sys);
 	remove_dead_trees(m_l_sys);
-	printf("Final number of trees: %d\n", m_l_sys->str_set.number_allocated());
+	printf("Final number of trees in str set: %d\n", m_l_sys->str_set.number_allocated());
+	printf("Final number of trees in grid: %d\n", m_l_sys->t_grid.number_of_trees());
 }

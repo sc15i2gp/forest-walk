@@ -1,12 +1,13 @@
 #pragma once
 #include "l_system.h"
 #include "str_set.h"
+#include "tree_grid.h"
 
 struct m_l_system
 {
 	l_system base_sys;
 	str_m_set str_set;
-	//tree_grid t_grid;
+	tree_grid t_grid;
 };
 
 m_l_system create_m_l_system(int str_set_max); 

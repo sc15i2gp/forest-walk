@@ -63,7 +63,8 @@ SOURCES       = main.cpp \
 		ChartWidget.cpp \
 		multiset_l_system.cpp \
 		MLSystemWidget.cpp \
-		str_set.cpp moc_ChartWidget.cpp \
+		str_set.cpp \
+		tree_grid.cpp moc_ChartWidget.cpp \
 		moc_MLSystemWidget.cpp
 OBJECTS       = main.o \
 		maths.o \
@@ -79,6 +80,7 @@ OBJECTS       = main.o \
 		multiset_l_system.o \
 		MLSystemWidget.o \
 		str_set.o \
+		tree_grid.o \
 		moc_ChartWidget.o \
 		moc_MLSystemWidget.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
@@ -166,7 +168,8 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		ChartWidget.h \
 		multiset_l_system.h \
 		MLSystemWidget.h \
-		str_set.h main.cpp \
+		str_set.h \
+		tree_grid.h main.cpp \
 		maths.cpp \
 		string_functions.cpp \
 		mesh.cpp \
@@ -179,7 +182,8 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		ChartWidget.cpp \
 		multiset_l_system.cpp \
 		MLSystemWidget.cpp \
-		str_set.cpp
+		str_set.cpp \
+		tree_grid.cpp
 QMAKE_TARGET  = forest-walk
 DESTDIR       = 
 TARGET        = forest-walk
@@ -363,8 +367,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents maths.h string_functions.h mesh.h turtle.h arithmetic_tokeniser.h expression_evaluator.h char_queue.h l_system.h ForestWalkWindow.h ChartWidget.h multiset_l_system.h MLSystemWidget.h str_set.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp maths.cpp string_functions.cpp mesh.cpp turtle.cpp arithmetic_tokeniser.cpp expression_evaluator.cpp char_queue.cpp l_system.cpp ForestWalkWindow.cpp ChartWidget.cpp multiset_l_system.cpp MLSystemWidget.cpp str_set.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents maths.h string_functions.h mesh.h turtle.h arithmetic_tokeniser.h expression_evaluator.h char_queue.h l_system.h ForestWalkWindow.h ChartWidget.h multiset_l_system.h MLSystemWidget.h str_set.h tree_grid.h $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp maths.cpp string_functions.cpp mesh.cpp turtle.cpp arithmetic_tokeniser.cpp expression_evaluator.cpp char_queue.cpp l_system.cpp ForestWalkWindow.cpp ChartWidget.cpp multiset_l_system.cpp MLSystemWidget.cpp str_set.cpp tree_grid.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -416,6 +420,7 @@ moc_MLSystemWidget.cpp: ChartWidget.h \
 		char_queue.h \
 		char_queue_stack.h \
 		str_set.h \
+		tree_grid.h \
 		MLSystemWidget.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
@@ -448,7 +453,8 @@ main.o: main.cpp ForestWalkWindow.h \
 		arithmetic_token_stack.h \
 		char_queue.h \
 		char_queue_stack.h \
-		str_set.h
+		str_set.h \
+		tree_grid.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 maths.o: maths.cpp maths.h
@@ -509,7 +515,8 @@ ForestWalkWindow.o: ForestWalkWindow.cpp ForestWalkWindow.h \
 		arithmetic_token_stack.h \
 		char_queue.h \
 		char_queue_stack.h \
-		str_set.h
+		str_set.h \
+		tree_grid.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ForestWalkWindow.o ForestWalkWindow.cpp
 
 ChartWidget.o: ChartWidget.cpp ChartWidget.h \
@@ -526,7 +533,8 @@ multiset_l_system.o: multiset_l_system.cpp multiset_l_system.h \
 		arithmetic_token_stack.h \
 		char_queue.h \
 		char_queue_stack.h \
-		str_set.h
+		str_set.h \
+		tree_grid.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o multiset_l_system.o multiset_l_system.cpp
 
 MLSystemWidget.o: MLSystemWidget.cpp MLSystemWidget.h \
@@ -541,11 +549,15 @@ MLSystemWidget.o: MLSystemWidget.cpp MLSystemWidget.h \
 		arithmetic_token_stack.h \
 		char_queue.h \
 		char_queue_stack.h \
-		str_set.h
+		str_set.h \
+		tree_grid.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MLSystemWidget.o MLSystemWidget.cpp
 
 str_set.o: str_set.cpp str_set.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o str_set.o str_set.cpp
+
+tree_grid.o: tree_grid.cpp tree_grid.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o tree_grid.o tree_grid.cpp
 
 moc_ChartWidget.o: moc_ChartWidget.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_ChartWidget.o moc_ChartWidget.cpp
