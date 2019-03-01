@@ -66,21 +66,6 @@ void remove_str_from_set(m_l_system* m_l_sys, int str_index)
 	}
 }
 
-void tree_domination_check(m_l_system* m_l_sys, int tree)
-{
-	char* str_0 = m_l_sys->str_set.find_str(tree);
-	for(int i = 0; i < m_l_sys->str_set.size(); i++)
-	{
-		if(i != tree && m_l_sys->str_set.is_allocated(i))
-		{
-			char* str_1 = m_l_sys->str_set.find_str(i);
-			if(trees_intersect(str_0, str_1))
-			{
-				determine_dominated_tree(str_0, str_1);
-			}
-		}
-	}
-}
 
 void check_for_tree_intersection(m_l_system* m_l_sys, int t_0, int t_1)
 {
@@ -95,49 +80,58 @@ void check_for_tree_intersection(m_l_system* m_l_sys, int t_0, int t_1)
 	}
 }
 
+void check_grid_nodes_for_intersection(m_l_system* m_l_sys, tree_node* n_0, tree_node* n_1)
+{	
+	if(n_0->str_ref != n_1->str_ref)
+	{
+		check_for_tree_intersection(m_l_sys, n_0->str_ref, n_1->str_ref);
+	}
+}
+
 void check_grid_buckets_for_intersections(m_l_system* m_l_sys, tree_node* b_0, tree_node* b_1)
 {
 	for(tree_node* bucket_0 = b_0; bucket_0; bucket_0 = bucket_0->next)
 	{
 		for(tree_node* bucket_1 = b_1; bucket_1; bucket_1 = bucket_1->next)
 		{
-			if(bucket_0->str_ref != bucket_1->str_ref)
+			check_grid_nodes_for_intersection(m_l_sys, bucket_0, bucket_1);
+		}
+	}
+}
+
+
+void tree_domination_check(m_l_system* m_l_sys, int x_0, int y_0)
+{
+	for(int y_1 = y_0-1; y_1 < y_0+2; y_1++)
+	{
+		for(int x_1 = x_0-1; x_1 < x_0+2; x_1++)
+		{
+			if(	x_1 >= 0 && x_1 < m_l_sys->t_grid.width() &&
+				y_1 >= 0 && y_1 < m_l_sys->t_grid.height())
 			{
-				check_for_tree_intersection(m_l_sys, bucket_0->str_ref, bucket_1->str_ref);
+				tree_node* b_0 = m_l_sys->t_grid.bucket(x_0, y_0);
+				tree_node* b_1 = m_l_sys->t_grid.bucket(x_1, y_1);
+				check_grid_buckets_for_intersections(m_l_sys, b_0, b_1);
 			}
 		}
 	}
 }
 
+void tree_domination_check(m_l_system* m_l_sys, int tree)
+{
+	tree_node* t = m_l_sys->t_grid.find_node(tree);
+	int x_0 = t->x;
+	int y_0 = t->y;
+	tree_domination_check(m_l_sys, x_0, y_0);
+}
+
 void tree_domination_check(m_l_system* m_l_sys)
 {
-	/*
-	//Check whether trees are dominated
-	for(int i = 0; i < m_l_sys->str_set.size(); i++)
-	{
-		for(int j = i+1; j < m_l_sys->str_set.size(); j++)
-		{
-			check_for_tree_intersection(m_l_sys, i,j);
-		}
-	}
-	*/
 	for(int y_0 = 0; y_0 < m_l_sys->t_grid.height(); y_0++)
 	{
 		for(int x_0 = 0; x_0 < m_l_sys->t_grid.width(); x_0++)
 		{
-			for(int y_1 = y_0-1; y_1 < y_0+2; y_1++)
-			{
-				for(int x_1 = x_0-1; x_1 < x_0+2; x_1++)
-				{
-					if(	x_1 >= 0 && x_1 < m_l_sys->t_grid.width() &&
-						y_1 >= 0 && y_1 < m_l_sys->t_grid.height())
-					{
-						tree_node* b_0 = m_l_sys->t_grid.bucket(x_0, y_0);
-						tree_node* b_1 = m_l_sys->t_grid.bucket(x_1, y_1);
-						check_grid_buckets_for_intersections(m_l_sys, b_0, b_1);
-					}
-				}
-			}
+			tree_domination_check(m_l_sys, x_0, y_0);
 		}
 	}
 }
@@ -158,7 +152,7 @@ void remove_dead_trees(m_l_system* m_l_sys)
 	for(int i = 0; i < m_l_sys->str_set.size(); i++)
 	{
 		char* str = m_l_sys->str_set.find_str(i);
-		if(number_of_modules(str) <= 1)
+		if(m_l_sys->str_set.is_allocated(i) && number_of_modules(str) <= 1)
 		{
 			m_l_sys->t_grid.remove_tree(i);
 			m_l_sys->str_set.free(i);

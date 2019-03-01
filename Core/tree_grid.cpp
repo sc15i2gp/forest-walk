@@ -34,6 +34,15 @@ tree_node* tree_grid::find_available_node()
 	return node;
 }
 
+tree_node* tree_grid::find_node(int t)
+{
+	for(int i = 0; i < node_array_size; i++)
+	{
+		if(node_array[i].str_ref == t && node_array[i].in_use) return node_array+i;
+	}
+	return NULL;
+}
+
 void tree_grid::insert_tree(int str_ref, float f_x, float f_y)
 {
 	int x = f_x/20;
@@ -59,18 +68,11 @@ void tree_grid::insert_tree(int str_ref, float f_x, float f_y)
 
 void tree_grid::remove_tree(int str_ref)
 {
-	tree_node* node = node_array;
-	for(int i = 0; i < node_array_size; i++, node++)
-	{
-		if(node->str_ref == str_ref && node->in_use)
-		{
-			node->in_use = false;
-			if(node->previous) node->previous->next = node->next;
-			else node_grid[node->y][node->x] = node->next;
-			if(node->next) node->next->previous = node->previous;
-			break;
-		}
-	}
+	tree_node* node = find_node(str_ref);
+	node->in_use = false;
+	if(node->previous) node->previous->next = node->next;
+	else node_grid[node->y][node->x] = node->next;
+	if(node->next) node->next->previous = node->previous;
 }
 
 void tree_grid::remove_all_trees()

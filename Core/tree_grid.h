@@ -23,6 +23,7 @@ struct tree_grid
 	int node_array_size;
 	tree_node*** node_grid;
 	tree_node* find_available_node();
+	tree_node* find_node(int);
 	void insert_tree(int,float,float);
 	void remove_tree(int);
 	void remove_all_trees();
