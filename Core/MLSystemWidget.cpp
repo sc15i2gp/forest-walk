@@ -41,14 +41,17 @@ void MLSystemWidget::push_str_set_to_chart_and_render()
 	str_m_set* s = &(m_l_sys.str_set);
 	for(int i = 0; i < s->size(); i++)
 	{
-		char* str = s->find_str(i);
-		if(number_of_modules(str) > 1)
+		if(s->is_allocated(i))
 		{
-			float x = read_real_parameter_value(str, 0);
-			float y = read_real_parameter_value(str, 1);
-			float r = read_real_parameter_value(str, 2);
-			int c = (int)read_real_parameter_value(find_next_module(str));
-			chart->push_point(x,y,r,c);
+			char* str = s->find_str(i);
+			if(number_of_modules(str) > 1)
+			{
+				float x = read_real_parameter_value(str, 0);
+				float y = read_real_parameter_value(str, 1);
+				float r = read_real_parameter_value(str, 2);
+				int c = (int)read_real_parameter_value(find_next_module(str));
+				chart->push_point(x,y,r,c);
+			}
 		}
 	}
 	parentWidget()->update();

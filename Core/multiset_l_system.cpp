@@ -55,7 +55,7 @@ void determine_dominated_tree(char* t, char* u)
 	float t_r = read_real_parameter_value(t, 2);
 	float u_r = read_real_parameter_value(u, 2);
 	if(t_r < u_r) set_dominated_tree(t);
-	else set_dominated_tree(u);
+	else if(u_r < t_r) set_dominated_tree(u);
 }
 
 void remove_str_from_set(m_l_system* m_l_sys, int str_index)
@@ -160,15 +160,32 @@ void remove_dead_trees(m_l_system* m_l_sys)
 	}
 }
 
+void generate_propagation_vector(m_l_system* m_l_sys, int parent)
+{
+	//Get parent position
+	//Generate random position within 10 of parent position in random direction
+	//If within bounds
+	//	Set global paremeters v and w to new position x and y respectively
+	//Else
+	//	Set global parameters v and w to parent position + constant vector
+	//Generate random radius
+	//Set global parameter t to radius
+}
+
 void derive_set(m_l_system* m_l_sys)
 {
+	m_l_sys->str_set.print();
 	printf("Number of trees in str set: %d\n", m_l_sys->str_set.number_allocated());
 	printf("Number of trees in grid: %d\n", m_l_sys->t_grid.number_of_trees());
 	//Derive strs in str_set
 	for(int i = 0; i < m_l_sys->str_set.size(); i++)
 	{
+		//Generate position within a radius of 10.0f of the current str
+		//If out of bounds, use a default vector
+		generate_propagation_vector(m_l_sys, i);
 		if(m_l_sys->str_set.is_allocated(i)) derive_str((l_system*)m_l_sys, m_l_sys->str_set.find_str(i));
 	}
+	//Prune branched strings
 	for(int i = 0; i < m_l_sys->str_set.size(); i++)
 	{
 		if(m_l_sys->str_set.is_allocated(i))
@@ -177,7 +194,18 @@ void derive_set(m_l_system* m_l_sys)
 			char* new_str = m_l_sys->str_set.find_str_and_alloc(&index);
 			new_str[0] = 0;
 			prune_branches(m_l_sys->str_set.find_str(i),new_str);
-			if(strlen(new_str) == 0) m_l_sys->str_set.free(index);
+			if(strlen(new_str) == 0)
+			{
+				new_str[0] = 0;
+				m_l_sys->str_set.free(index);
+			}
+			else
+			{
+				//Get new str x and y
+				float x = read_real_parameter_value(new_str, 0);
+				float y = read_real_parameter_value(new_str, 1);
+				m_l_sys->t_grid.insert_tree(index, x, y);
+			}
 		}
 	}
 	tree_domination_check(m_l_sys);

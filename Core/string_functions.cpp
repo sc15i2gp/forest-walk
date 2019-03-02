@@ -362,7 +362,7 @@ void prune_branches(char* branched_str, char* dest)
 			if(dest)
 			{
 				memcpy(dest, module+1, length_to_prune-1);
-				dest[length_to_prune] = 0;
+				dest[length_to_prune-1] = 0;
 			}
 			if(*(module-1) == '[')
 			{
