@@ -21,6 +21,7 @@ public slots:
 private:
 	void push_str_set_to_chart_and_render();
 	long int seed;
+	int forest_length;
 	ChartGLWidget* chart;
 	m_l_system m_l_sys;
 };

@@ -1,24 +1,27 @@
 #include "tree_grid.h"
 
-tree_grid create_tree_grid(int node_array_size)
+tree_grid create_tree_grid(int node_array_size, int grid_area_length)
 {
 	tree_grid new_grid = {};
 	new_grid.node_array = (tree_node*)malloc(sizeof(tree_node)*node_array_size);
 	new_grid.node_array_size = node_array_size;
 	memset(new_grid.node_array, 0, sizeof(tree_node)*node_array_size);
 
-	new_grid.node_grid = (tree_node***)malloc(sizeof(tree_node**)*20);
-	for(int i = 0; i < 20; i++)
+	int num_nodes_in_length = grid_area_length/BUCKET_LENGTH;
+	new_grid.grid_area_length = grid_area_length;
+	new_grid.node_grid = (tree_node***)malloc(sizeof(tree_node**)*num_nodes_in_length);
+	for(int i = 0; i < num_nodes_in_length; i++)
 	{//For each node row in grid
-		new_grid.node_grid[i] = (tree_node**)malloc(sizeof(tree_node*)*20);
-		memset(new_grid.node_grid[i], 0, sizeof(tree_node*)*20);
+		new_grid.node_grid[i] = (tree_node**)malloc(sizeof(tree_node*)*num_nodes_in_length);
+		memset(new_grid.node_grid[i], 0, sizeof(tree_node*)*num_nodes_in_length);
 	}
 	return new_grid;
 }
 
 void destroy_tree_grid(tree_grid* t)
 {
-	for(int i = 19; i >= 0; i--)
+	int num_nodes_in_length = t->grid_area_length/BUCKET_LENGTH;
+	for(int i = num_nodes_in_length-1; i >= 0; i--)
 	{
 		free(t->node_grid[i]);
 	}
@@ -45,8 +48,8 @@ tree_node* tree_grid::find_node(int t)
 
 void tree_grid::insert_tree(int str_ref, float f_x, float f_y)
 {
-	int x = f_x/20;
-	int y = f_y/20;
+	int x = f_x/BUCKET_LENGTH;
+	int y = f_y/BUCKET_LENGTH;
 	
 	tree_node** node_loc = &(node_grid[y][x]);
 	tree_node* previous = NULL;
@@ -55,6 +58,7 @@ void tree_grid::insert_tree(int str_ref, float f_x, float f_y)
 		previous = *node_loc;
 		node_loc = &((*node_loc)->next);
 	}
+
 
 	tree_node* new_tree_node = find_available_node();
 	new_tree_node->str_ref = str_ref;
@@ -77,9 +81,10 @@ void tree_grid::remove_tree(int str_ref)
 
 void tree_grid::remove_all_trees()
 {
-	for(int i = 0; i < 20; i++)
+	int num_nodes_in_length = grid_area_length/BUCKET_LENGTH;
+	for(int i = 0; i < num_nodes_in_length; i++)
 	{
-		for(int j = 0; j < 20; j++)
+		for(int j = 0; j < num_nodes_in_length; j++)
 		{
 			node_grid[i][j] = NULL;
 		}
@@ -100,12 +105,12 @@ int tree_grid::number_of_trees()
 
 int tree_grid::height()
 {
-	return 20;
+	return grid_area_length/BUCKET_LENGTH;
 }
 
 int tree_grid::width()
 {
-	return 20;
+	return grid_area_length/BUCKET_LENGTH;
 }
 
 tree_node* tree_grid::bucket(int x, int y)
@@ -116,9 +121,10 @@ tree_node* tree_grid::bucket(int x, int y)
 int tree_grid::number_of_used_buckets()
 {
 	int total = 0;
-	for(int y = 0; y < 20; y++)
+	int num_nodes_in_length = grid_area_length/BUCKET_LENGTH;
+	for(int y = 0; y < num_nodes_in_length; y++)
 	{
-		for(int x = 0; x < 20; x++)
+		for(int x = 0; x < num_nodes_in_length; x++)
 		{
 			if(bucket(x,y)) total++;
 		}

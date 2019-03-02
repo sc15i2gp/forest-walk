@@ -7,6 +7,8 @@
 //grid row width = 20 node pts
 //grid height = 20 rows
 
+#define BUCKET_LENGTH 20
+
 struct tree_node
 {
 	bool in_use;
@@ -21,6 +23,7 @@ struct tree_grid
 {
 	tree_node* node_array;
 	int node_array_size;
+	int grid_area_length;
 	tree_node*** node_grid;
 	tree_node* find_available_node();
 	tree_node* find_node(int);
@@ -34,5 +37,5 @@ struct tree_grid
 	int number_of_used_buckets();
 };
 
-tree_grid create_tree_grid(int);
+tree_grid create_tree_grid(int,int);
 void destroy_tree_grid(tree_grid*);

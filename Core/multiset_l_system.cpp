@@ -1,10 +1,10 @@
 #include "multiset_l_system.h"
 
-m_l_system create_m_l_system(int str_set_max)
+m_l_system create_m_l_system(int str_set_max, int forest_length)
 {
 	m_l_system new_sys = {};
 	new_sys.str_set = create_str_m_set(str_set_max);
-	new_sys.t_grid = create_tree_grid(str_set_max);
+	new_sys.t_grid = create_tree_grid(str_set_max, forest_length);
 	return new_sys;
 }
 
@@ -176,15 +176,29 @@ vec3 generate_vector_within_radius(vec3 center, float r_max)
 void generate_propagation_vector(m_l_system* m_l_sys, int parent)
 {
 	char* p_str = m_l_sys->str_set.find_str(parent);
+	int species = read_real_parameter_value(p_str, 0);
 	vec3 p_pos;
 	p_pos.x = read_real_parameter_value(p_str, 1);
 	p_pos.y = read_real_parameter_value(p_str, 2);
-	vec3 new_pos = generate_vector_within_radius(p_pos, 10.0f);
+	float propagation_radius = 0.0f;
+	switch(species)
+	{
+		case PINE:
+			propagation_radius = 10.0f;
+			break;
+		case BIRCH:
+			propagation_radius = 15.0f;
+			break;
+		case ROWAN:
+			propagation_radius = 50.0f;
+			break;
+	}
+	vec3 new_pos = generate_vector_within_radius(p_pos, propagation_radius);
 	char v[8] = {};
 	char w[8] = {};
 	char t[8] = {};
-	if(	new_pos.x < 0.0f || new_pos.x > 400.0f ||
-		new_pos.y < 0.0f || new_pos.y > 400.0f)
+	if(	new_pos.x < 0.0f || new_pos.x > m_l_sys->t_grid.grid_area_length ||
+		new_pos.y < 0.0f || new_pos.y > m_l_sys->t_grid.grid_area_length)
 	{//If new_pos is out of bounds	
 		new_pos = p_pos; //Set it to parent's position so it will immediately be removed through domination
 	}
@@ -196,6 +210,26 @@ void generate_propagation_vector(m_l_system* m_l_sys, int parent)
 	set_global_parameter((l_system*)m_l_sys, 'v', v);
 	set_global_parameter((l_system*)m_l_sys, 'w', w);
 	set_global_parameter((l_system*)m_l_sys, 't', t);
+}
+
+void apply_species_transformation_to_l_system(m_l_system* m_l_sys, int tree)
+{
+	int species = read_real_parameter_value(m_l_sys->str_set.find_str(tree), 0);
+	switch(species)
+	{
+		case PINE:
+			set_global_parameter((l_system*)m_l_sys, 'R', "6");
+			set_global_parameter((l_system*)m_l_sys, 'G', "1.4");
+			break;
+		case BIRCH:
+			set_global_parameter((l_system*)m_l_sys, 'R', "3");
+			set_global_parameter((l_system*)m_l_sys, 'G', "2.0");
+			break;
+		case ROWAN:
+			set_global_parameter((l_system*)m_l_sys, 'R', "2.0");
+			set_global_parameter((l_system*)m_l_sys, 'G', "1.389");
+			break;
+	}
 }
 
 void derive_set(m_l_system* m_l_sys)
@@ -210,6 +244,7 @@ void derive_set(m_l_system* m_l_sys)
 		if(m_l_sys->str_set.is_allocated(i))
 		{
 			generate_propagation_vector(m_l_sys, i);
+			apply_species_transformation_to_l_system(m_l_sys, i);
 			derive_str((l_system*)m_l_sys, m_l_sys->str_set.find_str(i));
 		}
 	}
