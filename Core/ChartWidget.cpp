@@ -69,21 +69,39 @@ void ChartGLWidget::clear_points()
 	number_of_points = 0;
 }
 
-void ChartGLWidget::push_point(float x, float y, float r, int c)
+void ChartGLWidget::push_point(float x, float y, float r, int c, int s)
 {
 	point* p = points + number_of_points;
 	p->x = x;
 	p->y = y;
 	p->r = r;
 	p->c = c;
+	p->s = s;
 	number_of_points++;
 }
 
 void ChartGLWidget::render_circle(point* p)
 {	
 	vec3 colour; 
-	if(p->c > 0) colour = {0.508f,0.8f,0.13f};
-	else colour = {1.0f, 0.0f, 0.2f};
+	if(p->c == 0) 
+	{
+		colour = {1.0f, 0.0f, 0.2f};
+	}
+	else
+	{
+		switch(p->s)
+		{
+			case 0:
+				colour = {0.004f,0.475f,0.435f};
+				break;
+			case 1:
+				colour = {0.508f,0.8f,0.13f};
+				break;
+			case 2:
+				colour = {1.0f,0.412f,0.706f};
+				break;
+		}
+	}
 	glPushMatrix();
 	glTranslatef(p->x, p->y, 0.0f);
 	glBindTexture(GL_TEXTURE_2D, texture_buffer);

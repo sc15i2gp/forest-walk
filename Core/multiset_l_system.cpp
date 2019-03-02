@@ -32,12 +32,12 @@ void clear_str_set(m_l_system* m_l_sys)
 
 bool trees_intersect(char* t, char* u)
 {
-	float t_x = read_real_parameter_value(t, 0);
-	float t_y = read_real_parameter_value(t, 1);
-	float t_r = read_real_parameter_value(t, 2);
-	float u_x = read_real_parameter_value(u, 0);
-	float u_y = read_real_parameter_value(u, 1);
-	float u_r = read_real_parameter_value(u, 2);
+	float t_x = read_real_parameter_value(t, 1);
+	float t_y = read_real_parameter_value(t, 2);
+	float t_r = read_real_parameter_value(t, 3);
+	float u_x = read_real_parameter_value(u, 1);
+	float u_y = read_real_parameter_value(u, 2);
+	float u_r = read_real_parameter_value(u, 3);
 
 	float dist = sqrt((t_x - u_x)*(t_x - u_x) + (t_y - u_y)*(t_y - u_y));
 	float total_radius = t_r + u_r;
@@ -52,8 +52,8 @@ void set_dominated_tree(char* t)
 
 void determine_dominated_tree(char* t, char* u)
 {
-	float t_r = read_real_parameter_value(t, 2);
-	float u_r = read_real_parameter_value(u, 2);
+	float t_r = read_real_parameter_value(t, 3);
+	float u_r = read_real_parameter_value(u, 3);
 	if(t_r < u_r) set_dominated_tree(t);
 	else set_dominated_tree(u);
 }
@@ -136,12 +136,12 @@ void tree_domination_check(m_l_system* m_l_sys)
 	}
 }
 
-void add_str(m_l_system* m_l_sys, float x, float y, float r, int c)
+void add_str(m_l_system* m_l_sys, float x, float y, float r, int s)
 {
 	int str_index;
 	char* str = m_l_sys->str_set.find_str_and_alloc(&str_index);
 	assert(str);
-	snprintf(str, SET_STR_MAX_SIZE, "T(%f,%f,%f)?(%d)\0", x, y, r, c);
+	snprintf(str, SET_STR_MAX_SIZE, "T(%d,%f,%f,%f)?(1)\0", s, x, y, r);
 	m_l_sys->t_grid.insert_tree(str_index, x, y);
 	tree_domination_check(m_l_sys, str_index);//Only go through current string set once for added string
 }
@@ -177,8 +177,8 @@ void generate_propagation_vector(m_l_system* m_l_sys, int parent)
 {
 	char* p_str = m_l_sys->str_set.find_str(parent);
 	vec3 p_pos;
-	p_pos.x = read_real_parameter_value(p_str, 0);
-	p_pos.y = read_real_parameter_value(p_str, 1);
+	p_pos.x = read_real_parameter_value(p_str, 1);
+	p_pos.y = read_real_parameter_value(p_str, 2);
 	vec3 new_pos = generate_vector_within_radius(p_pos, 10.0f);
 	char v[8] = {};
 	char w[8] = {};
@@ -230,8 +230,8 @@ void derive_set(m_l_system* m_l_sys)
 			else
 			{
 				//Get new str x and y
-				float x = read_real_parameter_value(new_str, 0);
-				float y = read_real_parameter_value(new_str, 1);
+				float x = read_real_parameter_value(new_str, 1);
+				float y = read_real_parameter_value(new_str, 2);
 				m_l_sys->t_grid.insert_tree(index, x, y);
 			}
 		}

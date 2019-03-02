@@ -13,8 +13,9 @@ struct point
 {
 	float x;
 	float y;
-	float r;
-	int c;
+	float r; //Radius
+	int c; //Dominated
+	int s; //Species
 };
 
 class ChartGLWidget: public QGLWidget, protected QGLFunctions
@@ -25,7 +26,7 @@ public:
 	~ChartGLWidget();
 
 	void render_circle(point*);
-	void push_point(float,float,float,int);
+	void push_point(float,float,float,int,int);
 	void clear_points();
 	void set_forest_bounds(float width, float height);
 signals:
