@@ -7,7 +7,9 @@ MLSystemWidget::MLSystemWidget(QWidget* parent, ChartGLWidget* c): QWidget(paren
 	chart->set_forest_bounds((float)forest_length, (float)forest_length);
 	m_l_sys = create_m_l_system(8192, forest_length);
 	add_production(&m_l_sys, "<T(s,x,y,r)>?(c)", "", "c == 0", 1.0f);
+	add_production(&m_l_sys, "<T(s,x,y,r)>?(c)", "T(s,x,y,r)", "c==0", 0.0f); //Shade tolerance
 	add_production(&m_l_sys, "<T(s,x,y,r)>", "T(s,x,y,r)", "r >= R", 1.0f);
+	add_production(&m_l_sys, "<T(s,x,y,r)>", "", "r >= R", 0.0f); //Longevity
 	add_global_parameter(&m_l_sys, 'R', "5.0");
 	add_global_parameter(&m_l_sys, 'v', "390.0");
 	add_global_parameter(&m_l_sys, 'w', "390.0");

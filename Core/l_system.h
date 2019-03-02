@@ -53,6 +53,7 @@ void add_production(l_system* l, char* pre_l_context, char* pre_strict, char* pr
 void add_production(l_system* l, char* pre_l_context, char* pre_strict, char* pre_r_context, char* successor, char* condition, char* probability);
 void add_global_parameter(l_system*, char token, char* initial_value = NULL);
 void set_global_parameter(l_system*, char token, char* value);
+void set_production_probability(l_system*, int production, float probability);
 void derive_str(l_system*,char*);
 void load_l_system(l_system*,const char*, char* axiom_buffer);
 void save_l_system(l_system*,const char*, char* axiom_buffer);

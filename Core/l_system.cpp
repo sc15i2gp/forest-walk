@@ -195,6 +195,12 @@ void set_global_parameter(l_system* l, char token, char* value)
 	strcpy(mapping->real_str, value);
 }
 
+void set_production_probability(l_system* l, int p_index, float probability)
+{
+	production* p = l->p_set + p_index;
+	p->probability = probability;
+}
+
 bool should_ignore_in_context(char* module)
 {
 	char symbol = *module;

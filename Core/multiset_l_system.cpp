@@ -215,21 +215,33 @@ void generate_propagation_vector(m_l_system* m_l_sys, int parent)
 void apply_species_transformation_to_l_system(m_l_system* m_l_sys, int tree)
 {
 	int species = read_real_parameter_value(m_l_sys->str_set.find_str(tree), 0);
+	float shade_tolerance = 0.0f;
+	float longevity = 0.0f;
 	switch(species)
 	{
 		case PINE:
 			set_global_parameter((l_system*)m_l_sys, 'R', "6");
 			set_global_parameter((l_system*)m_l_sys, 'G', "1.4");
+			shade_tolerance = 0.3f;
+			longevity = 0.95f;
 			break;
 		case BIRCH:
 			set_global_parameter((l_system*)m_l_sys, 'R', "3");
 			set_global_parameter((l_system*)m_l_sys, 'G', "2.0");
+			shade_tolerance = 0.1f;
+			longevity = 0.5f;
 			break;
 		case ROWAN:
 			set_global_parameter((l_system*)m_l_sys, 'R', "2.0");
 			set_global_parameter((l_system*)m_l_sys, 'G', "1.389");
+			shade_tolerance = 0.5f;
+			longevity = 0.7f;
 			break;
 	}
+	set_production_probability((l_system*)m_l_sys, 0, 1.0f-shade_tolerance);
+	set_production_probability((l_system*)m_l_sys, 1, shade_tolerance);
+	set_production_probability((l_system*)m_l_sys, 2, longevity);
+	set_production_probability((l_system*)m_l_sys, 3, 1.0f-longevity);
 }
 
 void derive_set(m_l_system* m_l_sys)
