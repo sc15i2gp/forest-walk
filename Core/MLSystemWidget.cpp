@@ -10,7 +10,10 @@ MLSystemWidget::MLSystemWidget(QWidget* parent, ChartGLWidget* c): QWidget(paren
 	add_production(&m_l_sys, "<T(x,y,r)>?(c)", "", "c == 0", 1.0f);
 	add_production(&m_l_sys, "<T(x,y,r)>", "T(x,y,r)", "r >= R", 1.0f);
 	add_global_parameter(&m_l_sys, 'R', "5.0");
-	add_production(&m_l_sys, "<T(x,y,r)>?(c)", "T(x,y,r + 1.01*r)[%T(10,10,10)?(1)]", NULL, 1.0f);
+	add_global_parameter(&m_l_sys, 'v', "390.0");
+	add_global_parameter(&m_l_sys, 'w', "390.0");
+	add_global_parameter(&m_l_sys, 't', "10.0");
+	add_production(&m_l_sys, "<T(x,y,r)>?(c)", "T(x,y,r + 1.01*r)[%T(v,w,t)?(1)]", NULL, 1.0f);
 	//add_production(&m_l_sys, "<T(x,y,r)>?(c)", "T(x,y,r + 1.01*r)", NULL, 1.0f);
 	seed = (long int)time(NULL);
 	connect(chart, SIGNAL(initialised()), this, SLOT(init_system()));
@@ -26,7 +29,7 @@ void MLSystemWidget::init_system()
 	clear_str_set(&m_l_sys);
 	chart->clear_points();
 	srand(seed);
-	for(int i = 0; i < 1; i++)
+	for(int i = 0; i < 128; i++)
 	{
 		float x = rand() % 400;
 		float y = rand() % 400;

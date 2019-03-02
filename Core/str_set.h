@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define SET_STR_MAX_SIZE 64
+#define SET_STR_MAX_SIZE 128
 
 struct str_m_set
 {

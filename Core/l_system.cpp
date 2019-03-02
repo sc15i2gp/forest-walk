@@ -184,6 +184,17 @@ void add_global_parameter(l_system* l, char token, char* initial_value)
 	strcpy(mapping->real_str, initial_value);
 }
 
+void set_global_parameter(l_system* l, char token, char* value)
+{
+	param_mapping* mapping = l->param_map;
+	while(mapping->symbol != token)
+	{
+		if(mapping >= l->param_map + PARAM_MAP_MAX) return;
+		mapping++;
+	}
+	strcpy(mapping->real_str, value);
+}
+
 bool should_ignore_in_context(char* module)
 {
 	char symbol = *module;

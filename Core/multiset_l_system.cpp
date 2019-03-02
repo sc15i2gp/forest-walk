@@ -55,7 +55,7 @@ void determine_dominated_tree(char* t, char* u)
 	float t_r = read_real_parameter_value(t, 2);
 	float u_r = read_real_parameter_value(u, 2);
 	if(t_r < u_r) set_dominated_tree(t);
-	else if(u_r < t_r) set_dominated_tree(u);
+	else set_dominated_tree(u);
 }
 
 void remove_str_from_set(m_l_system* m_l_sys, int str_index)
@@ -160,21 +160,46 @@ void remove_dead_trees(m_l_system* m_l_sys)
 	}
 }
 
+vec3 generate_vector_within_radius(vec3 center, float r_max)
+{
+	int c = rand()%100; //How much of r_max away from the center should v be
+	float c_f = (float)c/100.0f;
+	float r = r_max*c_f;
+	vec3 v = {r, 0.0f, 0.0f};
+
+	int a = rand()%360; //Angle to rotate around v
+	v = rotate_about_axis(v, vec3{0.0f,0.0f,1.0f}, (float)a);
+	v = v + center;
+	return v;
+}
+
 void generate_propagation_vector(m_l_system* m_l_sys, int parent)
 {
-	//Get parent position
-	//Generate random position within 10 of parent position in random direction
-	//If within bounds
-	//	Set global paremeters v and w to new position x and y respectively
-	//Else
-	//	Set global parameters v and w to parent position + constant vector
-	//Generate random radius
-	//Set global parameter t to radius
+	char* p_str = m_l_sys->str_set.find_str(parent);
+	vec3 p_pos;
+	p_pos.x = read_real_parameter_value(p_str, 0);
+	p_pos.y = read_real_parameter_value(p_str, 1);
+	vec3 new_pos = generate_vector_within_radius(p_pos, 10.0f);
+	char v[8] = {};
+	char w[8] = {};
+	char t[8] = {};
+	if(	new_pos.x < 0.0f || new_pos.x > 400.0f ||
+		new_pos.y < 0.0f || new_pos.y > 400.0f)
+	{//If new_pos is out of bounds	
+		new_pos = p_pos; //Set it to parent's position so it will immediately be removed through domination
+	}
+	float r = (float)(rand() % 400)/600.0f + 0.1f;
+	
+	snprintf(v, 8, "%f", new_pos.x);
+	snprintf(w, 8, "%f", new_pos.y);
+	snprintf(t, 8, "%f", r);
+	set_global_parameter((l_system*)m_l_sys, 'v', v);
+	set_global_parameter((l_system*)m_l_sys, 'w', w);
+	set_global_parameter((l_system*)m_l_sys, 't', t);
 }
 
 void derive_set(m_l_system* m_l_sys)
 {
-	m_l_sys->str_set.print();
 	printf("Number of trees in str set: %d\n", m_l_sys->str_set.number_allocated());
 	printf("Number of trees in grid: %d\n", m_l_sys->t_grid.number_of_trees());
 	//Derive strs in str_set
@@ -182,8 +207,11 @@ void derive_set(m_l_system* m_l_sys)
 	{
 		//Generate position within a radius of 10.0f of the current str
 		//If out of bounds, use a default vector
-		generate_propagation_vector(m_l_sys, i);
-		if(m_l_sys->str_set.is_allocated(i)) derive_str((l_system*)m_l_sys, m_l_sys->str_set.find_str(i));
+		if(m_l_sys->str_set.is_allocated(i))
+		{
+			generate_propagation_vector(m_l_sys, i);
+			derive_str((l_system*)m_l_sys, m_l_sys->str_set.find_str(i));
+		}
 	}
 	//Prune branched strings
 	for(int i = 0; i < m_l_sys->str_set.size(); i++)
