@@ -2,7 +2,8 @@
 #include <QBoxLayout>
 #include <QWidget>
 #include <QPushButton>
-#include "ChartWidget.h"
+#include <QRadioButton>
+#include "ForestWidget.h"
 #include "MLSystemWidget.h"
 
 class AppWindow: public QWidget
@@ -12,6 +13,6 @@ public:
 	void init();
 private:
 	QBoxLayout* layout;
-	ChartGLWidget* gl_widget;
+	ForestGLWidget* gl_widget;
 	MLSystemWidget* m_l_widget;
 };

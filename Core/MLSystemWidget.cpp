@@ -1,6 +1,6 @@
 #include "MLSystemWidget.h"
 
-MLSystemWidget::MLSystemWidget(QWidget* parent, ChartGLWidget* c): QWidget(parent)
+MLSystemWidget::MLSystemWidget(QWidget* parent, ForestGLWidget* c): QWidget(parent)
 {
 	forest_length = 200;
 	chart = c;

@@ -6,6 +6,6 @@ INCLUDEPATH += . /opt/local/include
 QT += widgets opengl gui core
 LIBS += -lGLU 
 
-HEADERS += maths.h string_functions.h mesh.h turtle.h arithmetic_tokeniser.h expression_evaluator.h char_queue.h l_system.h ForestWalkWindow.h ChartWidget.h multiset_l_system.h MLSystemWidget.h str_set.h tree_grid.h
+HEADERS += maths.h string_functions.h mesh.h turtle.h arithmetic_tokeniser.h expression_evaluator.h char_queue.h l_system.h ForestWalkWindow.h ForestWidget.h multiset_l_system.h MLSystemWidget.h str_set.h tree_grid.h
 
-SOURCES += main.cpp maths.cpp string_functions.cpp mesh.cpp turtle.cpp arithmetic_tokeniser.cpp expression_evaluator.cpp char_queue.cpp l_system.cpp ForestWalkWindow.cpp ChartWidget.cpp multiset_l_system.cpp MLSystemWidget.cpp str_set.cpp tree_grid.cpp
+SOURCES += main.cpp maths.cpp string_functions.cpp mesh.cpp turtle.cpp arithmetic_tokeniser.cpp expression_evaluator.cpp char_queue.cpp l_system.cpp ForestWalkWindow.cpp ForestWidget.cpp multiset_l_system.cpp MLSystemWidget.cpp str_set.cpp tree_grid.cpp
