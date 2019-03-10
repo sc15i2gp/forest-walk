@@ -64,7 +64,10 @@ SOURCES       = main.cpp \
 		multiset_l_system.cpp \
 		MLSystemWidget.cpp \
 		str_set.cpp \
-		tree_grid.cpp moc_ForestWidget.cpp \
+		tree_grid.cpp \
+		Ball.cpp \
+		BallMath.cpp \
+		BallAux.cpp moc_ForestWidget.cpp \
 		moc_MLSystemWidget.cpp
 OBJECTS       = main.o \
 		maths.o \
@@ -81,6 +84,9 @@ OBJECTS       = main.o \
 		MLSystemWidget.o \
 		str_set.o \
 		tree_grid.o \
+		Ball.o \
+		BallMath.o \
+		BallAux.o \
 		moc_ForestWidget.o \
 		moc_MLSystemWidget.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
@@ -169,7 +175,10 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		multiset_l_system.h \
 		MLSystemWidget.h \
 		str_set.h \
-		tree_grid.h main.cpp \
+		tree_grid.h \
+		Ball.h \
+		BallMath.h \
+		BallAux.h main.cpp \
 		maths.cpp \
 		string_functions.cpp \
 		mesh.cpp \
@@ -183,7 +192,10 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		multiset_l_system.cpp \
 		MLSystemWidget.cpp \
 		str_set.cpp \
-		tree_grid.cpp
+		tree_grid.cpp \
+		Ball.cpp \
+		BallMath.cpp \
+		BallAux.cpp
 QMAKE_TARGET  = forest-walk
 DESTDIR       = 
 TARGET        = forest-walk
@@ -367,8 +379,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents maths.h string_functions.h mesh.h turtle.h arithmetic_tokeniser.h expression_evaluator.h char_queue.h l_system.h ForestWalkWindow.h ForestWidget.h multiset_l_system.h MLSystemWidget.h str_set.h tree_grid.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp maths.cpp string_functions.cpp mesh.cpp turtle.cpp arithmetic_tokeniser.cpp expression_evaluator.cpp char_queue.cpp l_system.cpp ForestWalkWindow.cpp ForestWidget.cpp multiset_l_system.cpp MLSystemWidget.cpp str_set.cpp tree_grid.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents maths.h string_functions.h mesh.h turtle.h arithmetic_tokeniser.h expression_evaluator.h char_queue.h l_system.h ForestWalkWindow.h ForestWidget.h multiset_l_system.h MLSystemWidget.h str_set.h tree_grid.h Ball.h BallMath.h BallAux.h $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp maths.cpp string_functions.cpp mesh.cpp turtle.cpp arithmetic_tokeniser.cpp expression_evaluator.cpp char_queue.cpp l_system.cpp ForestWalkWindow.cpp ForestWidget.cpp multiset_l_system.cpp MLSystemWidget.cpp str_set.cpp tree_grid.cpp Ball.cpp BallMath.cpp BallAux.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -403,16 +415,23 @@ compiler_moc_header_make_all: moc_ForestWidget.cpp moc_MLSystemWidget.cpp
 compiler_moc_header_clean:
 	-$(DEL_FILE) moc_ForestWidget.cpp moc_MLSystemWidget.cpp
 moc_ForestWidget.cpp: maths.h \
+		Ball.h \
+		BallAux.h \
+		mesh.h \
 		ForestWidget.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include ./moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/ip/Documents/forest-walk/Core -I/home/ip/Documents/forest-walk/Core -I/opt/local/include -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtOpenGL -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ForestWidget.h -o moc_ForestWidget.cpp
 
-moc_MLSystemWidget.cpp: multiset_l_system.h \
+moc_MLSystemWidget.cpp: ForestWidget.h \
+		maths.h \
+		Ball.h \
+		BallAux.h \
+		mesh.h \
+		multiset_l_system.h \
 		l_system.h \
 		string_functions.h \
 		expression_evaluator.h \
-		maths.h \
 		float_stack.h \
 		arithmetic_tokeniser.h \
 		arithmetic_token_stack.h \
@@ -442,6 +461,9 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean
 main.o: main.cpp ForestWalkWindow.h \
 		ForestWidget.h \
 		maths.h \
+		Ball.h \
+		BallAux.h \
+		mesh.h \
 		MLSystemWidget.h \
 		multiset_l_system.h \
 		l_system.h \
@@ -504,6 +526,9 @@ l_system.o: l_system.cpp l_system.h \
 ForestWalkWindow.o: ForestWalkWindow.cpp ForestWalkWindow.h \
 		ForestWidget.h \
 		maths.h \
+		Ball.h \
+		BallAux.h \
+		mesh.h \
 		MLSystemWidget.h \
 		multiset_l_system.h \
 		l_system.h \
@@ -518,7 +543,11 @@ ForestWalkWindow.o: ForestWalkWindow.cpp ForestWalkWindow.h \
 		tree_grid.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ForestWalkWindow.o ForestWalkWindow.cpp
 
-ForestWidget.o: ForestWidget.cpp 
+ForestWidget.o: ForestWidget.cpp ForestWidget.h \
+		maths.h \
+		Ball.h \
+		BallAux.h \
+		mesh.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ForestWidget.o ForestWidget.cpp
 
 multiset_l_system.o: multiset_l_system.cpp multiset_l_system.h \
@@ -536,11 +565,15 @@ multiset_l_system.o: multiset_l_system.cpp multiset_l_system.h \
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o multiset_l_system.o multiset_l_system.cpp
 
 MLSystemWidget.o: MLSystemWidget.cpp MLSystemWidget.h \
+		ForestWidget.h \
+		maths.h \
+		Ball.h \
+		BallAux.h \
+		mesh.h \
 		multiset_l_system.h \
 		l_system.h \
 		string_functions.h \
 		expression_evaluator.h \
-		maths.h \
 		float_stack.h \
 		arithmetic_tokeniser.h \
 		arithmetic_token_stack.h \
@@ -555,6 +588,18 @@ str_set.o: str_set.cpp str_set.h
 
 tree_grid.o: tree_grid.cpp tree_grid.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o tree_grid.o tree_grid.cpp
+
+Ball.o: Ball.cpp Ball.h \
+		BallAux.h \
+		BallMath.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Ball.o Ball.cpp
+
+BallMath.o: BallMath.cpp BallMath.h \
+		BallAux.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o BallMath.o BallMath.cpp
+
+BallAux.o: BallAux.cpp BallAux.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o BallAux.o BallAux.cpp
 
 moc_ForestWidget.o: moc_ForestWidget.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_ForestWidget.o moc_ForestWidget.cpp

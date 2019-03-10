@@ -6,23 +6,26 @@ MLSystemWidget::MLSystemWidget(QWidget* parent, ForestGLWidget* c): QWidget(pare
 	chart = c;
 	chart->set_forest_bounds((float)forest_length, (float)forest_length);
 	m_l_sys = create_m_l_system(8192, forest_length);
-	add_production(&m_l_sys, "<T(s,x,y,r)>?(c)", "", "c == 0", 1.0f);
-	add_production(&m_l_sys, "<T(s,x,y,r)>?(c)", "T(s,x,y,r)", "c==0", 0.0f); //Shade tolerance
-	add_production(&m_l_sys, "<T(s,x,y,r)>", "T(s,x,y,r)", "r >= R", 1.0f);
-	add_production(&m_l_sys, "<T(s,x,y,r)>", "", "r >= R", 0.0f); //Longevity
+	tree_seeds = (long int*)malloc(sizeof(long int)*8192);
+	for(int i = 0; i < 8192; i++) tree_seeds[i] = -1;
+	add_production(&m_l_sys, "<T(s,x,y,r,a)>?(c)", "", "c == 0", 1.0f);
+	add_production(&m_l_sys, "<T(s,x,y,r,a)>?(c)", "T(s,x,y,r,a)", "c==0", 0.0f); //Shade tolerance
+	add_production(&m_l_sys, "<T(s,x,y,r,a)>", "T(s,x,y,r,a)", "r >= R", 1.0f);
+	add_production(&m_l_sys, "<T(s,x,y,r,a)>", "", "r >= R", 0.0f); //Longevity
 	add_global_parameter(&m_l_sys, 'R', "5.0");
 	add_global_parameter(&m_l_sys, 'v', "390.0");
 	add_global_parameter(&m_l_sys, 'w', "390.0");
 	add_global_parameter(&m_l_sys, 't', "10.0");
 	add_global_parameter(&m_l_sys, 'G', "20.0");
-	add_production(&m_l_sys, "<T(s,x,y,r)>?(c)", "T(s,x,y,G*r)[%T(s,v,w,t)?(1)]", NULL, 1.0f);
-	//add_production(&m_l_sys, "<T(s,x,y,r)>?(c)", "T(s,x,y,1.947*r)", NULL, 1.0f);
+	//add_production(&m_l_sys, "<T(s,x,y,r,a)>?(c)", "T(s,x,y,G*r,a+1)[%T(s,v,w,t,0)?(1)]", NULL, 1.0f);
+	add_production(&m_l_sys, "<T(s,x,y,r,a)>?(c)", "T(s,x,y,G*r,a+1)", NULL, 1.0f);
 	seed = (long int)time(NULL);
 	connect(chart, SIGNAL(initialised()), this, SLOT(init_system()));
 }
 
 MLSystemWidget::~MLSystemWidget()
 {
+	free(tree_seeds);
 	destroy_m_l_system(&m_l_sys);
 }
 
@@ -56,8 +59,10 @@ void MLSystemWidget::push_str_set_to_chart_and_render()
 				float x = read_real_parameter_value(str, 1);
 				float y = read_real_parameter_value(str, 2);
 				float r = read_real_parameter_value(str, 3);
+				int age = (int)read_real_parameter_value(str, 4);
 				int c = (int)read_real_parameter_value(find_next_module(str));
-				chart->push_point(x,y,r,c,s);
+				if(tree_seeds[i] < 0) tree_seeds[i] = (long int)rand();
+				chart->push_point(x,y,r,c,s,age,tree_seeds[i]);
 			}
 		}
 	}

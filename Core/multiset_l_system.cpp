@@ -141,7 +141,7 @@ void add_str(m_l_system* m_l_sys, float x, float y, float r, int s)
 	int str_index;
 	char* str = m_l_sys->str_set.find_str_and_alloc(&str_index);
 	assert(str);
-	snprintf(str, SET_STR_MAX_SIZE, "T(%d,%f,%f,%f)?(1)\0", s, x, y, r);
+	snprintf(str, SET_STR_MAX_SIZE, "T(%d,%f,%f,%f,0)?(1)\0", s, x, y, r);
 	m_l_sys->t_grid.insert_tree(str_index, x, y);
 	tree_domination_check(m_l_sys, str_index);//Only go through current string set once for added string
 }
@@ -220,22 +220,22 @@ void apply_species_transformation_to_l_system(m_l_system* m_l_sys, int tree)
 	switch(species)
 	{
 		case PINE:
-			set_global_parameter((l_system*)m_l_sys, 'R', "6");
+			set_global_parameter((l_system*)m_l_sys, 'R', "10");
 			set_global_parameter((l_system*)m_l_sys, 'G', "1.4");
 			shade_tolerance = 0.3f;
 			longevity = 0.95f;
 			break;
 		case BIRCH:
-			set_global_parameter((l_system*)m_l_sys, 'R', "3");
-			set_global_parameter((l_system*)m_l_sys, 'G', "2.0");
+			set_global_parameter((l_system*)m_l_sys, 'R', "7");
+			set_global_parameter((l_system*)m_l_sys, 'G', "1.6");
 			shade_tolerance = 0.1f;
 			longevity = 0.5f;
 			break;
 		case ROWAN:
-			set_global_parameter((l_system*)m_l_sys, 'R', "2.0");
-			set_global_parameter((l_system*)m_l_sys, 'G', "1.389");
+			set_global_parameter((l_system*)m_l_sys, 'R', "2.5");
+			set_global_parameter((l_system*)m_l_sys, 'G', "1.2");
 			shade_tolerance = 0.5f;
-			longevity = 0.7f;
+			longevity = 0.6f;
 			break;
 	}
 	set_production_probability((l_system*)m_l_sys, 0, 1.0f-shade_tolerance);

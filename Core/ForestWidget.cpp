@@ -3,12 +3,29 @@
 ForestGLWidget::ForestGLWidget(QWidget* parent): QGLWidget(parent)
 {
 	points = (point*)malloc(sizeof(point)*MAX_TREE_COUNT);
+	tree_str_buffer = (char*)malloc(MAX_DERIVED_OUTPUT_SIZE);
+	
+	tree_model_buffer.branch_mesh = create_mesh(2048*4096, 2048*4096);
+	tree_model_buffer.leaf_mesh = create_mesh(2048*4096, 2048*4096);
+	tree_model_buffer.fruit_mesh = create_mesh(2048*4096, 2048*4096);
+	
+	Ball_Init(&forest_ball_data);
+	Ball_Init(&light_ball_data);
+	Ball_Place(&forest_ball_data, qOne, 1.0f);
+	Ball_Place(&light_ball_data, qOne, 1.0f);
+	load_l_system(&ls_pine, "../l-systems_for_work/pine_with_leaves.lsys", axiom_pine);
+	load_l_system(&ls_birch, "../l-systems_for_work/birch_with_leaves.lsys", axiom_birch);
+	load_l_system(&ls_rowan, "../l-systems_for_work/rowan_with_leaves_and_fruit.lsys", axiom_rowan);
+	print_l_system(&ls_pine, "Pine");
+	print_l_system(&ls_birch, "Birch");
+	print_l_system(&ls_rowan, "Rowan");
 }
 
 ForestGLWidget::~ForestGLWidget()
 {
 	if(texture_data) free(texture_data);
 	if(points) free(points);
+	free(tree_str_buffer);
 }
 
 void ForestGLWidget::buffer_circle_texture()
@@ -64,7 +81,7 @@ void ForestGLWidget::set_projection_matrix()
 	}
 	else 
 	{
-		gluPerspective(80.0f, (float)view_width/(float)view_height, 0.1f, 100.0f);
+		gluPerspective(80.0f, (float)view_width/(float)view_height, 0.1f, 400.0f);
 	}
 }
 
@@ -80,7 +97,7 @@ void ForestGLWidget::clear_points()
 	number_of_points = 0;
 }
 
-void ForestGLWidget::push_point(float x, float y, float r, int c, int s)
+void ForestGLWidget::push_point(float x, float y, float r, int c, int s, int age, long int seed)
 {
 	point* p = points + number_of_points;
 	p->x = x;
@@ -88,6 +105,8 @@ void ForestGLWidget::push_point(float x, float y, float r, int c, int s)
 	p->r = r;
 	p->c = c;
 	p->s = s;
+	p->age = age;
+	p->seed = seed;
 	number_of_points++;
 }
 
@@ -165,6 +184,8 @@ void ForestGLWidget::render_chart()
 	}
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_BLEND);
+	glEnable(GL_DEPTH_TEST);
 	glPopMatrix();
 	//Chart mode only
 }
@@ -252,34 +273,246 @@ void ForestGLWidget::load_platform()
 	//Final vertex data destination
 	mesh plat = create_mesh(144, 36);
 	plat.push_vertex_data(_vertex_data, 24, final_indices, 36);
-	glGenBuffers(1, &platform);
-	glBindBuffer(GL_ARRAY_BUFFER, platform);
-	glBufferData(GL_ARRAY_BUFFER, 2*plat.vertex_data_length*sizeof(vec3), plat.vertex_data, GL_STATIC_DRAW);
-	glGenBuffers(1, &platform_index_buffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, platform_index_buffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, plat.number_of_indices*sizeof(GLuint), plat.indices, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	platform = buffer_mesh(&plat);
 	destroy_mesh(plat);
 }
 
-void ForestGLWidget::render_forest()
+void ForestGLWidget::set_material(material* m)
 {
-	if(platform == 0) load_platform();
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-	glColor3f(0.0f, 1.0f, 0.0f);
-	glBindBuffer(GL_ARRAY_BUFFER, platform);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, platform_index_buffer);
+	glMaterialfv(GL_FRONT, GL_AMBIENT, m->ambient);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, m->diffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, m->specular);
+	glMaterialf(GL_FRONT, GL_SHININESS, m->shininess);
+}
+
+void ForestGLWidget::render(render_object obj)
+{
+	glBindBuffer(GL_ARRAY_BUFFER, obj.vertex_buffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj.index_buffer);
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, 6*sizeof(float), (void*)0);
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glNormalPointer(GL_FLOAT, 6*sizeof(float), (void*)(3*sizeof(float)));
-	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, NULL);
+	glDrawElements(GL_TRIANGLES, obj.number_of_indices, GL_UNSIGNED_INT, NULL);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
 
+void ForestGLWidget::set_branch_material(int species)
+{
+	material* wood_material = NULL;
+        material pine_material =
+	{
+		{0.420f, 0.355f, 0.159f},
+		{0.471f, 0.325f, 0.247f},
+		{0.0f, 0.0f, 0.0f},
+		2.0f
+	};
+	material birch_material =
+	{
+		{0.537f, 0.525f, 0.502f},
+		{0.937f, 0.925f, 0.902f},
+		{0.0f, 0.0f, 0.0f},
+		2.0f
+	};
+	material rowan_material =
+	{
+		{0.2f, 0.2f, 0.2f},
+		{0.667f, 0.698f, 0.627f},
+		{0.0f, 0.0f, 0.0f},
+		2.0f
+	};
+	switch(species)
+	{
+		case PINE:
+			wood_material = &pine_material;
+			break;
+		case BIRCH:
+			wood_material = &birch_material;
+			break;
+		case ROWAN:
+			wood_material = &rowan_material;
+			break;
+	}
+	set_material(wood_material);
+}
+
+void ForestGLWidget::set_leaf_material(int species)
+{
+	material leaf_material =
+	{
+		{0.004f, 0.196f, 0.125f},
+		{0.227f, 0.373f, 0.043f},
+		{0.0f, 0.01f, 0.0f},
+		2.0f
+	};
+	set_material(&leaf_material);
+}
+
+void ForestGLWidget::set_fruit_material(int species)
+{
+	material fruit_material =
+	{
+		{0.2f, 0.027f, 0.0f},
+		{1.0f, 0.141f, 0.0f},
+		{1.0f, 0.914f, 0.898f},
+		16.0f
+	};
+	set_material(&fruit_material);
+}
+
+void ForestGLWidget::render(tree_buffer_object obj, int species)
+{
+	if(obj.branch_obj.vertex_buffer)
+	{
+		set_branch_material(species);
+		render(obj.branch_obj);
+	}
+	if(obj.leaf_obj.vertex_buffer)
+	{
+		set_leaf_material(species);
+		render(obj.leaf_obj);
+	}
+	if(obj.fruit_obj.vertex_buffer)
+	{
+		set_fruit_material(species);
+		render(obj.fruit_obj);
+	}
+}
+
+render_object ForestGLWidget::buffer_mesh(mesh* m)
+{
+	render_object obj = {};
+	glGenBuffers(1, &obj.vertex_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, obj.vertex_buffer);
+	glBufferData(GL_ARRAY_BUFFER, 2*m->vertex_data_length*sizeof(vec3), m->vertex_data, GL_STATIC_DRAW);
+	glGenBuffers(1, &obj.index_buffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj.index_buffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m->number_of_indices*sizeof(GLuint), m->indices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	obj.number_of_indices = m->number_of_indices;
+	return obj;
+}
+
+tree_buffer_object ForestGLWidget::buffer_tree_mesh_group(tree_mesh_group* t)
+{
+	tree_buffer_object obj = {};
+	if(t->branch_mesh.vertex_data_length > 0) obj.branch_obj = buffer_mesh(&t->branch_mesh);
+	if(t->leaf_mesh.vertex_data_length > 0) obj.leaf_obj = buffer_mesh(&t->leaf_mesh);
+	if(t->fruit_mesh.vertex_data_length > 0) obj.fruit_obj = buffer_mesh(&t->fruit_mesh);
+	return obj;
+}
+
+void ForestGLWidget::clear_buffers(render_object obj)
+{
+	glDeleteBuffers(1, &obj.vertex_buffer);
+	glDeleteBuffers(1, &obj.index_buffer);
+}
+
+void ForestGLWidget::clear_buffers(tree_buffer_object obj)
+{
+	clear_buffers(obj.branch_obj);
+	clear_buffers(obj.leaf_obj);
+	clear_buffers(obj.fruit_obj);
+}
+
+void ForestGLWidget::clear_tree_model(tree_mesh_group* t)
+{
+	t->branch_mesh.vertex_data_length = 0;
+	t->branch_mesh.number_of_indices = 0;
+	t->leaf_mesh.vertex_data_length = 0;
+	t->leaf_mesh.number_of_indices = 0;
+	t->fruit_mesh.vertex_data_length = 0;
+	t->fruit_mesh.number_of_indices = 0;
+}
+
+void ForestGLWidget::generate_tree_str(point* p, char* str_buffer)
+{
+	l_system* l = NULL;
+	char* axiom = NULL;
+	int max_derive_count = 0;
+	int derive_coefficient = 0;
+	switch(p->s)
+	{
+		case PINE:
+			l = &ls_pine;
+			axiom = axiom_pine;
+			max_derive_count = 20;
+			derive_coefficient = 2;
+			break;
+		case BIRCH:
+			l = &ls_birch;
+			axiom = axiom_birch;
+			max_derive_count = 20;
+			derive_coefficient = 2;
+			break;
+		case ROWAN:
+			l = &ls_rowan;
+			axiom = axiom_rowan;
+			max_derive_count = 10;
+			derive_coefficient = 2;
+			break;
+	}
+	strcpy(str_buffer, axiom);
+	srand(p->seed);
+	int age = derive_coefficient*p->age;
+	int derive_count = (age < max_derive_count) ? age : max_derive_count;
+	for(int i = 0; i < derive_count; i++) derive_str(l, str_buffer);
+}
+
+void ForestGLWidget::generate_tree_model(char* tree_str, tree_mesh_group* model)
+{
+	run_turtle(tree_str, model);
+}
+
+void ForestGLWidget::render_forest()
+{
+	if(platform.vertex_buffer == 0) load_platform();
+	glMatrixMode(GL_MODELVIEW);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glPushMatrix();
+	glLoadIdentity();
+	GLfloat current_ball_value[16];
+	GLfloat light_pos[] = {0.0f, 1.0f, 1.0f, 0.0f};
+	Ball_Value(&light_ball_data, current_ball_value);
+	glMultMatrixf(current_ball_value);
+	glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
+	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 180.0f);
+
+	glLoadIdentity();
+	glTranslatef(0.0f, -0.2f, -1.0f);
+	glTranslatef(translate_x, translate_y, translate_z);
+	
+	Ball_Value(&forest_ball_data, current_ball_value);
+	glMultMatrixf(current_ball_value);
+	
+	material grass_material =
+	{
+		{0.004f, 0.196f, 0.125f},
+		{0.227f, 0.373f, 0.043f},
+		{0.5f, 0.51f, 0.5f},
+		2.0f
+	};
+	set_material(&grass_material);
+	render(platform);
+	glTranslatef(-(forest_width/2.0f),0.0f,-(forest_height/2.0f));
+	for(int i = 0; i < number_of_points; i++)
+	{
+		point* p = points+i;
+		generate_tree_str(p, tree_str_buffer);
+		clear_tree_model(&tree_model_buffer);
+		generate_tree_model(tree_str_buffer, &tree_model_buffer);
+		tree_obj = buffer_tree_mesh_group(&tree_model_buffer);
+		glPushMatrix();
+		glTranslatef(p->x, 0.0f, p->y);
+		render(tree_obj, p->s);
+		glPopMatrix();
+		clear_buffers(tree_obj);
+	}
+	glDisable(GL_LIGHT0);
+	glDisable(GL_LIGHTING);
 	glPopMatrix();
 }
 
@@ -290,4 +523,95 @@ void ForestGLWidget::paintGL()
 	if(chart_mode) render_chart();
 	else render_forest();	
 	glFlush();
+}
+
+void ForestGLWidget::mousePressEvent(QMouseEvent* e)
+{
+	last_pressed_mouse_button = e->button();
+	float s_x = width();
+	float s_y = height();
+	HVect ball_vec;
+	ball_vec.x = (2.0f*e->x() - s_x)/s_x;
+	ball_vec.y = (s_y - 2.0f*e->y())/s_y;
+	//tree_ball_vec.y = (2.0f*e->y() - s)/s;
+	switch(last_pressed_mouse_button)
+	{
+		case Qt::LeftButton:
+			Ball_Mouse(&forest_ball_data, ball_vec);
+			Ball_BeginDrag(&forest_ball_data);
+			parentWidget()->update();
+			update();
+			break;
+		case Qt::RightButton:
+			last_x = ball_vec.x;
+			last_y = ball_vec.y;
+			parentWidget()->update();
+			update();
+			break;
+		case Qt::MiddleButton:
+			Ball_Mouse(&light_ball_data, ball_vec);
+			Ball_BeginDrag(&light_ball_data);
+			parentWidget()->update();
+			update();
+			break;
+	}
+}
+
+void ForestGLWidget::mouseReleaseEvent(QMouseEvent* e)
+{
+	switch(last_pressed_mouse_button)
+	{
+		case Qt::LeftButton:
+			Ball_EndDrag(&forest_ball_data);
+			parentWidget()->update();
+			update();
+			break;
+		case Qt::RightButton:
+			parentWidget()->update();
+			update();
+			break;
+		case Qt::MiddleButton:
+			Ball_EndDrag(&light_ball_data);
+			parentWidget()->update();
+			update();
+	}
+}
+
+void ForestGLWidget::mouseMoveEvent(QMouseEvent* e)
+{
+	float s_x = width();
+	float s_y = height();
+	HVect ball_vec;
+	ball_vec.x = (2.0f*e->x() - s_x)/s_x;
+	ball_vec.y = (s_y - 2.0f*e->y())/s_y;
+	switch(last_pressed_mouse_button)
+	{
+		case Qt::LeftButton:
+			Ball_Mouse(&forest_ball_data, ball_vec);
+			Ball_Update(&forest_ball_data);
+			parentWidget()->update();
+			update();
+			break;
+		case Qt::RightButton:
+			translate_x += ball_vec.x - last_x;
+			translate_y += ball_vec.y - last_y;
+			last_x = ball_vec.x;
+			last_y = ball_vec.y;
+			parentWidget()->update();
+			update();
+			break;
+		case Qt::MiddleButton:
+			Ball_Mouse(&light_ball_data, ball_vec);
+			Ball_Update(&light_ball_data);
+			parentWidget()->update();
+			update();
+			break;
+	}
+}
+
+void ForestGLWidget::wheelEvent(QWheelEvent* e)
+{
+	translate_z += 0.5f*(e->angleDelta().y()/120);
+	parentWidget()->update();
+	update();
 }

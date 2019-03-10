@@ -2,10 +2,7 @@
 #include "l_system.h"
 #include "str_set.h"
 #include "tree_grid.h"
-
-#define PINE 0
-#define BIRCH 1
-#define ROWAN 2
+#include "species_info.h"
 
 struct m_l_system
 {
