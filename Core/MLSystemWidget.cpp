@@ -6,6 +6,7 @@ MLSystemWidget::MLSystemWidget(QWidget* parent, ForestGLWidget* c): QWidget(pare
 	chart = c;
 	chart->set_forest_bounds((float)forest_length, (float)forest_length);
 	m_l_sys = create_m_l_system(8192, forest_length);
+	chart->set_tree_grid(&m_l_sys.t_grid);
 	tree_seeds = (long int*)malloc(sizeof(long int)*8192);
 	for(int i = 0; i < 8192; i++) tree_seeds[i] = -1;
 	add_production(&m_l_sys, "<T(s,x,y,r,a)>?(c)", "", "c == 0", 1.0f);
@@ -47,22 +48,27 @@ void MLSystemWidget::init_system()
 
 void MLSystemWidget::push_str_set_to_chart_and_render()
 {
+	TIMED(__func__);
 	str_m_set* s = &(m_l_sys.str_set);
-	for(int i = 0; i < s->size(); i++)
+	for(int i = 0; i < m_l_sys.t_grid.height(); i++)
 	{
-		if(s->is_allocated(i))
+		for(int j = 0; j < m_l_sys.t_grid.width(); j++)
 		{
-			char* str = s->find_str(i);
-			if(number_of_modules(str) > 1)
+			tree_node* tree = m_l_sys.t_grid.bucket(j,i);
+			for(; tree; tree = tree->next)
 			{
-				int s = (int)read_real_parameter_value(str, 0);
-				float x = read_real_parameter_value(str, 1);
-				float y = read_real_parameter_value(str, 2);
-				float r = read_real_parameter_value(str, 3);
-				int age = (int)read_real_parameter_value(str, 4);
-				int c = (int)read_real_parameter_value(find_next_module(str));
-				if(tree_seeds[i] < 0) tree_seeds[i] = (long int)rand();
-				chart->push_point(x,y,r,c,s,age,tree_seeds[i]);
+				char* str = s->find_str(tree->str_ref);
+				if(number_of_modules(str) > 1)
+				{
+					int s = (int)read_real_parameter_value(str, 0);
+					float x = read_real_parameter_value(str, 1);
+					float y = read_real_parameter_value(str, 2);
+					float r = read_real_parameter_value(str, 3);
+					int age = (int)read_real_parameter_value(str, 4);
+					int c = (int)read_real_parameter_value(find_next_module(str));
+					if(tree_seeds[i] < 0) tree_seeds[i] = (long int)rand();
+					tree->point_ref = chart->push_point(x,y,r,c,s,age,tree_seeds[i]);
+				}
 			}
 		}
 	}
@@ -72,6 +78,7 @@ void MLSystemWidget::push_str_set_to_chart_and_render()
 
 void MLSystemWidget::run_derivation()
 {
+	TIMED(__func__);
 	chart->clear_points();
 	derive_set(&m_l_sys);
 	//print_l_system(&m_l_sys.base_sys, "multiset");

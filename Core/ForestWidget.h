@@ -11,6 +11,8 @@
 #include "l_system.h"
 #include "turtle.h"
 #include "species_info.h"
+#include "timed.h"
+#include "tree_grid.h"
 
 #define CT_WIDTH 512
 #define MAX_TREE_COUNT 8192
@@ -58,13 +60,14 @@ public:
 	void render_chart();
 	void render_forest();
 	void render_circle(point*);
-	void push_point(float,float,float,int,int,int, long int);
+	int push_point(float,float,float,int,int,int, long int);
 	void clear_points();
 	void set_forest_bounds(float width, float height);
 	void mousePressEvent(QMouseEvent*);
 	void mouseReleaseEvent(QMouseEvent*);
 	void mouseMoveEvent(QMouseEvent*);
 	void wheelEvent(QWheelEvent*);
+	void set_tree_grid(tree_grid*);
 
 public slots:
 	void set_chart_mode();
@@ -81,6 +84,7 @@ protected:
 	void resizeGL(int w, int h);
 	void paintGL();
 	void render(render_object obj);
+	void render_bucket_of_trees(int,int);
 	render_object buffer_mesh(mesh* m);
 	void set_leaf_material(int);
 	void set_branch_material(int);
@@ -127,4 +131,5 @@ protected:
 	l_system ls_rowan;
 
 	char* tree_str_buffer = NULL;
+	tree_grid* t_grid = NULL;
 };

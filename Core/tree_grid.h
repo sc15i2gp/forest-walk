@@ -13,6 +13,7 @@ struct tree_node
 {
 	bool in_use;
 	int str_ref;
+	int point_ref;
 	int x;
 	int y;
 	tree_node* previous;

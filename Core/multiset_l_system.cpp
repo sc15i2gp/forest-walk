@@ -246,8 +246,8 @@ void apply_species_transformation_to_l_system(m_l_system* m_l_sys, int tree)
 
 void derive_set(m_l_system* m_l_sys)
 {
-	printf("Number of trees in str set: %d\n", m_l_sys->str_set.number_allocated());
-	printf("Number of trees in grid: %d\n", m_l_sys->t_grid.number_of_trees());
+	//printf("Number of trees in str set: %d\n", m_l_sys->str_set.number_allocated());
+	//printf("Number of trees in grid: %d\n", m_l_sys->t_grid.number_of_trees());
 	//Derive strs in str_set
 	for(int i = 0; i < m_l_sys->str_set.size(); i++)
 	{
@@ -285,6 +285,6 @@ void derive_set(m_l_system* m_l_sys)
 	}
 	tree_domination_check(m_l_sys);
 	remove_dead_trees(m_l_sys);
-	printf("Final number of trees in str set: %d\n", m_l_sys->str_set.number_allocated());
-	printf("Final number of trees in grid: %d\n", m_l_sys->t_grid.number_of_trees());
+	//printf("Final number of trees in str set: %d\n", m_l_sys->str_set.number_allocated());
+	//printf("Final number of trees in grid: %d\n", m_l_sys->t_grid.number_of_trees());
 }

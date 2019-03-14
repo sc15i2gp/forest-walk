@@ -3,6 +3,7 @@
 #include "str_set.h"
 #include "tree_grid.h"
 #include "species_info.h"
+#include "timed.h"
 
 struct m_l_system
 {

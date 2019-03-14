@@ -28,6 +28,11 @@ ForestGLWidget::~ForestGLWidget()
 	free(tree_str_buffer);
 }
 
+void ForestGLWidget::set_tree_grid(tree_grid* t)
+{
+	t_grid = t;
+}
+
 void ForestGLWidget::buffer_circle_texture()
 {
 	texture_data = (GLubyte*)malloc(sizeof(GLubyte)*CT_WIDTH*CT_WIDTH*4);
@@ -97,7 +102,7 @@ void ForestGLWidget::clear_points()
 	number_of_points = 0;
 }
 
-void ForestGLWidget::push_point(float x, float y, float r, int c, int s, int age, long int seed)
+int ForestGLWidget::push_point(float x, float y, float r, int c, int s, int age, long int seed)
 {
 	point* p = points + number_of_points;
 	p->x = x;
@@ -107,7 +112,7 @@ void ForestGLWidget::push_point(float x, float y, float r, int c, int s, int age
 	p->s = s;
 	p->age = age;
 	p->seed = seed;
-	number_of_points++;
+	return number_of_points++;
 }
 
 void ForestGLWidget::render_circle(point* p)
@@ -363,6 +368,7 @@ void ForestGLWidget::set_fruit_material(int species)
 
 void ForestGLWidget::render(tree_buffer_object obj, int species)
 {
+	TIMED(__func__);
 	if(obj.branch_obj.vertex_buffer)
 	{
 		set_branch_material(species);
@@ -397,6 +403,7 @@ render_object ForestGLWidget::buffer_mesh(mesh* m)
 
 tree_buffer_object ForestGLWidget::buffer_tree_mesh_group(tree_mesh_group* t)
 {
+	TIMED(__func__);
 	tree_buffer_object obj = {};
 	if(t->branch_mesh.vertex_data_length > 0) obj.branch_obj = buffer_mesh(&t->branch_mesh);
 	if(t->leaf_mesh.vertex_data_length > 0) obj.leaf_obj = buffer_mesh(&t->leaf_mesh);
@@ -429,6 +436,7 @@ void ForestGLWidget::clear_tree_model(tree_mesh_group* t)
 
 void ForestGLWidget::generate_tree_str(point* p, char* str_buffer)
 {
+	TIMED(__func__);
 	l_system* l = NULL;
 	char* axiom = NULL;
 	int max_derive_count = 0;
@@ -463,11 +471,60 @@ void ForestGLWidget::generate_tree_str(point* p, char* str_buffer)
 
 void ForestGLWidget::generate_tree_model(char* tree_str, tree_mesh_group* model)
 {
+	TIMED(__func__);
 	run_turtle(tree_str, model);
+}
+
+//NOTE: From observing execution times, functions which take the longest during derivation are:
+//	- l_system derive_str
+//	- run_turtle
+//	- render
+
+//TODO: Don't generate tree models for trees which don't change
+
+//TODO: Reduce number of string derivations
+//	- Have many points not too near each other share seeds
+
+//TODO: Render only certain buckets
+
+//TODO: Optimise rendering
+//	- Reduce number of derivations which are required during rendering
+//		- Only derive strings in certain buckets
+//		- Save previously derived strings
+//		- Share derived strings
+//	- Reduce number of times tree models should be generated
+//		- Cache previously generated models
+//		- Only generate models in certain buckets
+//	- Reduce number of draw calls
+//		- Draw trees in certain buckets
+//		- Fog
+
+//TODO: Toggle domination on chart
+//TODO: Toggle + show old age on chart
+//TODO: Chart key
+
+void ForestGLWidget::render_bucket_of_trees(int x, int y)
+{
+	tree_node* t_node = t_grid->bucket(x,y);
+	for(; t_node; t_node = t_node->next)
+	{
+		printf("------------------------\n");
+		point* p = points+t_node->point_ref;
+		generate_tree_str(p, tree_str_buffer); //BIGGEST TIME WASTER
+		clear_tree_model(&tree_model_buffer);
+		generate_tree_model(tree_str_buffer, &tree_model_buffer); //NEXT BIGGEST
+		tree_obj = buffer_tree_mesh_group(&tree_model_buffer);
+		glPushMatrix();
+		glTranslatef(p->x, 0.0f, p->y);
+		render(tree_obj, p->s);
+		glPopMatrix();
+		clear_buffers(tree_obj);
+	}
 }
 
 void ForestGLWidget::render_forest()
 {
+	TIMED(__func__);
 	if(platform.vertex_buffer == 0) load_platform();
 	glMatrixMode(GL_MODELVIEW);
 	glEnable(GL_LIGHTING);
@@ -498,21 +555,27 @@ void ForestGLWidget::render_forest()
 	set_material(&grass_material);
 	render(platform);
 	glTranslatef(-(forest_width/2.0f),0.0f,-(forest_height/2.0f));
-	for(int i = 0; i < number_of_points; i++)
+	
+	glEnable(GL_FOG);
+	glFogf(GL_FOG_START, 0.0f);
+	glFogf(GL_FOG_END, 100.0f);
+	glFogf(GL_FOG_MODE, GL_LINEAR);
+	glFogf(GL_FOG_DENSITY, 1.0f);
+	GLfloat fog_colour[] = {0.494f, 0.753f, 0.933f, 1.0f};
+	glFogfv(GL_FOG_COLOR, fog_colour);
+	printf("------------------------\n");
+	for(int i = 0; i < t_grid->height(); i++)
 	{
-		point* p = points+i;
-		generate_tree_str(p, tree_str_buffer);
-		clear_tree_model(&tree_model_buffer);
-		generate_tree_model(tree_str_buffer, &tree_model_buffer);
-		tree_obj = buffer_tree_mesh_group(&tree_model_buffer);
-		glPushMatrix();
-		glTranslatef(p->x, 0.0f, p->y);
-		render(tree_obj, p->s);
-		glPopMatrix();
-		clear_buffers(tree_obj);
+		for(int j = 0; j < t_grid->width(); j++)
+		{
+			render_bucket_of_trees(j, i);
+		}
 	}
+	printf("------------------------\n");
+
 	glDisable(GL_LIGHT0);
 	glDisable(GL_LIGHTING);
+	glDisable(GL_FOG);
 	glPopMatrix();
 }
 
