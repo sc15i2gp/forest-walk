@@ -97,6 +97,9 @@ protected:
 	void generate_tree_model(char*,tree_mesh_group*);
 	void generate_tree_str(point* p, char*);
 
+	int find_tree_buffer_object(tree_node*);
+	void clear_unused_model_buffers();
+
 	float forest_width = 0.0f;
 	float forest_height = 0.0f;
 	int view_width = 0;
@@ -132,4 +135,8 @@ protected:
 
 	char* tree_str_buffer = NULL;
 	tree_grid* t_grid = NULL;
+
+	//Maps tree_nodes in grid to buffered tree_models
+	tree_node* tree_nodes[4096] = {};
+	tree_buffer_object tree_models[4096] = {};
 };

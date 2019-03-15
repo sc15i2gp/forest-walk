@@ -119,7 +119,7 @@ void tree_domination_check(m_l_system* m_l_sys, int x_0, int y_0)
 
 void tree_domination_check(m_l_system* m_l_sys, int tree)
 {
-	tree_node* t = m_l_sys->t_grid.find_node(tree);
+	tree_node* t = m_l_sys->t_grid.find_node_by_str_ref(tree);
 	int x_0 = t->x;
 	int y_0 = t->y;
 	tree_domination_check(m_l_sys, x_0, y_0);
@@ -257,7 +257,11 @@ void derive_set(m_l_system* m_l_sys)
 		{
 			generate_propagation_vector(m_l_sys, i);
 			apply_species_transformation_to_l_system(m_l_sys, i);
+			char* s = m_l_sys->str_set.find_str(i);
+			float r_0 = read_real_parameter_value(s, 3);
 			derive_str((l_system*)m_l_sys, m_l_sys->str_set.find_str(i));
+			float r_1 = read_real_parameter_value(s, 3);
+			if(r_0 != r_1) m_l_sys->t_grid.find_node_by_str_ref(i)->changed = true;
 		}
 	}
 	//Prune branched strings

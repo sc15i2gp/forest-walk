@@ -12,6 +12,7 @@
 struct tree_node
 {
 	bool in_use;
+	bool changed;
 	int str_ref;
 	int point_ref;
 	int x;
@@ -27,7 +28,7 @@ struct tree_grid
 	int grid_area_length;
 	tree_node*** node_grid;
 	tree_node* find_available_node();
-	tree_node* find_node(int);
+	tree_node* find_node_by_str_ref(int);
 	void insert_tree(int,float,float);
 	void remove_tree(int);
 	void remove_all_trees();

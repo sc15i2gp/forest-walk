@@ -413,8 +413,8 @@ tree_buffer_object ForestGLWidget::buffer_tree_mesh_group(tree_mesh_group* t)
 
 void ForestGLWidget::clear_buffers(render_object obj)
 {
-	glDeleteBuffers(1, &obj.vertex_buffer);
-	glDeleteBuffers(1, &obj.index_buffer);
+	if(obj.vertex_buffer) glDeleteBuffers(1, &obj.vertex_buffer);
+	if(obj.index_buffer) glDeleteBuffers(1, &obj.index_buffer);
 }
 
 void ForestGLWidget::clear_buffers(tree_buffer_object obj)
@@ -480,8 +480,6 @@ void ForestGLWidget::generate_tree_model(char* tree_str, tree_mesh_group* model)
 //	- run_turtle
 //	- render
 
-//TODO: Don't generate tree models for trees which don't change
-
 //TODO: Reduce number of string derivations
 //	- Have many points not too near each other share seeds
 
@@ -503,22 +501,56 @@ void ForestGLWidget::generate_tree_model(char* tree_str, tree_mesh_group* model)
 //TODO: Toggle + show old age on chart
 //TODO: Chart key
 
+int ForestGLWidget::find_tree_buffer_object(tree_node* t)
+{
+	for(int i = 0; i < 4096; i++)
+	{
+		if(t == tree_nodes[i]) return i;
+		else if(!tree_nodes[i])
+		{
+			tree_nodes[i] = t;
+			return i;
+		}
+	}
+}
+
+void ForestGLWidget::clear_unused_model_buffers()
+{
+	for(int i = 0; i < 4096; i++)
+	{
+		if(tree_nodes[i] && !tree_nodes[i]->in_use)
+		{
+			clear_buffers(tree_models[i]);
+			tree_nodes[i] = NULL;
+		}
+	}
+}
+
+int models_gen = 0;
+
 void ForestGLWidget::render_bucket_of_trees(int x, int y)
 {
+	clear_unused_model_buffers();
 	tree_node* t_node = t_grid->bucket(x,y);
 	for(; t_node; t_node = t_node->next)
 	{
 		printf("------------------------\n");
 		point* p = points+t_node->point_ref;
-		generate_tree_str(p, tree_str_buffer); //BIGGEST TIME WASTER
-		clear_tree_model(&tree_model_buffer);
-		generate_tree_model(tree_str_buffer, &tree_model_buffer); //NEXT BIGGEST
-		tree_obj = buffer_tree_mesh_group(&tree_model_buffer);
+		int model_ref = find_tree_buffer_object(t_node);
+		if(t_node->changed)
+		{
+			generate_tree_str(p, tree_str_buffer); //BIGGEST TIME WASTER
+			clear_tree_model(&tree_model_buffer);
+			generate_tree_model(tree_str_buffer, &tree_model_buffer); //NEXT BIGGEST
+			clear_buffers(tree_models[model_ref]);
+			tree_models[model_ref] = buffer_tree_mesh_group(&tree_model_buffer);
+			t_node->changed = false;
+			models_gen++;
+		}
 		glPushMatrix();
 		glTranslatef(p->x, 0.0f, p->y);
-		render(tree_obj, p->s);
+		render(tree_models[model_ref], p->s);
 		glPopMatrix();
-		clear_buffers(tree_obj);
 	}
 }
 
@@ -564,6 +596,7 @@ void ForestGLWidget::render_forest()
 	GLfloat fog_colour[] = {0.494f, 0.753f, 0.933f, 1.0f};
 	glFogfv(GL_FOG_COLOR, fog_colour);
 	printf("------------------------\n");
+	models_gen = 0;
 	for(int i = 0; i < t_grid->height(); i++)
 	{
 		for(int j = 0; j < t_grid->width(); j++)
@@ -571,6 +604,7 @@ void ForestGLWidget::render_forest()
 			render_bucket_of_trees(j, i);
 		}
 	}
+	printf("Generated %d tree models\n", models_gen);
 	printf("------------------------\n");
 
 	glDisable(GL_LIGHT0);
