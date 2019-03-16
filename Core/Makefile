@@ -430,10 +430,12 @@ moc_ForestWidget.cpp: maths.h \
 		arithmetic_token_stack.h \
 		char_queue.h \
 		char_queue_stack.h \
+		timed.h \
 		turtle.h \
 		polygon_stack.h \
 		turtle_stack.h \
 		species_info.h \
+		tree_grid.h \
 		ForestWidget.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
@@ -452,13 +454,14 @@ moc_MLSystemWidget.cpp: ForestWidget.h \
 		arithmetic_token_stack.h \
 		char_queue.h \
 		char_queue_stack.h \
+		timed.h \
 		turtle.h \
 		polygon_stack.h \
 		turtle_stack.h \
 		species_info.h \
+		tree_grid.h \
 		multiset_l_system.h \
 		str_set.h \
-		tree_grid.h \
 		MLSystemWidget.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
@@ -492,14 +495,15 @@ main.o: main.cpp ForestWalkWindow.h \
 		arithmetic_token_stack.h \
 		char_queue.h \
 		char_queue_stack.h \
+		timed.h \
 		turtle.h \
 		polygon_stack.h \
 		turtle_stack.h \
 		species_info.h \
+		tree_grid.h \
 		MLSystemWidget.h \
 		multiset_l_system.h \
-		str_set.h \
-		tree_grid.h
+		str_set.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 maths.o: maths.cpp maths.h
@@ -544,7 +548,8 @@ l_system.o: l_system.cpp l_system.h \
 		arithmetic_tokeniser.h \
 		arithmetic_token_stack.h \
 		char_queue.h \
-		char_queue_stack.h
+		char_queue_stack.h \
+		timed.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o l_system.o l_system.cpp
 
 ForestWalkWindow.o: ForestWalkWindow.cpp ForestWalkWindow.h \
@@ -561,14 +566,15 @@ ForestWalkWindow.o: ForestWalkWindow.cpp ForestWalkWindow.h \
 		arithmetic_token_stack.h \
 		char_queue.h \
 		char_queue_stack.h \
+		timed.h \
 		turtle.h \
 		polygon_stack.h \
 		turtle_stack.h \
 		species_info.h \
+		tree_grid.h \
 		MLSystemWidget.h \
 		multiset_l_system.h \
-		str_set.h \
-		tree_grid.h
+		str_set.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ForestWalkWindow.o ForestWalkWindow.cpp
 
 ForestWidget.o: ForestWidget.cpp ForestWidget.h \
@@ -584,10 +590,12 @@ ForestWidget.o: ForestWidget.cpp ForestWidget.h \
 		arithmetic_token_stack.h \
 		char_queue.h \
 		char_queue_stack.h \
+		timed.h \
 		turtle.h \
 		polygon_stack.h \
 		turtle_stack.h \
-		species_info.h
+		species_info.h \
+		tree_grid.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ForestWidget.o ForestWidget.cpp
 
 multiset_l_system.o: multiset_l_system.cpp multiset_l_system.h \
@@ -600,6 +608,7 @@ multiset_l_system.o: multiset_l_system.cpp multiset_l_system.h \
 		arithmetic_token_stack.h \
 		char_queue.h \
 		char_queue_stack.h \
+		timed.h \
 		str_set.h \
 		tree_grid.h \
 		species_info.h
@@ -619,13 +628,14 @@ MLSystemWidget.o: MLSystemWidget.cpp MLSystemWidget.h \
 		arithmetic_token_stack.h \
 		char_queue.h \
 		char_queue_stack.h \
+		timed.h \
 		turtle.h \
 		polygon_stack.h \
 		turtle_stack.h \
 		species_info.h \
+		tree_grid.h \
 		multiset_l_system.h \
-		str_set.h \
-		tree_grid.h
+		str_set.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MLSystemWidget.o MLSystemWidget.cpp
 
 str_set.o: str_set.cpp str_set.h

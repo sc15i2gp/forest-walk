@@ -67,6 +67,7 @@ void tree_grid::insert_tree(int str_ref, float f_x, float f_y)
 	new_tree_node->previous = previous;
 	new_tree_node->next = NULL;
 	new_tree_node->in_use = true;
+	new_tree_node->seed = -1;
 	new_tree_node->changed = true;
 	*node_loc = new_tree_node;
 }

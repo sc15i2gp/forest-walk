@@ -17,6 +17,9 @@ struct tree_node
 	int point_ref;
 	int x;
 	int y;
+	int species;
+	int age;
+	long int seed;
 	tree_node* previous;
 	tree_node* next;
 };

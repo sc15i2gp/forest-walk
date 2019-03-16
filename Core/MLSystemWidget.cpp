@@ -7,8 +7,7 @@ MLSystemWidget::MLSystemWidget(QWidget* parent, ForestGLWidget* c): QWidget(pare
 	chart->set_forest_bounds((float)forest_length, (float)forest_length);
 	m_l_sys = create_m_l_system(8192, forest_length);
 	chart->set_tree_grid(&m_l_sys.t_grid);
-	tree_seeds = (long int*)malloc(sizeof(long int)*8192);
-	for(int i = 0; i < 8192; i++) tree_seeds[i] = -1;
+	for(int i = 0; i < 32; i++) tree_seeds[i] = (long int)rand();
 	add_production(&m_l_sys, "<T(s,x,y,r,a)>?(c)", "", "c == 0", 1.0f);
 	add_production(&m_l_sys, "<T(s,x,y,r,a)>?(c)", "T(s,x,y,r,a)", "c==0", 0.0f); //Shade tolerance
 	add_production(&m_l_sys, "<T(s,x,y,r,a)>", "T(s,x,y,r,a)", "r >= R", 1.0f);
@@ -26,7 +25,6 @@ MLSystemWidget::MLSystemWidget(QWidget* parent, ForestGLWidget* c): QWidget(pare
 
 MLSystemWidget::~MLSystemWidget()
 {
-	free(tree_seeds);
 	destroy_m_l_system(&m_l_sys);
 }
 
@@ -66,7 +64,9 @@ void MLSystemWidget::push_str_set_to_chart_and_render()
 					float r = read_real_parameter_value(str, 3);
 					int age = (int)read_real_parameter_value(str, 4);
 					int c = (int)read_real_parameter_value(find_next_module(str));
-					if(tree_seeds[i] < 0) tree_seeds[i] = (long int)rand();
+					if(tree->seed < 0) tree->seed = tree_seeds[rand() % 32];
+					tree->species = s;
+					tree->age = age;
 					tree->point_ref = chart->push_point(x,y,r,c,s,age,tree_seeds[i]);
 				}
 			}

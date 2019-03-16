@@ -50,6 +50,18 @@ struct point
 	long int seed;
 };
 
+struct model_cache
+{
+	int ref_count;
+	tree_buffer_object model;
+};
+
+struct tree_model_ref
+{
+	int model_ref;
+	tree_node* tree;
+};
+
 class ForestGLWidget: public QGLWidget, protected QGLFunctions
 {
 	Q_OBJECT
@@ -84,21 +96,31 @@ protected:
 	void resizeGL(int w, int h);
 	void paintGL();
 	void render(render_object obj);
-	void render_bucket_of_trees(int,int);
 	render_object buffer_mesh(mesh* m);
 	void set_leaf_material(int);
 	void set_branch_material(int);
 	void set_fruit_material(int);
-	void render(tree_buffer_object,int);
+	void render(int,int);
 	tree_buffer_object buffer_tree_mesh_group(tree_mesh_group*);
 	void clear_tree_model(tree_mesh_group*);
 	void clear_buffers(render_object);
 	void clear_buffers(tree_buffer_object);
-	void generate_tree_model(char*,tree_mesh_group*);
-	void generate_tree_str(point* p, char*);
+	void generate_tree_model(int);
+	void derive_tree_str(int,int,int);
+	void push_bucket_of_trees_to_render_queue(int,int);
+	void sort_render_queue();
+	void generate_tree_models();
+	void render_tree_models();
+	void load_axiom_into_tree_str(int);
 
 	int find_tree_buffer_object(tree_node*);
 	void clear_unused_model_buffers();
+	int find_available_tree_model_cache();
+	int find_tree_model_cache(tree_node*);
+	tree_model_ref* find_available_tree_model_ref();
+
+	bool is_model_in_cache(tree_node*);
+	tree_model_ref* find_tree_model_ref(tree_node*);
 
 	float forest_width = 0.0f;
 	float forest_height = 0.0f;
@@ -137,6 +159,10 @@ protected:
 	tree_grid* t_grid = NULL;
 
 	//Maps tree_nodes in grid to buffered tree_models
-	tree_node* tree_nodes[4096] = {};
-	tree_buffer_object tree_models[4096] = {};
+	tree_model_ref tree_model_refs[4096] = {};
+	
+	model_cache tree_models[4096] = {};
+
+	int render_queue_length = 0;
+	tree_node* render_queue[4096] = {};
 };
