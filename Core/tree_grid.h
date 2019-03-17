@@ -15,10 +15,14 @@ struct tree_node
 	bool changed;
 	int str_ref;
 	int point_ref;
-	int x;
-	int y;
+	int x; //Grid_x
+	int y; //Grid_y
+	float _x; //Actual_x
+	float _y; //Actual_y
+	float _r; //Radius
 	int species;
 	int age;
+	int dominated;
 	long int seed;
 	tree_node* previous;
 	tree_node* next;
@@ -30,6 +34,7 @@ struct tree_grid
 	int node_array_size;
 	int grid_area_length;
 	tree_node*** node_grid;
+	bool derived;
 	tree_node* find_available_node();
 	tree_node* find_node_by_str_ref(int);
 	void insert_tree(int,float,float);

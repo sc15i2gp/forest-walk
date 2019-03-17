@@ -31,7 +31,6 @@ MLSystemWidget::~MLSystemWidget()
 void MLSystemWidget::init_system()
 {
 	clear_str_set(&m_l_sys);
-	chart->clear_points();
 	srand(seed);
 	for(int i = 0; i < 128; i++)
 	{
@@ -67,7 +66,11 @@ void MLSystemWidget::push_str_set_to_chart_and_render()
 					if(tree->seed < 0) tree->seed = tree_seeds[rand() % 32];
 					tree->species = s;
 					tree->age = age;
-					tree->point_ref = chart->push_point(x,y,r,c,s,age,tree_seeds[i]);
+					tree->_x = x;
+					tree->_y = y;
+					tree->_r = r;
+					tree->dominated = c;
+					//tree->point_ref = chart->push_point(x,y,r,c,s,age,tree_seeds[i]);
 				}
 			}
 		}
@@ -79,9 +82,9 @@ void MLSystemWidget::push_str_set_to_chart_and_render()
 void MLSystemWidget::run_derivation()
 {
 	TIMED(__func__);
-	chart->clear_points();
 	derive_set(&m_l_sys);
 	//print_l_system(&m_l_sys.base_sys, "multiset");
 	//print_str_set(&m_l_sys);
+	m_l_sys.t_grid.derived = true;
 	push_str_set_to_chart_and_render();
 }

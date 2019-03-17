@@ -2,9 +2,9 @@
 
 ForestGLWidget::ForestGLWidget(QWidget* parent): QGLWidget(parent)
 {
-	points = (point*)malloc(sizeof(point)*MAX_TREE_COUNT);
-	tree_str_buffer = (char*)malloc(MAX_DERIVED_OUTPUT_SIZE);
-	memset(tree_str_buffer, 0, MAX_DERIVED_OUTPUT_SIZE);
+	model_generator = create_tree_model_generator();
+	t_map = create_tree_model_map(4096,4096);
+	r_queue = create_render_queue(4096);
 
 	tree_model_buffer.branch_mesh = create_mesh(2048*4096, 2048*4096);
 	tree_model_buffer.leaf_mesh = create_mesh(2048*4096, 2048*4096);
@@ -14,19 +14,14 @@ ForestGLWidget::ForestGLWidget(QWidget* parent): QGLWidget(parent)
 	Ball_Init(&light_ball_data);
 	Ball_Place(&forest_ball_data, qOne, 1.0f);
 	Ball_Place(&light_ball_data, qOne, 1.0f);
-	load_l_system(&ls_pine, "../l-systems_for_work/pine_with_leaves.lsys", axiom_pine);
-	load_l_system(&ls_birch, "../l-systems_for_work/birch_with_leaves.lsys", axiom_birch);
-	load_l_system(&ls_rowan, "../l-systems_for_work/rowan_with_leaves_and_fruit.lsys", axiom_rowan);
-	print_l_system(&ls_pine, "Pine");
-	print_l_system(&ls_birch, "Birch");
-	print_l_system(&ls_rowan, "Rowan");
 }
 
 ForestGLWidget::~ForestGLWidget()
 {
 	if(texture_data) free(texture_data);
-	if(points) free(points);
-	free(tree_str_buffer);
+	destroy_render_queue(r_queue);
+	destroy_tree_model_map(t_map);
+	destroy_tree_model_generator(model_generator);
 }
 
 void ForestGLWidget::set_tree_grid(tree_grid* t)
@@ -98,34 +93,16 @@ void ForestGLWidget::resizeGL(int w, int h)
 	set_projection_matrix();
 }
 
-void ForestGLWidget::clear_points()
-{
-	number_of_points = 0;
-}
-
-int ForestGLWidget::push_point(float x, float y, float r, int c, int s, int age, long int seed)
-{
-	point* p = points + number_of_points;
-	p->x = x;
-	p->y = y;
-	p->r = r;
-	p->c = c;
-	p->s = s;
-	p->age = age;
-	p->seed = seed;
-	return number_of_points++;
-}
-
-void ForestGLWidget::render_circle(point* p)
+void ForestGLWidget::render_circle(tree_node* t)
 {	
 	vec3 colour; 
-	if(p->c == 0) 
+	if(t->dominated == 0) 
 	{
 		colour = {1.0f, 0.0f, 0.2f};
 	}
 	else
 	{
-		switch(p->s)
+		switch(t->species)
 		{
 			case 0:
 				colour = {0.004f,0.475f,0.435f};
@@ -139,18 +116,18 @@ void ForestGLWidget::render_circle(point* p)
 		}
 	}
 	glPushMatrix();
-	glTranslatef(p->x, p->y, 0.0f);
+	glTranslatef(t->_x, t->_y, 0.0f);
 	glBindTexture(GL_TEXTURE_2D, texture_buffer);
 	glColor3f(colour.x, colour.y, colour.z);
 	glBegin(GL_POLYGON);
 	glTexCoord2f(0.0f, 1.0f);
-	glVertex3f(-p->r, -p->r, 0.0f); //Bottom left
+	glVertex3f(-t->_r, -t->_r, 0.0f); //Bottom left
 	glTexCoord2f(1.0f, 1.0f);
-	glVertex3f(p->r, -p->r, 0.0f); //Bottom right
+	glVertex3f(t->_r, -t->_r, 0.0f); //Bottom right
 	glTexCoord2f(1.0f, 0.0f);
-	glVertex3f(p->r, p->r, 0.0f); //Top right
+	glVertex3f(t->_r, t->_r, 0.0f); //Top right
 	glTexCoord2f(0.0f, 0.0f);
-	glVertex3f(-p->r, p->r, 0.0f); //Top left
+	glVertex3f(-t->_r, t->_r, 0.0f); //Top left
 	glEnd();
 	glPopMatrix();
 }
@@ -175,7 +152,6 @@ void ForestGLWidget::set_forest_mode()
 
 void ForestGLWidget::render_chart()
 {
-	//Chart mode only
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
@@ -184,16 +160,19 @@ void ForestGLWidget::render_chart()
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
-	for(int i = 0; i < number_of_points; i++)
+	for(int i = 0; i < t_grid->height(); i++)
 	{
-		render_circle(points+i);
+		for(int j = 0; j < t_grid->width(); j++)
+		{
+			tree_node* t = t_grid->bucket(j,i);
+			for(; t; t = t->next) render_circle(t);
+		}
 	}
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glPopMatrix();
-	//Chart mode only
 }
 
 void copy_float_vector(float* src, float* dest, int size = 3)
@@ -367,10 +346,9 @@ void ForestGLWidget::set_fruit_material(int species)
 	set_material(&fruit_material);
 }
 
-void ForestGLWidget::render(int model_index, int species)
+void ForestGLWidget::render(tree_buffer_object obj, int species)
 {
 	//TIMED(__func__);
-	tree_buffer_object obj = tree_models[model_index].model;
 	if(obj.branch_obj.vertex_buffer)
 	{
 		set_branch_material(species);
@@ -436,49 +414,16 @@ void ForestGLWidget::clear_tree_model(tree_mesh_group* t)
 	t->fruit_mesh.number_of_indices = 0;
 }
 
-void ForestGLWidget::derive_tree_str(int current_age, int to_age_by, int species)
-{
-	//TIMED(__func__);
-	l_system* l = NULL;
-	int max_derive_count = 0;
-	int derive_coefficient = 0;
-	switch(species)
-	{
-		case PINE:
-			l = &ls_pine;
-			max_derive_count = 20;
-			derive_coefficient = 2;
-			break;
-		case BIRCH:
-			l = &ls_birch;
-			max_derive_count = 20;
-			derive_coefficient = 2;
-			break;
-		case ROWAN:
-			l = &ls_rowan;
-			max_derive_count = 10;
-			derive_coefficient = 2;
-			break;
-	}
-	int final_age = current_age + derive_coefficient*to_age_by;
-	int derive_count = (final_age < max_derive_count) ? final_age : max_derive_count;
-	for(int i = 0; i < derive_count; i++) derive_str(l, tree_str_buffer);
-}
-
-void ForestGLWidget::generate_tree_model(int cache_index)
+void ForestGLWidget::generate_tree_model(tree_node* t_node)
 {
 	//TIMED(__func__);
 	clear_tree_model(&tree_model_buffer);
-	run_turtle(tree_str_buffer, &tree_model_buffer);
-	tree_models[cache_index].model = buffer_tree_mesh_group(&tree_model_buffer);
+	model_generator.generate_tree_model(&tree_model_buffer);
+	t_map.set_model(t_node, buffer_tree_mesh_group(&tree_model_buffer));
 }
 
-//NOTE: From observing execution times, functions which take the longest during derivation are:
-//	- l_system derive_str
-//	- run_turtle
-//	- render
-
-//TODO: Remove points, only do stuff with tree_nodes
+//TODO: Fix tree node segfault when moving viewpoint
+//	- Separate tree_model_refs and tree_models + associated code
 
 //TODO: Render only certain buckets
 //	- Based on view position in terms of the tree_grid
@@ -499,80 +444,19 @@ void ForestGLWidget::generate_tree_model(int cache_index)
 
 //TODO: Demos
 
-void ForestGLWidget::load_axiom_into_tree_str(int species)
-{
-	char* axiom;
-	switch(species)
-	{
-		case PINE:
-			axiom = axiom_pine;
-			break;
-		case BIRCH:
-			axiom = axiom_birch;
-			break;
-		case ROWAN:
-			axiom = axiom_rowan;
-			break;
-	}
-	strcpy(tree_str_buffer, axiom);
-}
-
 void ForestGLWidget::clear_unused_model_buffers()
 {
 	for(int i = 0; i < 4096; i++)
-	{
-		tree_model_ref* ref = tree_model_refs+i;
-
-		if(ref->tree && !ref->tree->in_use)
-		{
-			if(tree_models[ref->model_ref].ref_count == 1)
+	{//For each tree in the reference cache
+		if(t_map.ref_in_use(i) && !t_map.tree_in_use(i))
+		{//If the ref has a tree and that tree is no longer in use
+			if(t_map.model_ref_count(i) == 1)
 			{
-				clear_buffers(tree_models[ref->model_ref].model);
-				tree_models[ref->model_ref].ref_count = 0;
-				ref->tree = NULL;
+				clear_buffers(t_map.find_model(i));
 			}
+			t_map.release_ref(i);
 		}
 	}
-}
-
-tree_model_ref* ForestGLWidget::find_tree_model_ref(tree_node* t)
-{
-	for(int i = 0; i < 4096; i++)
-	{
-		if(tree_model_refs[i].tree == t) return tree_model_refs+i;
-	}
-	return NULL;
-}
-
-bool ForestGLWidget::is_model_in_cache(tree_node* t)
-{
-	return find_tree_model_ref(t) != NULL;
-}
-
-int ForestGLWidget::find_available_tree_model_cache()
-{
-	for(int i = 0; i < 4096; i++)
-	{
-		if(tree_models[i].ref_count == 0) return i;
-	}
-	return -1;
-}
-
-int ForestGLWidget::find_tree_model_cache(tree_node* t)
-{
-	tree_model_ref* ref = find_tree_model_ref(t);
-	if(ref) return ref->model_ref;
-	else return -1;
-}
-
-
-tree_model_ref* ForestGLWidget::find_available_tree_model_ref()
-{
-	for(int i = 0; i < 4096; i++)
-	{
-		if(tree_model_refs[i].tree == NULL) return tree_model_refs+i;
-	}
-	return NULL;
 }
 
 int models_gen = 0;
@@ -582,89 +466,13 @@ void ForestGLWidget::push_bucket_of_trees_to_render_queue(int x, int y)
 	tree_node* t_node = t_grid->bucket(x, y);
 	for(; t_node; t_node = t_node->next)
 	{
-		render_queue[render_queue_length] = t_node;
-		render_queue_length++;
+		if(t_node->age > 0)
+		{
+			r_queue.push(t_node);
+		}
 	}
 }
 
-void merge(tree_node** left_node_list, tree_node** right_node_list, int left_list_length, int right_list_length)
-{
-	tree_node* temp_node_list[4096] = {};
-	int left_list_counter = 0;
-	int right_list_counter = 0;
-	int temp_list_counter = 0;
-	while(left_list_counter < left_list_length || right_list_counter < right_list_length)
-	{
-		if(right_list_counter == right_list_length)
-		{
-			temp_node_list[temp_list_counter++] = left_node_list[left_list_counter++];
-			continue;
-		}
-		else if(left_list_counter == left_list_length)
-		{
-			temp_node_list[temp_list_counter++] = right_node_list[right_list_counter++];
-			continue;
-		}
-
-
-		if(left_node_list[left_list_counter]->species < right_node_list[right_list_counter]->species)
-		{
-			temp_node_list[temp_list_counter++] = left_node_list[left_list_counter++];
-		}
-		else if(left_node_list[left_list_counter]->species > right_node_list[right_list_counter]->species)
-		{
-			temp_node_list[temp_list_counter++] = right_node_list[right_list_counter++];
-		}
-		else
-		{
-			if(left_node_list[left_list_counter]->seed < right_node_list[right_list_counter]->seed)
-			{
-				temp_node_list[temp_list_counter++] = left_node_list[left_list_counter++];
-			}
-			else if(left_node_list[left_list_counter]->seed > right_node_list[right_list_counter]->seed)
-			{
-
-				temp_node_list[temp_list_counter++] = right_node_list[right_list_counter++];
-			}
-			else
-			{
-				if(left_node_list[left_list_counter]->age < right_node_list[right_list_counter]->age)
-				{
-					temp_node_list[temp_list_counter++] = left_node_list[left_list_counter++];
-				}
-				else
-				{
-					temp_node_list[temp_list_counter++] = right_node_list[right_list_counter++];
-				}
-			}
-		}
-	}
-	for(int i = 0; i < temp_list_counter; i++)
-	{
-		left_node_list[i] = temp_node_list[i];
-	}
-}
-
-void sort(tree_node** node_list, int list_length)
-{
-	if(list_length > 1)
-	{
-		int left_list_length = list_length/2;
-		int right_list_length = list_length - left_list_length;
-		sort(node_list, left_list_length);
-		sort(node_list+left_list_length, right_list_length);
-		merge(node_list, node_list+left_list_length, left_list_length, right_list_length);
-	}
-}
-
-void ForestGLWidget::sort_render_queue()
-{
-	TIMED(__func__);
-	sort(render_queue, render_queue_length);
-}
-
-//I need to generate a single model which can be used by one or more trees and cached for reuse
-//Between renders, multiple particular trees can share the same model before but then should have different models after, therefore a model in cache should only be removed when no trees should use it
 void ForestGLWidget::generate_tree_models()
 {
 	TIMED(__func__);
@@ -676,9 +484,9 @@ void ForestGLWidget::generate_tree_models()
 	long int p_seed = -1;
 	int p_model_cache_ref = -1;
 	int previous_model = -1;
-	for(int i = 0; i < render_queue_length; i++)
+	for(int i = 0; i < r_queue.length; i++)
 	{
-		tree_node* t_node = render_queue[i];
+		tree_node* t_node = r_queue.find_item(i);
 		species = t_node->species;
 		age = t_node->age;
 		seed = t_node->seed;
@@ -690,56 +498,53 @@ void ForestGLWidget::generate_tree_models()
 			if(species == p_species && seed == p_seed)
 			{
 				int d_age = age - p_age;
-				derive_tree_str(age, d_age, species);
+				model_generator.derive_tree_str(d_age, species);
 			}
 			else
 			{
-				load_axiom_into_tree_str(species);
-				srand(seed);
-				derive_tree_str(0, age, species);
+				model_generator.load_axiom(species);
+				model_generator.set_seed(seed);
+				model_generator.derive_tree_str(age, species);
 			}
 
 			//Load model
-			if(is_model_in_cache(t_node))
-			{
+			if(t_map.tree_has_model(t_node))
+			{//If the tree_node has a matching model in cache already
 				if(t_node->changed)
 				{
-					tree_model_ref* ref = find_tree_model_ref(t_node);
-					if(tree_models[ref->model_ref].ref_count == 1)
-					{
-						clear_buffers(tree_models[ref->model_ref].model);
+					if(t_map.model_ref_count(t_node) == 1)
+					{//If the model is only used for rendering t_node
+						clear_buffers(t_map.find_model(t_node));
 					}
-					else
-					{
-						tree_models[ref->model_ref].ref_count--;
-						ref->model_ref = find_available_tree_model_cache();
-					}
-					//Gen model
-					generate_tree_model(ref->model_ref);
+					t_map.release_ref(t_node);
+					t_map.add_model_ref(t_node);
+					generate_tree_model(t_node);
 					models_gen++;
-					previous_model = ref->model_ref;
+					previous_model = t_map.model_ref(t_node);
 					t_node->changed = false;
 				}
 			}
 			else
 			{
-				tree_model_ref* ref = find_available_tree_model_ref();
-				ref->model_ref = find_available_tree_model_cache();
-				ref->tree = t_node;
+				t_map.add_model_ref(t_node);
 
 				//Gen model in cache index
-				generate_tree_model(ref->model_ref);
+				generate_tree_model(t_node);
 				models_gen++;
-				previous_model = ref->model_ref;
+				previous_model = t_map.model_ref(t_node);
 			}
 		}
-		else
+		else 
 		{
-			//the previous model generated suffices
-			tree_model_ref* ref = find_available_tree_model_ref();
-			ref->model_ref = previous_model;
-			ref->tree = t_node;
-			tree_models[previous_model].ref_count++;
+			if(t_map.tree_has_model(t_node))
+			{
+				if(t_map.model_ref_count(t_node) == 1)
+				{//If the model is only used for rendering t_node
+					clear_buffers(t_map.find_model(t_node));
+				}
+				t_map.release_ref(t_node);
+			}
+			t_map.add_model_ref(t_node, previous_model);
 		}
 
 		
@@ -752,23 +557,20 @@ void ForestGLWidget::generate_tree_models()
 void ForestGLWidget::render_tree_models()
 {
 	TIMED(__func__);
-	for(int i = 0; i < render_queue_length; i++)
+	for(tree_node* t_node = r_queue.pop(); r_queue.length > 0; t_node = r_queue.pop())
 	{
-		tree_node* t_node = render_queue[i];
-		point* p = points + t_node->point_ref;
 		glPushMatrix();
-		glTranslatef(p->x, 0.0f, p->y);
-		int model_ref = find_tree_model_cache(t_node);
-		render(model_ref, t_node->species);
+		glTranslatef(t_node->_x, 0.0f, t_node->_y);
+		render(t_map.find_model(t_node), t_node->species);
 		glPopMatrix();
-		render_queue[i] = NULL;
 	}
-	render_queue_length = 0;
+	r_queue.reset(); //Not a circular buffer so head ptr needs resetting
 }
 
 void ForestGLWidget::render_forest()
 {
 	TIMED(__func__);
+	
 	if(platform.vertex_buffer == 0) load_platform();
 	glMatrixMode(GL_MODELVIEW);
 	glEnable(GL_LIGHTING);
@@ -817,8 +619,12 @@ void ForestGLWidget::render_forest()
 			push_bucket_of_trees_to_render_queue(j, i);
 		}
 	}
-	sort_render_queue(); //species, then seed, then age
-	generate_tree_models();
+	if(t_grid->derived)
+	{
+		r_queue.sort();
+		generate_tree_models();
+		t_grid->derived = false;
+	}
 	render_tree_models();
 	printf("Generated %d tree models\n", models_gen);
 	printf("------------------------\n");
@@ -846,7 +652,6 @@ void ForestGLWidget::mousePressEvent(QMouseEvent* e)
 	HVect ball_vec;
 	ball_vec.x = (2.0f*e->x() - s_x)/s_x;
 	ball_vec.y = (s_y - 2.0f*e->y())/s_y;
-	//tree_ball_vec.y = (2.0f*e->y() - s)/s;
 	switch(last_pressed_mouse_button)
 	{
 		case Qt::LeftButton:

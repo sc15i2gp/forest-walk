@@ -68,7 +68,9 @@ SOURCES       = main.cpp \
 		Ball.cpp \
 		BallMath.cpp \
 		BallAux.cpp \
-		timed.cpp moc_ForestWidget.cpp \
+		timed.cpp \
+		tree_model_gen.cpp \
+		render_data.cpp moc_ForestWidget.cpp \
 		moc_MLSystemWidget.cpp
 OBJECTS       = main.o \
 		maths.o \
@@ -89,6 +91,8 @@ OBJECTS       = main.o \
 		BallMath.o \
 		BallAux.o \
 		timed.o \
+		tree_model_gen.o \
+		render_data.o \
 		moc_ForestWidget.o \
 		moc_MLSystemWidget.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
@@ -181,7 +185,9 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		Ball.h \
 		BallMath.h \
 		BallAux.h \
-		timed.h main.cpp \
+		timed.h \
+		tree_model_gen.h \
+		render_data.h main.cpp \
 		maths.cpp \
 		string_functions.cpp \
 		mesh.cpp \
@@ -199,7 +205,9 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		Ball.cpp \
 		BallMath.cpp \
 		BallAux.cpp \
-		timed.cpp
+		timed.cpp \
+		tree_model_gen.cpp \
+		render_data.cpp
 QMAKE_TARGET  = forest-walk
 DESTDIR       = 
 TARGET        = forest-walk
@@ -383,8 +391,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents maths.h string_functions.h mesh.h turtle.h arithmetic_tokeniser.h expression_evaluator.h char_queue.h l_system.h ForestWalkWindow.h ForestWidget.h multiset_l_system.h MLSystemWidget.h str_set.h tree_grid.h Ball.h BallMath.h BallAux.h timed.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp maths.cpp string_functions.cpp mesh.cpp turtle.cpp arithmetic_tokeniser.cpp expression_evaluator.cpp char_queue.cpp l_system.cpp ForestWalkWindow.cpp ForestWidget.cpp multiset_l_system.cpp MLSystemWidget.cpp str_set.cpp tree_grid.cpp Ball.cpp BallMath.cpp BallAux.cpp timed.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents maths.h string_functions.h mesh.h turtle.h arithmetic_tokeniser.h expression_evaluator.h char_queue.h l_system.h ForestWalkWindow.h ForestWidget.h multiset_l_system.h MLSystemWidget.h str_set.h tree_grid.h Ball.h BallMath.h BallAux.h timed.h tree_model_gen.h render_data.h $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp maths.cpp string_functions.cpp mesh.cpp turtle.cpp arithmetic_tokeniser.cpp expression_evaluator.cpp char_queue.cpp l_system.cpp ForestWalkWindow.cpp ForestWidget.cpp multiset_l_system.cpp MLSystemWidget.cpp str_set.cpp tree_grid.cpp Ball.cpp BallMath.cpp BallAux.cpp timed.cpp tree_model_gen.cpp render_data.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -436,6 +444,8 @@ moc_ForestWidget.cpp: maths.h \
 		turtle_stack.h \
 		species_info.h \
 		tree_grid.h \
+		render_data.h \
+		tree_model_gen.h \
 		ForestWidget.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
@@ -460,6 +470,8 @@ moc_MLSystemWidget.cpp: ForestWidget.h \
 		turtle_stack.h \
 		species_info.h \
 		tree_grid.h \
+		render_data.h \
+		tree_model_gen.h \
 		multiset_l_system.h \
 		str_set.h \
 		MLSystemWidget.h \
@@ -501,6 +513,8 @@ main.o: main.cpp ForestWalkWindow.h \
 		turtle_stack.h \
 		species_info.h \
 		tree_grid.h \
+		render_data.h \
+		tree_model_gen.h \
 		MLSystemWidget.h \
 		multiset_l_system.h \
 		str_set.h
@@ -572,6 +586,8 @@ ForestWalkWindow.o: ForestWalkWindow.cpp ForestWalkWindow.h \
 		turtle_stack.h \
 		species_info.h \
 		tree_grid.h \
+		render_data.h \
+		tree_model_gen.h \
 		MLSystemWidget.h \
 		multiset_l_system.h \
 		str_set.h
@@ -595,7 +611,9 @@ ForestWidget.o: ForestWidget.cpp ForestWidget.h \
 		polygon_stack.h \
 		turtle_stack.h \
 		species_info.h \
-		tree_grid.h
+		tree_grid.h \
+		render_data.h \
+		tree_model_gen.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ForestWidget.o ForestWidget.cpp
 
 multiset_l_system.o: multiset_l_system.cpp multiset_l_system.h \
@@ -634,6 +652,8 @@ MLSystemWidget.o: MLSystemWidget.cpp MLSystemWidget.h \
 		turtle_stack.h \
 		species_info.h \
 		tree_grid.h \
+		render_data.h \
+		tree_model_gen.h \
 		multiset_l_system.h \
 		str_set.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MLSystemWidget.o MLSystemWidget.cpp
@@ -658,6 +678,28 @@ BallAux.o: BallAux.cpp BallAux.h
 
 timed.o: timed.cpp timed.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o timed.o timed.cpp
+
+tree_model_gen.o: tree_model_gen.cpp tree_model_gen.h \
+		l_system.h \
+		string_functions.h \
+		expression_evaluator.h \
+		maths.h \
+		float_stack.h \
+		arithmetic_tokeniser.h \
+		arithmetic_token_stack.h \
+		char_queue.h \
+		char_queue_stack.h \
+		timed.h \
+		species_info.h \
+		mesh.h \
+		turtle.h \
+		polygon_stack.h \
+		turtle_stack.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o tree_model_gen.o tree_model_gen.cpp
+
+render_data.o: render_data.cpp render_data.h \
+		tree_grid.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o render_data.o render_data.cpp
 
 moc_ForestWidget.o: moc_ForestWidget.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_ForestWidget.o moc_ForestWidget.cpp
