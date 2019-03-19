@@ -538,15 +538,17 @@ void ForestGLWidget::generate_tree_model(tree_node* t_node)
 	t_map.set_model(t_node, buffer_tree_mesh_group(&tree_model_buffer));
 }
 
-//TODO: Remove models from cache if they haven't been rendered in a given time frame
-
-//TODO: Show on the chart which trees would be rendered
+//TODO: Smaller number of sphere/cylinder segments depending on distance
 
 //TODO: Toggle domination on chart
 //TODO: Toggle + show old age on chart
 //TODO: Chart key
 
+//TODO: Fix cylinder lighting
+
 //TODO: Demos
+
+//TODO: Limit amount of data sent to gpu (to prevent crash)
 
 //TODO: Billboard distant trees
 
@@ -646,17 +648,20 @@ void ForestGLWidget::generate_tree_models()
 		}
 		else 
 		{
-			if(t_map.tree_has_model(t_node))
+			if(t_node->changed)
 			{
-				if(t_map.model_ref_count(t_node) == 1)
-				{//If the model is only used for rendering t_node
-					clear_buffers(t_map.find_model(t_node));
-					models_cleared++;
+				if(t_map.tree_has_model(t_node))
+				{
+					if(t_map.model_ref_count(t_node) == 1)
+					{//If the model is only used for rendering t_node
+						clear_buffers(t_map.find_model(t_node));
+						models_cleared++;
+					}
+					t_map.release_ref(t_node);
 				}
-				t_map.release_ref(t_node);
+				t_map.add_model_ref(t_node, previous_model);
+				t_node->changed = false;
 			}
-			t_map.add_model_ref(t_node, previous_model);
-			t_node->changed = false;
 		}
 
 		
@@ -766,6 +771,7 @@ void ForestGLWidget::render_forest()
 	models_cleared = 0;
 	printf("%f\n", view_dist);
 	clear_unused_model_buffers();
+
 	int buckets_to_render[400] = {};
 	int number_of_buckets_to_render = pick_buckets_to_render(buckets_to_render, view_pos, view_dir, view_dist);
 	for(int i = 0; i < number_of_buckets_to_render; i++)
