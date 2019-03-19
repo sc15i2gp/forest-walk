@@ -36,7 +36,8 @@ public:
 
 	void render_chart();
 	void render_forest();
-	void render_circle(tree_node*);
+	void render_circle(float,float,float);
+	void render_tree_point(tree_node*);
 	void set_forest_bounds(float width, float height);
 	void mousePressEvent(QMouseEvent*);
 	void mouseReleaseEvent(QMouseEvent*);
@@ -47,6 +48,7 @@ public:
 public slots:
 	void set_chart_mode();
 	void set_forest_mode();
+	void set_view_dist(int);
 signals:
 	void initialised();
 
@@ -77,6 +79,8 @@ protected:
 	render_object buffer_mesh(mesh* m);
 	void render(tree_buffer_object,int);
 	void render_tree_models();
+	int pick_buckets_to_render(int*,vec3,vec3,float);
+	void render_grid();
 
 	//Tree model functions
 	void clear_tree_model(tree_mesh_group*);
@@ -99,13 +103,14 @@ protected:
 	//Forest data
 	render_object platform = {};
 	tree_mesh_group tree_model_buffer = {};
+	float view_dist = 30.0f;
 
 	//Arcball data
 	int last_pressed_mouse_button = -1;
 	float last_x = 0.0f;
 	float last_y = 0.0f;
 	float translate_x = 0.0f;
-	float translate_y = 0.0f;
+	float translate_y = -2.0f;
 	float translate_z = 0.0f;
 	BallData forest_ball_data = {};
 	BallData light_ball_data = {};

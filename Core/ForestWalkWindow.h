@@ -3,6 +3,7 @@
 #include <QWidget>
 #include <QPushButton>
 #include <QRadioButton>
+#include <QSlider>
 #include "ForestWidget.h"
 #include "MLSystemWidget.h"
 

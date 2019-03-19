@@ -49,6 +49,11 @@ vec3 normalise(vec3 v)
 	return v/magnitude(v);
 }
 
+vec3 normal_2d(vec3 v)
+{
+	return vec3{v.y, -v.x, v.z};
+}
+
 vec3 operator/(vec3 v,float f)
 {
 	return vec3{v.x/f, v.y/f, v.z/f};
@@ -76,6 +81,38 @@ vec3 rotate_about_axis(vec3 v, vec3 axis, float angle_deg)
 vec3 operator-(vec3 v1, vec3 v2)
 {
 	return vec3{v1.x - v2.x, v1.y - v2.y, v1.z - v2.z};
+}
+
+vec3 matrix_multiply_4x4(vec3 v, float* matrix)
+{
+	vec3 w = {0.0f, 0.0f, 0.0f};
+	w.x = matrix[0]*v.x + matrix[1]*v.y + matrix[2]*v.z + matrix[3];
+	w.y = matrix[4]*v.x + matrix[5]*v.y + matrix[6]*v.z + matrix[7];
+	w.z = matrix[8]*v.x + matrix[9]*v.y + matrix[10]*v.z + matrix[11];
+	return w;
+}
+
+void transpose_matrix_4x4(float* matrix)
+{
+	for(int i = 0; i < 4; i++)
+	{
+		for(int j = 0; j < 4; j++)
+		{
+			float temp = matrix[4*i+j];
+			matrix[4*i+j] = matrix[4*j+i];
+			matrix[4*j+i] = temp;
+		}
+	}
+}
+
+float min(float f, float g)
+{
+	return (f < g) ? f : g;
+}
+
+float max(float f, float g)
+{
+	return (f > g) ? f : g;
 }
 
 void print_vector(vec3 v)
