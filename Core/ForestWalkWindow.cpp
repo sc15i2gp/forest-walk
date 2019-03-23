@@ -25,6 +25,17 @@ void AppWindow::init()
 	chart_mode_control_layout->addWidget(forest_mode_button);
 	layout->addLayout(chart_mode_control_layout);
 
+	QBoxLayout* chart_toggle_layout = new QBoxLayout(QBoxLayout::LeftToRight);
+	QCheckBox* show_domination = new QCheckBox("Show domination", this);
+	QCheckBox* show_old_age = new QCheckBox("Show old age", this);
+	QCheckBox* show_view_range = new QCheckBox("Show view range", this);
+	QCheckBox* show_grid = new QCheckBox("Show grid", this);
+	chart_toggle_layout->addWidget(show_domination);
+	chart_toggle_layout->addWidget(show_old_age);
+	chart_toggle_layout->addWidget(show_view_range);
+	chart_toggle_layout->addWidget(show_grid);
+	layout->addLayout(chart_toggle_layout);
+
 	QSlider* view_dist_slider = new QSlider(Qt::Horizontal, this);
 	view_dist_slider->setMinimum(20);
 	view_dist_slider->setMaximum(80);
@@ -36,4 +47,28 @@ void AppWindow::init()
 	connect(chart_mode_button, SIGNAL(pressed()), this->gl_widget, SLOT(set_chart_mode()));
 	connect(forest_mode_button, SIGNAL(pressed()), this->gl_widget, SLOT(set_forest_mode()));
 	connect(view_dist_slider, SIGNAL(valueChanged(int)), this->gl_widget, SLOT(set_view_dist(int)));
+	connect(show_old_age, SIGNAL(stateChanged(int)), this, SLOT(show_old_age_checked(int)));
+	connect(show_view_range, SIGNAL(stateChanged(int)), this, SLOT(show_view_range_checked(int)));
+	connect(show_grid, SIGNAL(stateChanged(int)), this, SLOT(show_grid_checked(int)));
+	connect(show_domination, SIGNAL(stateChanged(int)), this, SLOT(show_domination_checked(int)));
+}
+
+void AppWindow::show_domination_checked(int state)
+{
+	gl_widget->set_show_domination(state == Qt::Checked);
+}
+
+void AppWindow::show_old_age_checked(int state)
+{
+	gl_widget->set_show_old_age(state == Qt::Checked);
+}
+
+void AppWindow::show_view_range_checked(int state)
+{
+	gl_widget->set_show_view_range(state == Qt::Checked);
+}
+
+void AppWindow::show_grid_checked(int state)
+{
+	gl_widget->set_show_grid(state == Qt::Checked);
 }

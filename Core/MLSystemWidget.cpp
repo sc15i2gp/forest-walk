@@ -66,11 +66,12 @@ void MLSystemWidget::push_str_set_to_chart_and_render()
 					if(tree->seed < 0) tree->seed = tree_seeds[rand() % 8];
 					tree->species = s;
 					tree->age = age;
+					const char* max_r = (s == PINE) ? PINE_MAX_RADIUS : (s == BIRCH) ? BIRCH_MAX_RADIUS : ROWAN_MAX_RADIUS;
+					tree->old_age = r >= atof(max_r);
 					tree->_x = x;
 					tree->_y = y;
 					tree->_r = r;
 					tree->dominated = c;
-					//tree->point_ref = chart->push_point(x,y,r,c,s,age,tree_seeds[i]);
 				}
 			}
 		}

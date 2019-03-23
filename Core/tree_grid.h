@@ -22,6 +22,7 @@ struct tree_node
 	float _r; //Radius
 	int species;
 	int age;
+	bool old_age;
 	int dominated;
 	long int seed;
 	tree_node* previous;

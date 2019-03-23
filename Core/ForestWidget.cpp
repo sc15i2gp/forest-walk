@@ -30,6 +30,30 @@ void ForestGLWidget::set_view_dist(int d)
 	updateGL();
 }
 
+void ForestGLWidget::set_show_domination(bool b)
+{
+	show_domination = b;
+	updateGL();
+}
+
+void ForestGLWidget::set_show_old_age(bool b)
+{
+	show_senescence = b;
+	updateGL();
+}
+
+void ForestGLWidget::set_show_view_range(bool b)
+{
+	show_view_range = b;
+	updateGL();
+}
+
+void ForestGLWidget::set_show_grid(bool b)
+{
+	show_grid = b;
+	updateGL();
+}
+
 void ForestGLWidget::set_tree_grid(tree_grid* t)
 {
 	t_grid = t;
@@ -102,7 +126,7 @@ void ForestGLWidget::resizeGL(int w, int h)
 void ForestGLWidget::render_tree_point(tree_node* t)
 {	
 	vec3 colour; 
-	if(t->dominated == 0) 
+	if(t->dominated == 0 && show_domination) 
 	{
 		colour = {1.0f, 0.0f, 0.2f};
 	}
@@ -121,6 +145,7 @@ void ForestGLWidget::render_tree_point(tree_node* t)
 				break;
 		}
 	}
+	if(t->old_age && show_senescence) colour = colour - vec3{0.1f, 0.1f, 0.1f};
 	glColor3f(colour.x, colour.y, colour.z);
 	render_circle(t->_x, t->_y, t->_r);
 }
@@ -196,7 +221,7 @@ void ForestGLWidget::render_grid()
 	}
 }
 
-void ForestGLWidget::render_chart()
+void ForestGLWidget::render_view_range()
 {
 	vec3 view_pos = {-translate_x, -translate_y, -translate_z};
 	vec3 view_dir = {0.0f, 0.0f, -1.0f};
@@ -232,34 +257,12 @@ void ForestGLWidget::render_chart()
 	max_x = _max_x*BUCKET_LENGTH;
 	max_y = _max_y*BUCKET_LENGTH;
 
-	glColor3f(0.0f,0.0f,0.0f);
-	//Draw grid
-	render_grid();
-
-	glEnable(GL_TEXTURE_2D);
-	glEnable(GL_BLEND);
-	glDisable(GL_DEPTH_TEST);
-	glAlphaFunc(GL_LESS, 0.2f);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-	for(int i = 0; i < t_grid->height(); i++)
-	{
-		for(int j = 0; j < t_grid->width(); j++)
-		{
-			tree_node* t = t_grid->bucket(j,i);
-			for(; t; t = t->next) render_tree_point(t);
-		}
-	}
-	glColor3f(0.0f, 0.0f, 0.0f);
-	
 	render_circle(view_pos.x, view_pos.z, 3.0f);
 	
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_BLEND);
-	
+
 	glLineWidth(2.0f);
 	glBegin(GL_LINES);
 	
@@ -287,6 +290,38 @@ void ForestGLWidget::render_chart()
 
 	glEnd();
 	glLineWidth(1.0f);
+}
+
+void ForestGLWidget::render_chart()
+{
+	glColor3f(0.0f,0.0f,0.0f);
+
+	if(show_grid) render_grid();
+
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_BLEND);
+	glDisable(GL_DEPTH_TEST);
+	glAlphaFunc(GL_LESS, 0.2f);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+	for(int i = 0; i < t_grid->height(); i++)
+	{
+		for(int j = 0; j < t_grid->width(); j++)
+		{
+			tree_node* t = t_grid->bucket(j,i);
+			for(; t; t = t->next) render_tree_point(t);
+		}
+	}
+	glColor3f(0.0f, 0.0f, 0.0f);
+	
+	if(show_view_range) render_view_range();
+	
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_BLEND);
+	
 	glEnable(GL_DEPTH_TEST);
 	glPopMatrix();
 }
@@ -538,10 +573,6 @@ void ForestGLWidget::generate_tree_model(tree_node* t_node, int lod)
 	t_map.set_model(t_node, buffer_tree_mesh_group(&tree_model_buffer), lod);
 }
 
-//TODO: Smaller number of sphere/cylinder segments depending on distance
-
-//TODO: Toggle domination on chart
-//TODO: Toggle + show old age on chart
 //TODO: Chart key
 
 //TODO: Demos

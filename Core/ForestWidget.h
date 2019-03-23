@@ -44,6 +44,10 @@ public:
 	void mouseMoveEvent(QMouseEvent*);
 	void wheelEvent(QWheelEvent*);
 	void set_tree_grid(tree_grid*);
+	void set_show_domination(bool);
+	void set_show_old_age(bool);
+	void set_show_view_range(bool);
+	void set_show_grid(bool);
 
 public slots:
 	void set_chart_mode();
@@ -81,6 +85,7 @@ protected:
 	void render_tree_models();
 	int pick_buckets_to_render(int*,vec3,vec3,float);
 	void render_grid();
+	void render_view_range();
 
 	//Tree model functions
 	void clear_tree_model(tree_mesh_group*);
@@ -95,6 +100,10 @@ protected:
 	int view_width = 0;
 	int view_height = 0;
 	bool chart_mode = true;
+	bool show_domination = false;
+	bool show_senescence = false;
+	bool show_view_range = false;
+	bool show_grid = false;
 	
 	//Texture data
 	GLubyte* texture_data = 0;

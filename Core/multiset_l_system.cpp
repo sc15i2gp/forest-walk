@@ -220,22 +220,22 @@ void apply_species_transformation_to_l_system(m_l_system* m_l_sys, int tree)
 	switch(species)
 	{
 		case PINE:
-			set_global_parameter((l_system*)m_l_sys, 'R', "10");
-			set_global_parameter((l_system*)m_l_sys, 'G', "1.4");
-			shade_tolerance = 0.3f;
-			longevity = 0.95f;
+			set_global_parameter((l_system*)m_l_sys, 'R', PINE_MAX_RADIUS);
+			set_global_parameter((l_system*)m_l_sys, 'G', PINE_GROWTH_FACTOR);
+			shade_tolerance = PINE_SHADE_TOLERANCE;
+			longevity = PINE_LONGEVITY;
 			break;
 		case BIRCH:
-			set_global_parameter((l_system*)m_l_sys, 'R', "7");
-			set_global_parameter((l_system*)m_l_sys, 'G', "1.6");
-			shade_tolerance = 0.1f;
-			longevity = 0.5f;
+			set_global_parameter((l_system*)m_l_sys, 'R', BIRCH_MAX_RADIUS);
+			set_global_parameter((l_system*)m_l_sys, 'G', BIRCH_GROWTH_FACTOR);
+			shade_tolerance = BIRCH_SHADE_TOLERANCE;
+			longevity = BIRCH_LONGEVITY;
 			break;
 		case ROWAN:
-			set_global_parameter((l_system*)m_l_sys, 'R', "2.5");
-			set_global_parameter((l_system*)m_l_sys, 'G', "1.2");
-			shade_tolerance = 0.5f;
-			longevity = 0.6f;
+			set_global_parameter((l_system*)m_l_sys, 'R', ROWAN_MAX_RADIUS);
+			set_global_parameter((l_system*)m_l_sys, 'G', ROWAN_GROWTH_FACTOR);
+			shade_tolerance = ROWAN_SHADE_TOLERANCE;
+			longevity = ROWAN_LONGEVITY;
 			break;
 	}
 	set_production_probability((l_system*)m_l_sys, 0, 1.0f-shade_tolerance);

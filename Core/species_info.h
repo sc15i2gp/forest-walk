@@ -3,3 +3,19 @@
 #define PINE 0
 #define BIRCH 1
 #define ROWAN 2
+
+#define PINE_MAX_RADIUS "10"
+#define BIRCH_MAX_RADIUS "7"
+#define ROWAN_MAX_RADIUS "2.5"
+
+#define PINE_GROWTH_FACTOR "1.4"
+#define BIRCH_GROWTH_FACTOR "1.6"
+#define ROWAN_GROWTH_FACTOR "1.2"
+
+#define PINE_SHADE_TOLERANCE 0.3f
+#define BIRCH_SHADE_TOLERANCE 0.1f
+#define ROWAN_SHADE_TOLERANCE 0.5f
+
+#define PINE_LONGEVITY 0.95f
+#define BIRCH_LONGEVITY 0.5f
+#define ROWAN_LONGEVITY 0.6f
