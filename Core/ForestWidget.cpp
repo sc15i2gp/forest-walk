@@ -530,12 +530,12 @@ void ForestGLWidget::clear_tree_model(tree_mesh_group* t)
 	t->fruit_mesh.number_of_indices = 0;
 }
 
-void ForestGLWidget::generate_tree_model(tree_node* t_node)
+void ForestGLWidget::generate_tree_model(tree_node* t_node, int lod)
 {
 	//TIMED(__func__);
 	clear_tree_model(&tree_model_buffer);
-	model_generator.generate_tree_model(&tree_model_buffer);
-	t_map.set_model(t_node, buffer_tree_mesh_group(&tree_model_buffer));
+	model_generator.generate_tree_model(&tree_model_buffer, lod);
+	t_map.set_model(t_node, buffer_tree_mesh_group(&tree_model_buffer), lod);
 }
 
 //TODO: Smaller number of sphere/cylinder segments depending on distance
@@ -543,8 +543,6 @@ void ForestGLWidget::generate_tree_model(tree_node* t_node)
 //TODO: Toggle domination on chart
 //TODO: Toggle + show old age on chart
 //TODO: Chart key
-
-//TODO: Fix cylinder lighting
 
 //TODO: Demos
 
@@ -583,7 +581,11 @@ void ForestGLWidget::push_bucket_of_trees_to_render_queue(int x, int y)
 
 int models_cleared = 0;
 
-void ForestGLWidget::generate_tree_models()
+#define LOW_DETAIL 0
+#define MID_DETAIL 1
+#define HIGH_DETAIL 2
+
+void ForestGLWidget::generate_tree_models(vec3 view_pos)
 {
 	TIMED(__func__);
 	int species = -1;
@@ -600,6 +602,16 @@ void ForestGLWidget::generate_tree_models()
 		species = t_node->species;
 		age = t_node->age;
 		seed = t_node->seed;
+
+		//If tree < 10 away, set high detail
+		//Else if tree < 20 away, set mid detail
+		//Else set low detail
+		vec3 tree_pos = {t_node->_x, 0.0f, t_node->_y};
+		float dist = magnitude(view_pos - tree_pos);
+		int lod;
+		if(dist < 10.0f) lod = HIGH_DETAIL;
+		else if(dist < 20.0f) lod = MID_DETAIL;
+		else lod = LOW_DETAIL;
 
 		//Generate tree string
 		if(species != p_species || age != p_age || seed != p_seed)
@@ -619,9 +631,9 @@ void ForestGLWidget::generate_tree_models()
 
 			//Load model
 			if(t_map.tree_has_model(t_node))
-			{//If the tree_node has a matching model in cache already
-				if(t_node->changed)
-				{
+			{//If the tree_node has a model in cache already
+				if(t_node->changed || t_map.lod(t_node) != lod)
+				{//If t_node's model should change
 					if(t_map.model_ref_count(t_node) == 1)
 					{//If the model is only used for rendering t_node
 						clear_buffers(t_map.find_model(t_node));
@@ -629,27 +641,27 @@ void ForestGLWidget::generate_tree_models()
 					}
 					t_map.release_ref(t_node);
 					t_map.add_model_ref(t_node);
-					generate_tree_model(t_node);
+					generate_tree_model(t_node, lod);
 					models_gen++;
 					previous_model = t_map.model_ref(t_node);
 					t_node->changed = false;
 				}
 			}
 			else
-			{
+			{//If the tree_node has no model in cache
 				t_map.add_model_ref(t_node);
 
 				//Gen model in cache index
-				generate_tree_model(t_node);
+				generate_tree_model(t_node, lod);
 				models_gen++;
 				previous_model = t_map.model_ref(t_node);
 				t_node->changed = false;
 			}
 		}
 		else 
-		{
-			if(t_node->changed)
-			{
+		{//If no new string needed to be derived (t_node has same model string as previous tree)
+			if(t_node->changed || t_map.lod(t_node) != lod)
+			{//If t_node's model ref should be updated
 				if(t_map.tree_has_model(t_node))
 				{
 					if(t_map.model_ref_count(t_node) == 1)
@@ -659,7 +671,14 @@ void ForestGLWidget::generate_tree_models()
 					}
 					t_map.release_ref(t_node);
 				}
-				t_map.add_model_ref(t_node, previous_model);
+				if(t_map.lod(previous_model) != lod)
+				{
+					t_map.add_model_ref(t_node);
+					generate_tree_model(t_node, lod);
+					models_gen++;
+					previous_model = t_map.model_ref(t_node);
+				}
+				else t_map.add_model_ref(t_node, previous_model);
 				t_node->changed = false;
 			}
 		}
@@ -783,7 +802,7 @@ void ForestGLWidget::render_forest()
 
 	printf("Rendering %d models\n", r_queue.length);
 	r_queue.sort();
-	generate_tree_models();
+	generate_tree_models(view_pos);
 	rendered = 0;
 	render_tree_models();
 	printf("Generated %d tree models\n", models_gen);

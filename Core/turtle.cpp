@@ -158,9 +158,7 @@ void push_branch_cylinder_to_tree_mesh(mesh* branch_mesh, turtle* t, float r, fl
 
         for(int i = 0; i < v; i++)
         {
-                vec3 edge = positions[(i+1)%v] - positions[i];
-                vec3 normal = cross(edge, t->orientation.heading);
-                normal = normalise(normal);
+		vec3 normal = normalise(positions[i] - t->position);
                 normals[i] = normal;
         }
         normals[v] = -t->orientation.heading;
@@ -249,7 +247,7 @@ polygon reverse(polygon& p)
 	return _p;
 }
 
-void run_turtle(char* input, tree_mesh_group* tree, float default_distance, float default_radius, float default_angle)
+void run_turtle(char* input, tree_mesh_group* tree, int lod, float default_distance, float default_radius, float default_angle)
 {
 	turtle t = {};
 	t.orientation.heading = vec3{0.0f, 1.0f, 0.0f};
@@ -307,7 +305,20 @@ void run_turtle(char* input, tree_mesh_group* tree, float default_distance, floa
 			{
 				float radius = default_radius;
 				if(module_param_count > 0) radius = read_real_parameter_value(module);
-				push_fruit_sphere_to_tree_mesh(&tree->fruit_mesh, &t, radius, 32, 32);
+				int sector_count;
+				switch(lod)
+				{
+					case 0:
+						sector_count = 8;
+						break;
+					case 1:
+						sector_count = 16;
+						break;
+					case 2:
+						sector_count = 32;
+						break;
+				}
+				push_fruit_sphere_to_tree_mesh(&tree->fruit_mesh, &t, radius, sector_count, sector_count);
 				break;
 			}
 			case 'f':
@@ -327,7 +338,20 @@ void run_turtle(char* input, tree_mesh_group* tree, float default_distance, floa
 				}
 				if(!polygon_mode)
 				{
-					push_branch_cylinder_to_tree_mesh(&tree->branch_mesh, &t, radius, length, 16);
+					int segment_count;
+					switch(lod)
+					{
+						case 0:
+							segment_count = 4;
+							break;
+						case 1:
+							segment_count = 8;
+							break;
+						case 2:
+							segment_count = 16;
+							break;
+					}
+					push_branch_cylinder_to_tree_mesh(&tree->branch_mesh, &t, radius, length, segment_count);
 				}
 				t.move_forward(length);
 				break;

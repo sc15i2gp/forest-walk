@@ -21,6 +21,7 @@ struct tree_buffer_object
 struct model_cache
 {
 	int ref_count;
+	int lod;
 	tree_buffer_object model;
 };
 
@@ -58,6 +59,9 @@ struct tree_model_map
 	
 	void add_model_ref(tree_node*,int=-1);
 	int model_ref(tree_node*);
+
+	int lod(tree_node*);
+	int lod(int);
 	
 	int model_ref_count(tree_node*);
 	int model_ref_count(int);
@@ -71,7 +75,7 @@ struct tree_model_map
 	
 	tree_buffer_object find_model(tree_node*);
 	tree_buffer_object find_model(int);
-	void set_model(tree_node*, tree_buffer_object);
+	void set_model(tree_node*, tree_buffer_object, int);
 	bool tree_has_model(tree_node*);
 
 	bool ref_in_use(int); //tree_model_refs[i]->tree != NULL

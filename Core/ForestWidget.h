@@ -84,8 +84,8 @@ protected:
 
 	//Tree model functions
 	void clear_tree_model(tree_mesh_group*);
-	void generate_tree_model(tree_node*);
-	void generate_tree_models();
+	void generate_tree_model(tree_node*,int);
+	void generate_tree_models(vec3);
 	
 	void push_bucket_of_trees_to_render_queue(int,int);
 

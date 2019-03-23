@@ -15,7 +15,7 @@ struct tree_model_generator
 	
 	char* tree_str_buffer;
 	
-	void generate_tree_model(tree_mesh_group*);
+	void generate_tree_model(tree_mesh_group*,int);
 	void derive_tree_str(int,int);
 	void load_axiom(int);
 	void set_seed(long int);

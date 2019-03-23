@@ -196,6 +196,16 @@ int tree_model_map::model_ref_count(int model_index)
 	return tree_models[model_index].ref_count;
 }
 
+int tree_model_map::lod(tree_node* t_node)
+{
+	return tree_models[model_ref(t_node)].lod;
+}
+
+int tree_model_map::lod(int model_index)
+{
+	return tree_models[model_index].lod;
+}
+
 void tree_model_map::release_ref(tree_model_ref* ref)
 {
 	tree_models[ref->model_ref].ref_count--;
@@ -227,10 +237,11 @@ tree_buffer_object tree_model_map::find_model(int ref_index)
 	return tree_models[ref->model_ref].model;
 }
 
-void tree_model_map::set_model(tree_node* t_node, tree_buffer_object model)
+void tree_model_map::set_model(tree_node* t_node, tree_buffer_object model, int lod)
 {
 	tree_model_ref* ref = find_tree_model_ref(t_node);
 	tree_models[ref->model_ref].model = model;
+	tree_models[ref->model_ref].lod = lod;
 }
 
 bool tree_model_map::tree_has_model(tree_node* t_node)

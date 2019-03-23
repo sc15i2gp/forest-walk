@@ -32,4 +32,4 @@ struct turtle
 
 #include "turtle_stack.h"
 
-void run_turtle(char* input, tree_mesh_group* tree, float default_distance = 1.0f, float default_branch_length = 0.5f, float default_angle = 90.0f);
+void run_turtle(char* input, tree_mesh_group* tree, int lod, float default_distance = 1.0f, float default_branch_length = 0.5f, float default_angle = 90.0f);

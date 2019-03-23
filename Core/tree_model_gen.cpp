@@ -20,9 +20,9 @@ void destroy_tree_model_generator(tree_model_generator t)
 	free(t.tree_str_buffer);
 }
 
-void tree_model_generator::generate_tree_model(tree_mesh_group* t_mesh)
+void tree_model_generator::generate_tree_model(tree_mesh_group* t_mesh, int lod)
 {
-	run_turtle(tree_str_buffer, t_mesh);
+	run_turtle(tree_str_buffer, t_mesh, lod);
 }
 
 void tree_model_generator::derive_tree_str(int derive_count, int species)
