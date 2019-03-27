@@ -573,14 +573,6 @@ void ForestGLWidget::generate_tree_model(tree_node* t_node, int lod)
 	t_map.set_model(t_node, buffer_tree_mesh_group(&tree_model_buffer), lod);
 }
 
-//TODO: Chart key
-
-//TODO: Demos
-
-//TODO: Limit amount of data sent to gpu (to prevent crash)
-
-//TODO: Billboard distant trees
-
 void ForestGLWidget::clear_unused_model_buffers()
 {
 	for(int i = 0; i < t_map.number_of_tree_model_refs; i++)

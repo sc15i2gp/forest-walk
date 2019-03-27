@@ -36,6 +36,14 @@ void AppWindow::init()
 	chart_toggle_layout->addWidget(show_grid);
 	layout->addLayout(chart_toggle_layout);
 
+	QBoxLayout* ecological_rules_layout = new QBoxLayout(QBoxLayout::LeftToRight);
+	QCheckBox* trees_should_propagate = new QCheckBox("Propagation", this);
+	QCheckBox* succession_should_happen = new QCheckBox("Succession", this);
+	ecological_rules_layout->addWidget(trees_should_propagate);
+	ecological_rules_layout->addWidget(succession_should_happen);
+	succession_should_happen->setCheckState(Qt::Checked);
+	layout->addLayout(ecological_rules_layout);
+
 	QSlider* view_dist_slider = new QSlider(Qt::Horizontal, this);
 	view_dist_slider->setMinimum(20);
 	view_dist_slider->setMaximum(80);
@@ -51,6 +59,8 @@ void AppWindow::init()
 	connect(show_view_range, SIGNAL(stateChanged(int)), this, SLOT(show_view_range_checked(int)));
 	connect(show_grid, SIGNAL(stateChanged(int)), this, SLOT(show_grid_checked(int)));
 	connect(show_domination, SIGNAL(stateChanged(int)), this, SLOT(show_domination_checked(int)));
+	connect(trees_should_propagate, SIGNAL(stateChanged(int)), this, SLOT(propagation_checked(int)));
+	connect(succession_should_happen, SIGNAL(stateChanged(int)), this, SLOT(succession_checked(int)));
 }
 
 void AppWindow::show_domination_checked(int state)
@@ -71,4 +81,14 @@ void AppWindow::show_view_range_checked(int state)
 void AppWindow::show_grid_checked(int state)
 {
 	gl_widget->set_show_grid(state == Qt::Checked);
+}
+
+void AppWindow::propagation_checked(int state)
+{
+	m_l_widget->set_propagation(state == Qt::Checked);
+}
+
+void AppWindow::succession_checked(int state)
+{
+	m_l_widget->set_succession(state == Qt::Checked);
 }

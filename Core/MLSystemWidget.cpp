@@ -8,24 +8,28 @@ MLSystemWidget::MLSystemWidget(QWidget* parent, ForestGLWidget* c): QWidget(pare
 	m_l_sys = create_m_l_system(8192, forest_length);
 	chart->set_tree_grid(&m_l_sys.t_grid);
 	for(int i = 0; i < 8; i++) tree_seeds[i] = (long int)rand();
-	add_production(&m_l_sys, "<T(s,x,y,r,a)>?(c)", "", "c == 0", 1.0f);
-	add_production(&m_l_sys, "<T(s,x,y,r,a)>?(c)", "T(s,x,y,r,a)", "c==0", 0.0f); //Shade tolerance
-	add_production(&m_l_sys, "<T(s,x,y,r,a)>", "T(s,x,y,r,a)", "r >= R", 1.0f);
-	add_production(&m_l_sys, "<T(s,x,y,r,a)>", "", "r >= R", 0.0f); //Longevity
-	add_global_parameter(&m_l_sys, 'R', "5.0");
-	add_global_parameter(&m_l_sys, 'v', "390.0");
-	add_global_parameter(&m_l_sys, 'w', "390.0");
-	add_global_parameter(&m_l_sys, 't', "10.0");
-	add_global_parameter(&m_l_sys, 'G', "20.0");
-	//add_production(&m_l_sys, "<T(s,x,y,r,a)>?(c)", "T(s,x,y,G*r,a+1)[%T(s,v,w,t,0)?(1)]", NULL, 1.0f);
-	add_production(&m_l_sys, "<T(s,x,y,r,a)>?(c)", "T(s,x,y,G*r,a+1)", NULL, 1.0f);
 	seed = (long int)time(NULL);
+	load_productions_and_parameters();
 	connect(chart, SIGNAL(initialised()), this, SLOT(init_system()));
 }
 
 MLSystemWidget::~MLSystemWidget()
 {
 	destroy_m_l_system(&m_l_sys);
+}
+
+void MLSystemWidget::load_productions_and_parameters()
+{
+	add_global_parameter(&m_l_sys, 'R', "5.0");
+	add_global_parameter(&m_l_sys, 'v', "390.0");
+	add_global_parameter(&m_l_sys, 'w', "390.0");
+	add_global_parameter(&m_l_sys, 't', "10.0");
+	add_global_parameter(&m_l_sys, 'G', "20.0");
+	add_production(&m_l_sys, "<T(s,x,y,r,a)>?(c)", "", "c == 0", 1.0f);
+	add_production(&m_l_sys, "<T(s,x,y,r,a)>?(c)", "T(s,x,y,r,a)", "c==0", 0.0f); //Shade tolerance
+	add_production(&m_l_sys, "<T(s,x,y,r,a)>", "T(s,x,y,r,a)", "r >= R", 1.0f);
+	add_production(&m_l_sys, "<T(s,x,y,r,a)>", "", "r >= R", 0.0f); //Longevity
+	add_production(&m_l_sys, "<T(s,x,y,r,a)>?(c)", "T(s,x,y,G*r,a+1)[%T(s,v,w,t,0)?(1)]", NULL, 1.0f);
 }
 
 void MLSystemWidget::init_system()
@@ -41,6 +45,20 @@ void MLSystemWidget::init_system()
 		add_str(&m_l_sys, x, y, r, s);
 	}
 	push_str_set_to_chart_and_render();
+}
+
+void MLSystemWidget::set_succession(bool b)
+{
+	m_l_sys.succession_should_happen = b;
+	parentWidget()->update();
+	chart->update();
+}
+
+void MLSystemWidget::set_propagation(bool b)
+{
+	m_l_sys.trees_should_propagate = b;
+	parentWidget()->update();
+	chart->update();
 }
 
 void MLSystemWidget::push_str_set_to_chart_and_render()

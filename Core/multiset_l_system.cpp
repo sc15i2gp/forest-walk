@@ -5,6 +5,8 @@ m_l_system create_m_l_system(int str_set_max, int forest_length)
 	m_l_system new_sys = {};
 	new_sys.str_set = create_str_m_set(str_set_max);
 	new_sys.t_grid = create_tree_grid(str_set_max, forest_length);
+	new_sys.trees_should_propagate = false;
+	new_sys.succession_should_happen = true;
 	return new_sys;
 }
 
@@ -22,6 +24,11 @@ void add_production(m_l_system* m_l_sys, char* predecessor, char* successor, cha
 void add_global_parameter(m_l_system* m_l_sys, char token, char* initial_val)
 {
 	add_global_parameter((l_system*)m_l_sys, token, initial_val);
+}
+
+void clear_production_set(m_l_system* m_l_sys)
+{
+	m_l_sys->base_sys.p_set_size = 0;
 }
 
 void clear_str_set(m_l_system* m_l_sys)
@@ -238,10 +245,20 @@ void apply_species_transformation_to_l_system(m_l_system* m_l_sys, int tree)
 			longevity = ROWAN_LONGEVITY;
 			break;
 	}
-	set_production_probability((l_system*)m_l_sys, 0, 1.0f-shade_tolerance);
-	set_production_probability((l_system*)m_l_sys, 1, shade_tolerance);
-	set_production_probability((l_system*)m_l_sys, 2, longevity);
-	set_production_probability((l_system*)m_l_sys, 3, 1.0f-longevity);
+	if(m_l_sys->succession_should_happen)
+	{
+		set_production_probability((l_system*)m_l_sys, 0, 1.0f-shade_tolerance);
+		set_production_probability((l_system*)m_l_sys, 1, shade_tolerance);
+		set_production_probability((l_system*)m_l_sys, 2, longevity);
+		set_production_probability((l_system*)m_l_sys, 3, 1.0f-longevity);
+	}
+	else
+	{
+		set_production_probability((l_system*)m_l_sys, 0, 1.0f);
+		set_production_probability((l_system*)m_l_sys, 1, 0.0f);
+		set_production_probability((l_system*)m_l_sys, 2, 1.0f);
+		set_production_probability((l_system*)m_l_sys, 3, 0.0f);
+	}
 }
 
 void derive_set(m_l_system* m_l_sys)
@@ -267,7 +284,7 @@ void derive_set(m_l_system* m_l_sys)
 	//Prune branched strings
 	for(int i = 0; i < m_l_sys->str_set.size(); i++)
 	{
-		if(m_l_sys->str_set.is_allocated(i))
+		if(m_l_sys->str_set.is_allocated(i) && m_l_sys->trees_should_propagate)
 		{
 			int index = -1;
 			char* new_str = m_l_sys->str_set.find_str_and_alloc(&index);
@@ -285,6 +302,10 @@ void derive_set(m_l_system* m_l_sys)
 				float y = read_real_parameter_value(new_str, 2);
 				m_l_sys->t_grid.insert_tree(index, x, y);
 			}
+		}
+		else
+		{
+			prune_branches(m_l_sys->str_set.find_str(i));
 		}
 	}
 	tree_domination_check(m_l_sys);
