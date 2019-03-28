@@ -1,5 +1,15 @@
 #include "mesh.h"
 
+int tree_mesh_group::size_in_bytes()
+{
+	return branch_mesh.size_in_bytes() + leaf_mesh.size_in_bytes() + fruit_mesh.size_in_bytes();
+}
+
+int mesh::size_in_bytes()
+{
+	return 2*3*sizeof(GLfloat)*vertex_data_length + sizeof(GLuint)*number_of_indices;
+}
+
 void mesh::push_vertex_data(vec3* new_vertex_data, int new_vertex_data_length, GLuint* new_indices, int number_of_new_indices)
 {
 	if(this->vertex_data_length + new_vertex_data_length > this->max_vertex_data_length)

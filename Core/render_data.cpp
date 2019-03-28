@@ -139,7 +139,7 @@ void render_queue::print()
 
 tree_model_map create_tree_model_map(int number_of_model_refs, int number_of_model_caches)
 {
-	tree_model_map t;
+	tree_model_map t = {};
 	t.tree_model_refs = (tree_model_ref*)malloc(sizeof(tree_model_ref)*number_of_model_refs);
 	memset(t.tree_model_refs, 0, sizeof(tree_model_ref)*number_of_model_refs);
 	t.number_of_tree_model_refs = number_of_model_refs;
@@ -208,7 +208,13 @@ int tree_model_map::lod(int model_index)
 
 void tree_model_map::release_ref(tree_model_ref* ref)
 {
-	tree_models[ref->model_ref].ref_count--;
+	model_cache* m_cache = tree_models+ref->model_ref;
+	m_cache->ref_count--;
+	if(m_cache->ref_count == 0) 
+	{//If the model will be cleared from VRAM
+		buffered_model_data_size -= m_cache->model_size;
+		m_cache->model_size = 0;
+	}
 	ref->tree = NULL;
 	ref->model_ref = -1;
 }
@@ -237,11 +243,13 @@ tree_buffer_object tree_model_map::find_model(int ref_index)
 	return tree_models[ref->model_ref].model;
 }
 
-void tree_model_map::set_model(tree_node* t_node, tree_buffer_object model, int lod)
+void tree_model_map::set_model(tree_node* t_node, tree_buffer_object model, int model_size, int lod)
 {
 	tree_model_ref* ref = find_tree_model_ref(t_node);
 	tree_models[ref->model_ref].model = model;
 	tree_models[ref->model_ref].lod = lod;
+	tree_models[ref->model_ref].model_size = model_size;
+	buffered_model_data_size += model_size;
 }
 
 bool tree_model_map::tree_has_model(tree_node* t_node)
