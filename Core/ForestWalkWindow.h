@@ -22,6 +22,7 @@ public slots:
 	void show_old_age_checked(int);
 	void show_view_range_checked(int);
 	void show_grid_checked(int);
+	void self_thinning_checked(int);
 	void propagation_checked(int);
 	void succession_checked(int);
 

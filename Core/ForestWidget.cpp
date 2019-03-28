@@ -3,7 +3,7 @@
 ForestGLWidget::ForestGLWidget(QWidget* parent): QGLWidget(parent)
 {
 	model_generator = create_tree_model_generator();
-	t_map = create_tree_model_map(4096,4096);
+	t_map = create_tree_model_map(128,64);
 	r_queue = create_render_queue(4096);
 
 	tree_model_buffer.branch_mesh = create_mesh(2048*4096, 2048*4096);
@@ -569,8 +569,8 @@ void ForestGLWidget::generate_tree_model(tree_node* t_node, int lod)
 {
 	//TIMED(__func__);
 	clear_tree_model(&tree_model_buffer);
-	model_generator.generate_tree_model(&tree_model_buffer, lod);
-	t_map.set_model(t_node, buffer_tree_mesh_group(&tree_model_buffer), lod);
+	int model_size = model_generator.generate_tree_model(&tree_model_buffer, lod);
+	t_map.set_model(t_node, buffer_tree_mesh_group(&tree_model_buffer), model_size, lod);
 }
 
 void ForestGLWidget::clear_unused_model_buffers()
@@ -611,6 +611,7 @@ int models_cleared = 0;
 void ForestGLWidget::generate_tree_models(vec3 view_pos)
 {
 	TIMED(__func__);
+	printf("Initial model data in VRAM = %d bytes\n", t_map.buffered_model_data_size);
 	int species = -1;
 	int p_species = -1;
 	int age = -1;
@@ -711,6 +712,7 @@ void ForestGLWidget::generate_tree_models(vec3 view_pos)
 		p_age = age;
 		p_seed = seed;
 	}
+	printf("Final model data in VRAM = %d bytes\n", t_map.buffered_model_data_size);
 }
 
 int rendered = 0;
@@ -795,12 +797,6 @@ void ForestGLWidget::render_forest()
 		2.0f
 	};
 	set_material(&grass_material);
-	render(platform);
-	glTranslatef(-(forest_width/2.0f),0.0f,-(forest_height/2.0f));
-	view_pos = view_pos + vec3{forest_width/2.0f,0.0f,forest_height/2.0f};
-	view_dir.y = 0.0f;
-	view_dir = normalise(view_dir);
-	
 	glEnable(GL_FOG);
 	glFogf(GL_FOG_START, 0.5f*view_dist);
 	glFogf(GL_FOG_END, 2.0f*view_dist);
@@ -808,6 +804,12 @@ void ForestGLWidget::render_forest()
 	glFogf(GL_FOG_DENSITY, 0.05f);
 	GLfloat fog_colour[] = {0.494f, 0.753f, 0.933f, 1.0f};
 	glFogfv(GL_FOG_COLOR, fog_colour);
+	render(platform);
+	glTranslatef(-(forest_width/2.0f),0.0f,-(forest_height/2.0f));
+	view_pos = view_pos + vec3{forest_width/2.0f,0.0f,forest_height/2.0f};
+	view_dir.y = 0.0f;
+	view_dir = normalise(view_dir);
+	
 	printf("------------------------\n");
 	models_gen = 0;
 	models_cleared = 0;

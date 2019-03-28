@@ -2,7 +2,7 @@
 
 MLSystemWidget::MLSystemWidget(QWidget* parent, ForestGLWidget* c): QWidget(parent)
 {
-	forest_length = 200;
+	forest_length = 100;
 	chart = c;
 	chart->set_forest_bounds((float)forest_length, (float)forest_length);
 	m_l_sys = create_m_l_system(8192, forest_length);
@@ -47,6 +47,20 @@ void MLSystemWidget::init_system()
 	push_str_set_to_chart_and_render();
 }
 
+void MLSystemWidget::set_self_thinning(bool b)
+{
+	m_l_sys.self_thinning_should_happen = b;
+	if(m_l_sys.self_thinning_should_happen)
+	{
+		tree_domination_check(&m_l_sys);
+	}
+	else
+	{
+		set_all_trees_not_dominated(&m_l_sys);
+	}
+	push_str_set_to_chart_and_render();
+}
+
 void MLSystemWidget::set_succession(bool b)
 {
 	m_l_sys.succession_should_happen = b;
@@ -63,7 +77,6 @@ void MLSystemWidget::set_propagation(bool b)
 
 void MLSystemWidget::push_str_set_to_chart_and_render()
 {
-	TIMED(__func__);
 	str_m_set* s = &(m_l_sys.str_set);
 	for(int i = 0; i < m_l_sys.t_grid.height(); i++)
 	{
@@ -100,10 +113,7 @@ void MLSystemWidget::push_str_set_to_chart_and_render()
 
 void MLSystemWidget::run_derivation()
 {
-	TIMED(__func__);
 	derive_set(&m_l_sys);
-	//print_l_system(&m_l_sys.base_sys, "multiset");
-	//print_str_set(&m_l_sys);
 	m_l_sys.t_grid.derived = true;
 	push_str_set_to_chart_and_render();
 }

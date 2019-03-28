@@ -37,11 +37,14 @@ void AppWindow::init()
 	layout->addLayout(chart_toggle_layout);
 
 	QBoxLayout* ecological_rules_layout = new QBoxLayout(QBoxLayout::LeftToRight);
+	QCheckBox* self_thinning_should_happen = new QCheckBox("Self-thinning", this);
 	QCheckBox* trees_should_propagate = new QCheckBox("Propagation", this);
 	QCheckBox* succession_should_happen = new QCheckBox("Succession", this);
+	ecological_rules_layout->addWidget(self_thinning_should_happen);
 	ecological_rules_layout->addWidget(trees_should_propagate);
 	ecological_rules_layout->addWidget(succession_should_happen);
 	succession_should_happen->setCheckState(Qt::Checked);
+	self_thinning_should_happen->setCheckState(Qt::Checked);
 	layout->addLayout(ecological_rules_layout);
 
 	QSlider* view_dist_slider = new QSlider(Qt::Horizontal, this);
@@ -59,6 +62,7 @@ void AppWindow::init()
 	connect(show_view_range, SIGNAL(stateChanged(int)), this, SLOT(show_view_range_checked(int)));
 	connect(show_grid, SIGNAL(stateChanged(int)), this, SLOT(show_grid_checked(int)));
 	connect(show_domination, SIGNAL(stateChanged(int)), this, SLOT(show_domination_checked(int)));
+	connect(self_thinning_should_happen, SIGNAL(stateChanged(int)), this, SLOT(self_thinning_checked(int)));
 	connect(trees_should_propagate, SIGNAL(stateChanged(int)), this, SLOT(propagation_checked(int)));
 	connect(succession_should_happen, SIGNAL(stateChanged(int)), this, SLOT(succession_checked(int)));
 }
@@ -81,6 +85,11 @@ void AppWindow::show_view_range_checked(int state)
 void AppWindow::show_grid_checked(int state)
 {
 	gl_widget->set_show_grid(state == Qt::Checked);
+}
+
+void AppWindow::self_thinning_checked(int state)
+{
+	m_l_widget->set_self_thinning(state == Qt::Checked);
 }
 
 void AppWindow::propagation_checked(int state)

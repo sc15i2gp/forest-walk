@@ -7,6 +7,7 @@ m_l_system create_m_l_system(int str_set_max, int forest_length)
 	new_sys.t_grid = create_tree_grid(str_set_max, forest_length);
 	new_sys.trees_should_propagate = false;
 	new_sys.succession_should_happen = true;
+	new_sys.self_thinning_should_happen = true;
 	return new_sys;
 }
 
@@ -261,6 +262,17 @@ void apply_species_transformation_to_l_system(m_l_system* m_l_sys, int tree)
 	}
 }
 
+void set_all_trees_not_dominated(m_l_system* m_l_sys)
+{
+	for(int i = 0; i < m_l_sys->str_set.size(); i++)
+	{
+		if(m_l_sys->str_set.is_allocated(i))
+		{
+			write_into_parameter(find_next_module(m_l_sys->str_set.find_str(i)), 0, 1.0f);
+		}
+	}
+}
+
 void derive_set(m_l_system* m_l_sys)
 {
 	//printf("Number of trees in str set: %d\n", m_l_sys->str_set.number_allocated());
@@ -308,7 +320,7 @@ void derive_set(m_l_system* m_l_sys)
 			prune_branches(m_l_sys->str_set.find_str(i));
 		}
 	}
-	tree_domination_check(m_l_sys);
+	if(m_l_sys->self_thinning_should_happen) tree_domination_check(m_l_sys);
 	remove_dead_trees(m_l_sys);
 	//printf("Final number of trees in str set: %d\n", m_l_sys->str_set.number_allocated());
 	//printf("Final number of trees in grid: %d\n", m_l_sys->t_grid.number_of_trees());

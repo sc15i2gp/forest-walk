@@ -13,6 +13,7 @@ class MLSystemWidget: public QWidget
 public:
 	MLSystemWidget(QWidget*,ForestGLWidget*);
 	~MLSystemWidget();
+	void set_self_thinning(bool);
 	void set_succession(bool);
 	void set_propagation(bool);
 
