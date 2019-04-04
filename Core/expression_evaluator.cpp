@@ -74,17 +74,16 @@ bool has_equal_precedence(char* x, char* y)
 float compute_rpn_string_result(char* str, int str_length)
 {
 	STACK(float) s;
-	assert(*str != 0);
 	arithmetic_tokeniser tokeniser = {str, str_length};
+
 	for(arithmetic_token token = tokeniser.get_next_rpn_token(); token.type != token_end && token.type != token_invalid; token = tokeniser.get_next_rpn_token())
-	{
+	{//For each token in input rpn string
 		if(token.type == token_operator)
 		{
 			float b = s.pop_state();
 			float a = s.pop_state();
 			float r = 0.0;
 			operation o = find_operation(token.str);
-			assert(o);
 			r = o(a, b);
 			s.push_state(r);
 		}
@@ -115,15 +114,16 @@ char top_operator(STACK(arithmetic_token)* s)
 }
 
 
-//Shunting yard algorithm
+//NOTE: Imlpementation of shunting yard algorithm
 void convert_expression_to_rpn(char* input, int input_length)
 {
 	STACK(arithmetic_token) s;
-	assert(*input != 0);
+
 	char_queue output_queue;
 	arithmetic_tokeniser tokeniser = {input, input_length};
+
 	for(arithmetic_token token = tokeniser.get_next_token(); token.type != token_end && token.type != token_invalid; token = tokeniser.get_next_token())
-	{
+	{//For each token in input str
 		if(token.type == token_real)
 		{
 			output_queue.push(token.str, token.length);
@@ -136,6 +136,8 @@ void convert_expression_to_rpn(char* input, int input_length)
 				is_left_associative(*s.read_state().str))) && 
 				top_operator(&s) != '(')
 			{
+				//Pop operator from token stack until stack's top token has: lower precedence than current token's;
+				//equal precedence as current token's and current token is right associative (e.g. exponent)
 				pop_operator(&s, &output_queue);
 			}
 			s.push_state(token);
@@ -151,7 +153,7 @@ void convert_expression_to_rpn(char* input, int input_length)
 		}
 	}
 	while(!s.is_empty())
-	{
+	{//Pop remaining operator tokens from stack to output queue
 		pop_operator(&s, &output_queue);
 	}
 	overwrite_string(input, output_queue.char_array, 0, input_length);
