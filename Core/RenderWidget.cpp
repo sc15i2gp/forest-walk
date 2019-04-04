@@ -101,7 +101,7 @@ void GLWidget::load_tree_model(char* tree_string)
 	tree.fruit_mesh.vertex_data_length = 0;
 	tree.fruit_mesh.number_of_indices = 0;
 
-	run_turtle(tree_string, &tree);
+	run_turtle(tree_string, &tree, 2);
 
 	if(tree.branch_mesh.vertex_data_length > 0) branches = buffer_mesh(&tree.branch_mesh);
 	if(tree.leaf_mesh.vertex_data_length > 0) leaves = buffer_mesh(&tree.leaf_mesh);

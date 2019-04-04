@@ -3,7 +3,7 @@
 ForestGLWidget::ForestGLWidget(QWidget* parent): QGLWidget(parent)
 {
 	model_generator = create_tree_model_generator();
-	t_map = create_tree_model_map(128,64);
+	t_map = create_tree_model_map(4096,256);
 	r_queue = create_render_queue(4096);
 
 	tree_model_buffer.branch_mesh = create_mesh(2048*4096, 2048*4096);

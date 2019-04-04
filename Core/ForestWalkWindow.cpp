@@ -48,7 +48,7 @@ void AppWindow::init()
 	layout->addLayout(ecological_rules_layout);
 
 	QSlider* view_dist_slider = new QSlider(Qt::Horizontal, this);
-	view_dist_slider->setMinimum(20);
+	view_dist_slider->setMinimum(10);
 	view_dist_slider->setMaximum(80);
 	view_dist_slider->setValue(30);
 	layout->addWidget(view_dist_slider);

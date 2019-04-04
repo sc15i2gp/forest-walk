@@ -2,9 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define IGNORE
-IGNORE
-//TODO: Format output code
+//NOTE: Purpose of this module is to avoid the need for C++ templates because they are abominable and worthless
+
+#define IGNORE_STACK_GEN
+IGNORE_STACK_GEN
 
 char* read_file_contents(const char* file_path)
 {
@@ -166,7 +167,7 @@ bool is_stack_macro(char* at)
 
 bool is_ignore_macro(char* at)
 {
-	return substr_equals(at, "IGNORE");
+	return substr_equals(at, "IGNORE_STACK_GEN");
 }
 
 char* move_over_stack_macro(char* at)
