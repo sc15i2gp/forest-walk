@@ -3,6 +3,9 @@
 #include <cstring>
 #include <cstdio>
 
+//A module string is string formed of parameterised symbols with 0 or more parameters
+//A branched string is a module string containing '[' and ']'
+
 //General string functions
 bool is_whitespace(char);
 

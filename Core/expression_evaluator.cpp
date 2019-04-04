@@ -115,6 +115,8 @@ char top_operator(STACK(arithmetic_token)* s)
 
 
 //NOTE: Imlpementation of shunting yard algorithm
+//NOTE: This function cannot tell if a string is already rpn, if the input string is already rpn, then result could be 
+//	an incorrectly formatted string
 void convert_expression_to_rpn(char* input, int input_length)
 {
 	STACK(arithmetic_token) s;
