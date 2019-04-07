@@ -2,6 +2,7 @@ TEMPLATE = app
 CONFIG += c++11
 TARGET = forest-walk
 INCLUDEPATH += . /opt/local/include
+QMAKE_CXXFLAGS += -Wno-write-strings
 
 QT += widgets opengl gui core
 LIBS += -lGLU 

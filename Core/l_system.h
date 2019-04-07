@@ -1,11 +1,9 @@
 #pragma once
 #include <stdio.h>
-#include <time.h>
 #include "string_functions.h"
 #include "expression_evaluator.h"
 #include "char_queue.h"
 #include "char_queue_stack.h"
-#include "timed.h"
 
 #define CONTEXT_MAX 32
 #define STRICT_MAX 16
@@ -47,14 +45,21 @@ struct l_system
 	param_mapping param_map[PARAM_MAP_MAX];
 };
 
-void print_production(production*);
-void print_l_system(l_system*, const char* name);
+//Change l_system properties
 void add_production(l_system*,char* pre, char* succ, char* cond = NULL, float = 1.0);
 void add_production(l_system* l, char* pre_l_context, char* pre_strict, char* pre_r_context, char* successor, char* condition, float probability);
 void add_production(l_system* l, char* pre_l_context, char* pre_strict, char* pre_r_context, char* successor, char* condition, char* probability);
 void add_global_parameter(l_system*, char token, char* initial_value = NULL);
 void set_global_parameter(l_system*, char token, char* value);
 void set_production_probability(l_system*, int production, float probability);
+
+//Derive
 void derive_str(l_system*,char*);
+
+//File I/O
 void load_l_system(l_system*,const char* path, char* axiom_buffer);
 void save_l_system(l_system*,const char* path, char* axiom_buffer);
+
+//Print
+void print_production(production*);
+void print_l_system(l_system*, const char* name);
