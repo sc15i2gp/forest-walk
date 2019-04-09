@@ -36,4 +36,6 @@ vec3 matrix_multiply_4x4(vec3 v, float* matrix);
 void transpose_matrix_4x4(float* matrix);
 float min(float,float);
 float max(float,float);
+bool do_circles_intersect(float x_0, float y_0, float r_0, float x_1, float y_1, float r_1);
+vec3 generate_vector_within_radius(vec3 center, float r_max);
 void print_vector(vec3 v);

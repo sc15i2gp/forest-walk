@@ -53,8 +53,8 @@ void AppWindow::init()
 	view_dist_slider->setValue(30);
 	layout->addWidget(view_dist_slider);
 
-	connect(derive_button, SIGNAL(clicked()), this->ecosystem_widget, SLOT(run_derivation()));
-	connect(reset_button, SIGNAL(clicked()), this->ecosystem_widget, SLOT(init_system()));
+	connect(derive_button, SIGNAL(clicked()), this->ecosystem_widget, SLOT(iterate_plastochron()));
+	connect(reset_button, SIGNAL(clicked()), this->ecosystem_widget, SLOT(init_ecosystem()));
 	connect(chart_mode_button, SIGNAL(pressed()), this->gl_widget, SLOT(set_chart_mode()));
 	connect(forest_mode_button, SIGNAL(pressed()), this->gl_widget, SLOT(set_forest_mode()));
 	connect(view_dist_slider, SIGNAL(valueChanged(int)), this->gl_widget, SLOT(set_view_dist(int)));

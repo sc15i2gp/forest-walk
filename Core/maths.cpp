@@ -115,7 +115,28 @@ float max(float f, float g)
 	return (f > g) ? f : g;
 }
 
+bool do_circles_intersect(float x_0, float y_0, float r_0, float x_1, float y_1, float r_1)
+{
+	float dist = sqrt((x_0 - x_1)*(x_0 - x_1) + (y_0 - y_1)*(y_0 - y_1));
+	float total_radius = r_0 + r_1;
+	return dist < total_radius;
+}
+
+
 void print_vector(vec3 v)
 {
 	printf("%f %f %f ", v.x, v.y, v.z);
+}
+
+vec3 generate_vector_within_radius(vec3 center, float r_max)
+{
+	int c = rand()%100; //How much of r_max away from the center should v be
+	float c_f = (float)c/100.0f;
+	float r = r_max*c_f;
+	vec3 v = {r, 0.0f, 0.0f};
+
+	int a = rand()%360; //Angle to rotate around v
+	v = rotate_about_axis(v, vec3{0.0f,0.0f,1.0f}, (float)a);
+	v = v + center;
+	return v;
 }

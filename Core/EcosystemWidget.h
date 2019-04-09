@@ -18,13 +18,12 @@ public:
 	void set_propagation(bool);
 
 public slots:
-	void run_derivation();
-	void init_system();
+	void iterate_plastochron();
+	void init_ecosystem();
 
 private:
 	long int seed;
 	long int tree_seeds[8] = {};
-	int forest_length;
 	ForestGLWidget* gl_widget;
 	forest_ecosystem ecosystem;
 };

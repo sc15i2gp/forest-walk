@@ -5,7 +5,6 @@
 #include "species_info.h"
 #include "timed.h"
 
-//TODO: Separate multiset l-system code from just ecosystem code
 struct m_l_system
 {
 	l_system base_l_sys;

@@ -5,6 +5,8 @@ struct forest_ecosystem
 {
 	m_l_system m_l_sys;
 	tree_grid t_grid;
+	int forest_length;
+
 	long int tree_seeds[8];
 
 	bool self_thinning_should_happen;
@@ -17,6 +19,7 @@ struct forest_ecosystem
 	void tree_domination_check();
 	void update_tree_grid_data();
 	void remove_all_trees();
+	float generate_initial_tree_radius();
 };
 
 forest_ecosystem create_ecosystem(int,int);
