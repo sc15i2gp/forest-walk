@@ -6,6 +6,7 @@ forest_ecosystem create_ecosystem(int str_set_max_size, int forest_length)
 
 	for(int i = 0; i < 8; i++) ecosystem.tree_seeds[i] = (long int)rand();
 	
+	//Initialise ecosystem fields
 	ecosystem.m_l_sys = create_m_l_system(str_set_max_size, forest_length);
 	ecosystem.t_grid = create_tree_grid(str_set_max_size, forest_length);
 	ecosystem.forest_length = forest_length;
@@ -34,6 +35,7 @@ void destroy_ecosystem(forest_ecosystem* ecosystem)
 	destroy_m_l_system(&ecosystem->m_l_sys);
 }
 
+//Get positions and radii of t and u, then check for intersection
 bool trees_intersect(char* t, char* u)
 {
 	float t_x = read_real_parameter_value(t, 1);
@@ -122,6 +124,7 @@ void remove_dead_trees(m_l_system* m_l_sys, tree_grid* t_grid)
 	for(int i = 0; i < m_l_sys->str_set.size(); i++)
 	{//For each string in the m_l_system
 		char* str = m_l_sys->str_set.find_str(i);
+
 		if(m_l_sys->str_set.is_allocated(i) && number_of_modules(str) <= 1)
 		{//If tree is dead
 			t_grid->remove_tree(i);
@@ -130,12 +133,14 @@ void remove_dead_trees(m_l_system* m_l_sys, tree_grid* t_grid)
 	}
 }
 
+//TODO: Remove reliance on forest_length for generating initial radius
 float generate_initial_tree_radius(int forest_length)
 {
 	return (float)(rand() % forest_length)/(forest_length+200.0f) + 0.1f;
 }
 
-void generate_propagation_vector(m_l_system* m_l_sys, tree_grid* t_grid, int parent, int forest_length)
+//Generates a propagation vector and an initial radius for a new tree
+void generate_propagation_data(m_l_system* m_l_sys, tree_grid* t_grid, int parent, int forest_length)
 {
 	//Determine propagation radius for species
 	float propagation_radius = 0.0f;
@@ -169,7 +174,7 @@ void generate_propagation_vector(m_l_system* m_l_sys, tree_grid* t_grid, int par
 		new_pos = p_pos; //Set it to parent's position so it will immediately be removed through domination
 	}
 	
-	//Generate initial radius for 
+	//Generate initial radius for a potential new tree
 	float r = generate_initial_tree_radius(forest_length);
 	
 	char v[8] = {};
@@ -185,6 +190,7 @@ void generate_propagation_vector(m_l_system* m_l_sys, tree_grid* t_grid, int par
 	m_l_sys->set_global_parameter('t', t);
 }
 
+//Change l_system's growth rate, max radius, shade tolerance and longevity according to the species of the tree parameter
 void apply_species_transformation_to_l_system(m_l_system* m_l_sys, int tree, bool succession_should_happen)
 {
 	int species = read_real_parameter_value(m_l_sys->str_set.find_str(tree), 0);
@@ -212,7 +218,7 @@ void apply_species_transformation_to_l_system(m_l_system* m_l_sys, int tree, boo
 			break;
 	}
 	if(succession_should_happen)
-	{
+	{//If succession should happen, change production probabilities such that shade tolerance nad longevity are tekn into account
 		m_l_sys->set_production_probability(0, 1.0f-shade_tolerance);
 		m_l_sys->set_production_probability(1, shade_tolerance);
 		m_l_sys->set_production_probability(2, longevity);
@@ -231,49 +237,48 @@ void derive_tree_strs(m_l_system* m_l_sys, tree_grid* t_grid, bool succession_sh
 {
 	for(int i = 0; i < m_l_sys->str_set.size(); i++)
 	{
-		//Generate position within a radius of 10.0f of the current str
+		//Generate position within a certain radius of the current str
 		//If out of bounds, use a default vector
 		if(m_l_sys->str_set.is_allocated(i))
 		{
-			generate_propagation_vector(m_l_sys, t_grid, i, forest_length);
+			generate_propagation_data(m_l_sys, t_grid, i, forest_length);
 			apply_species_transformation_to_l_system(m_l_sys, i, succession_should_happen);
 			char* s = m_l_sys->str_set.find_str(i);
+
 			float r_0 = read_real_parameter_value(s, 3);
 			m_l_sys->derive_str(i);
 			float r_1 = read_real_parameter_value(s, 3);
+
+			//This is necessary to ensure only trees which have changed need their tree models generated
 			if(r_0 != r_1) t_grid->find_node_by_str_ref(i)->changed = true;
 		}
 	}
 }
 
+//Removes propagated trees from their original strings and places them in their own
 void prune_tree_strs(m_l_system* m_l_sys, tree_grid* t_grid, bool trees_should_propagate)
 {
 	for(int i = 0; i < m_l_sys->str_set.size(); i++)
 	{
-		if(m_l_sys->str_set.is_allocated(i))
+		if(m_l_sys->str_set.is_allocated(i) && trees_should_propagate)
 		{
-			if(trees_should_propagate)
-			{
-				int index = -1;
-				char* new_str = m_l_sys->str_set.find_str_and_alloc(&index);
-				new_str[0] = 0;
-				prune_branches(m_l_sys->str_set.find_str(i),new_str);
-				if(strlen(new_str) == 0)
-				{
-					new_str[0] = 0;
-					m_l_sys->str_set.free(index);
-				}
-				else
-				{
-					//Get new str x and y
-					float x = read_real_parameter_value(new_str, 1);
-					float y = read_real_parameter_value(new_str, 2);
-					t_grid->insert_tree(index, x, y);
-				}
+			int index = -1;
+			char* new_str = m_l_sys->str_set.find_str_and_alloc(&index);
+			new_str[0] = 0;
+
+			prune_branches(m_l_sys->str_set.find_str(i),new_str);
+
+			if(strlen(new_str) == 0)
+			{//If there was no propagated tree string
+				m_l_sys->str_set.free(index);
 			}
 			else
 			{
-				prune_branches(m_l_sys->str_set.find_str(i));
+				//Get new str x and y
+				float x = read_real_parameter_value(new_str, 1);
+				float y = read_real_parameter_value(new_str, 2);
+
+				t_grid->insert_tree(index, x, y);
 			}
 		}
 	}
@@ -307,6 +312,8 @@ void forest_ecosystem::tree_domination_check()
 	}
 }
 
+//Each tree string in the multiset l-system's string set has a corresponding tree node in the tree grid
+//This function copies data from each tree string to their matching tree node
 void forest_ecosystem::update_tree_grid_data()
 {
 	str_m_set* s = &(m_l_sys.str_set);
@@ -320,6 +327,8 @@ void forest_ecosystem::update_tree_grid_data()
 				char* str = s->find_str(tree->str_ref);
 				if(number_of_modules(str) > 1)
 				{
+					const char* max_r = (s == PINE) ? PINE_MAX_RADIUS : (s == BIRCH) ? BIRCH_MAX_RADIUS : ROWAN_MAX_RADIUS;
+
 					int s = (int)read_real_parameter_value(str, 0);
 					float x = read_real_parameter_value(str, 1);
 					float y = read_real_parameter_value(str, 2);
@@ -329,7 +338,6 @@ void forest_ecosystem::update_tree_grid_data()
 					if(tree->seed < 0) tree->seed = tree_seeds[rand() % 8];
 					tree->species = s;
 					tree->age = age;
-					const char* max_r = (s == PINE) ? PINE_MAX_RADIUS : (s == BIRCH) ? BIRCH_MAX_RADIUS : ROWAN_MAX_RADIUS;
 					tree->old_age = r >= atof(max_r);
 					tree->_x = x;
 					tree->_y = y;
@@ -355,7 +363,7 @@ void forest_ecosystem::add_tree(float x, float y, float r, int s)
 	snprintf(str, SET_STR_MAX_SIZE, "T(%d,%f,%f,%f,0)?(1)\0", s, x, y, r);
 
 	t_grid.insert_tree(str_index, x, y);
-	::tree_domination_check(&m_l_sys, &t_grid, str_index);//Only go through current string set once for added string
+	::tree_domination_check(&m_l_sys, &t_grid, str_index);//Only go through current string set once for added string to check for domination
 }
 
 float forest_ecosystem::generate_initial_tree_radius()
