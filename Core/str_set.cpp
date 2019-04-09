@@ -3,10 +3,13 @@
 str_m_set create_str_m_set(int size)
 {
 	str_m_set new_set;
+
 	new_set.max_size = size;
 	new_set.strs = (char*)malloc(SET_STR_MAX_SIZE*size);
 	new_set.allocated = (bool*)malloc(sizeof(bool)*size);
+
 	memset(new_set.allocated, 0, sizeof(bool)*size);
+
 	return new_set;
 }
 
@@ -48,7 +51,7 @@ void str_m_set::alloc(int i)
 	allocated[i] = true;
 }
 
-int str_m_set::number_allocated()
+int str_m_set::number_of_strs_allocated()
 {
 	int total = 0;
 	for(int i = 0; i < size(); i++) if(is_allocated(i)) total++;

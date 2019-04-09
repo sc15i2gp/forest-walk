@@ -8,7 +8,7 @@
 #include <QCheckBox>
 #include <QPixmap>
 #include "ForestWidget.h"
-#include "MLSystemWidget.h"
+#include "EcosystemWidget.h"
 
 class AppWindow: public QWidget
 {
@@ -29,5 +29,5 @@ public slots:
 private:
 	QBoxLayout* layout;
 	ForestGLWidget* gl_widget;
-	MLSystemWidget* m_l_widget;
+	EcosystemWidget* ecosystem_widget;
 };

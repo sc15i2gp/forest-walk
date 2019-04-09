@@ -8,7 +8,7 @@ AppWindow::AppWindow(QWidget* parent): QWidget(parent)
 void AppWindow::init()
 {
 	gl_widget = new ForestGLWidget(this);
-	m_l_widget = new MLSystemWidget(this, gl_widget);
+	ecosystem_widget = new EcosystemWidget(this, gl_widget);
 	layout->addWidget(gl_widget);
 	QBoxLayout* sim_control_layout = new QBoxLayout(QBoxLayout::LeftToRight);
 	QPushButton* derive_button = new QPushButton("Derive");
@@ -53,8 +53,8 @@ void AppWindow::init()
 	view_dist_slider->setValue(30);
 	layout->addWidget(view_dist_slider);
 
-	connect(derive_button, SIGNAL(clicked()), this->m_l_widget, SLOT(run_derivation()));
-	connect(reset_button, SIGNAL(clicked()), this->m_l_widget, SLOT(init_system()));
+	connect(derive_button, SIGNAL(clicked()), this->ecosystem_widget, SLOT(run_derivation()));
+	connect(reset_button, SIGNAL(clicked()), this->ecosystem_widget, SLOT(init_system()));
 	connect(chart_mode_button, SIGNAL(pressed()), this->gl_widget, SLOT(set_chart_mode()));
 	connect(forest_mode_button, SIGNAL(pressed()), this->gl_widget, SLOT(set_forest_mode()));
 	connect(view_dist_slider, SIGNAL(valueChanged(int)), this->gl_widget, SLOT(set_view_dist(int)));
@@ -89,15 +89,15 @@ void AppWindow::show_grid_checked(int state)
 
 void AppWindow::self_thinning_checked(int state)
 {
-	m_l_widget->set_self_thinning(state == Qt::Checked);
+	ecosystem_widget->set_self_thinning(state == Qt::Checked);
 }
 
 void AppWindow::propagation_checked(int state)
 {
-	m_l_widget->set_propagation(state == Qt::Checked);
+	ecosystem_widget->set_propagation(state == Qt::Checked);
 }
 
 void AppWindow::succession_checked(int state)
 {
-	m_l_widget->set_succession(state == Qt::Checked);
+	ecosystem_widget->set_succession(state == Qt::Checked);
 }

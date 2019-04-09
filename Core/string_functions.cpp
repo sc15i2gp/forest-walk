@@ -378,7 +378,7 @@ char* find_end_of_branch(char* branch)
 }
 
 //Clears symbols between '[' and ']'
-//Copies cleared symbols into dest if dest is not NULL
+//Copies cleared symbols from the first branch into dest if dest is not NULL
 //Removes '[' and ']' if branch is now empty
 void prune_branches(char* branched_str, char* dest)
 {

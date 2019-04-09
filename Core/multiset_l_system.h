@@ -5,25 +5,25 @@
 #include "species_info.h"
 #include "timed.h"
 
+//TODO: Separate multiset l-system code from just ecosystem code
 struct m_l_system
 {
-	l_system base_sys;
+	l_system base_l_sys;
 	str_m_set str_set;
-	tree_grid t_grid;
-	bool self_thinning_should_happen;
-	bool trees_should_propagate;
-	bool succession_should_happen;
+
+	void print_str_set();
+
+	void add_production(char* predecessor, char* successor, char* condition, float prob = 1.0f);
+	void set_production_probability(int,float);
+	void add_global_parameter(char token, char* initial_val);
+	void set_global_parameter(char token, char* value);
+
+	void clear_production_set();
+	void clear_str_set();
+
+	void derive_str(int);
 };
 
 m_l_system create_m_l_system(int str_set_max, int forest_length); 
-void print_str_set(m_l_system*);
-void clear_production_set(m_l_system*);
-void clear_str_set(m_l_system*);
-char* get_str_from_set(m_l_system*, int);
 void destroy_m_l_system(m_l_system*);
-void add_str(m_l_system*, float x, float y, float r, int s);
-void add_production(m_l_system*, char* predecessor, char* successor, char* condition, float prob = 1.0f);
-void add_global_parameter(m_l_system*, char token, char* initial_val);
-void tree_domination_check(m_l_system*);
-void set_all_trees_not_dominated(m_l_system*);
-void derive_set(m_l_system*);
+
