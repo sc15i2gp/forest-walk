@@ -438,7 +438,7 @@ void derive_str(l_system* l, char* input_str)
 		//Push current module into l_context stack
 		if(*current_module == '[') l_context_stack.push_state(l_context_queue);
 		else if(*current_module == ']') l_context_queue = l_context_stack.pop_state();
-		else if(!should_ignore_in_context(current_module))
+		else if(!should_ignore_in_context(current_module) && l->max_l_context_size > 0)
 		{
 			if(l_context_push_count >= l->max_l_context_size)
 			{//If number of modules pushed to l_context is greater than max_l_context_size
