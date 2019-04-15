@@ -260,25 +260,32 @@ void prune_tree_strs(m_l_system* m_l_sys, tree_grid* t_grid, bool trees_should_p
 {
 	for(int i = 0; i < m_l_sys->str_set.size(); i++)
 	{
-		if(m_l_sys->str_set.is_allocated(i) && trees_should_propagate)
+		if(m_l_sys->str_set.is_allocated(i))
 		{
-			int index = -1;
-			char* new_str = m_l_sys->str_set.find_str_and_alloc(&index);
-			new_str[0] = 0;
+			if(trees_should_propagate)
+			{
+				int index = -1;
+				char* new_str = m_l_sys->str_set.find_str_and_alloc(&index);
+				new_str[0] = 0;
 
-			prune_branches(m_l_sys->str_set.find_str(i),new_str);
+				prune_branches(m_l_sys->str_set.find_str(i),new_str);
 
-			if(strlen(new_str) == 0)
-			{//If there was no propagated tree string
-				m_l_sys->str_set.free(index);
+				if(strlen(new_str) == 0)
+				{//If there was no propagated tree string
+					m_l_sys->str_set.free(index);
+				}
+				else
+				{
+					//Get new str x and y
+					float x = read_real_parameter_value(new_str, 1);
+					float y = read_real_parameter_value(new_str, 2);
+
+					t_grid->insert_tree(index, x, y);
+				}
 			}
 			else
 			{
-				//Get new str x and y
-				float x = read_real_parameter_value(new_str, 1);
-				float y = read_real_parameter_value(new_str, 2);
-
-				t_grid->insert_tree(index, x, y);
+				prune_branches(m_l_sys->str_set.find_str(i));
 			}
 		}
 	}
@@ -327,16 +334,16 @@ void forest_ecosystem::update_tree_grid_data()
 				char* str = s->find_str(tree->str_ref);
 				if(number_of_modules(str) > 1)
 				{
-					const char* max_r = (s == PINE) ? PINE_MAX_RADIUS : (s == BIRCH) ? BIRCH_MAX_RADIUS : ROWAN_MAX_RADIUS;
+					int sp = (int)read_real_parameter_value(str, 0);
+					const char* max_r = (sp == PINE) ? PINE_MAX_RADIUS : (sp == BIRCH) ? BIRCH_MAX_RADIUS : ROWAN_MAX_RADIUS;
 
-					int s = (int)read_real_parameter_value(str, 0);
 					float x = read_real_parameter_value(str, 1);
 					float y = read_real_parameter_value(str, 2);
 					float r = read_real_parameter_value(str, 3);
 					int age = (int)read_real_parameter_value(str, 4);
 					int c = (int)read_real_parameter_value(find_next_module(str));
 					if(tree->seed < 0) tree->seed = tree_seeds[rand() % 8];
-					tree->species = s;
+					tree->species = sp;
 					tree->age = age;
 					tree->old_age = r >= atof(max_r);
 					tree->_x = x;
