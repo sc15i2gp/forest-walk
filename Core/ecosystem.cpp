@@ -385,6 +385,4 @@ void forest_ecosystem::iterate_forest_by_one_plastochron()
 
 	if(self_thinning_should_happen) tree_domination_check();
 	remove_dead_trees(&m_l_sys, &t_grid);
-	t_grid.derived = true;
-	
 }
