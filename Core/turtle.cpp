@@ -44,22 +44,36 @@ void turtle::roll_right(float angle)
 	this->orientation.left = rotate_about_axis(this->orientation.left, this->orientation.heading, angle);
 }
 
+
+/********************************************************/
+
+/*		Push vertex data to mesh		*/
+
+/********************************************************/
+
+//Iterating over stacks is equivalent to iterating over latitude
+//Iterating over sectors is equivalent to iterating over longitude
 void push_fruit_sphere_to_tree_mesh(mesh* fruit_mesh, turtle* t, float radius, int stack_count, int sector_count)
 {
+	//Calculate geometric information
 	vec3 center_pos = t->position + radius*t->orientation.heading;
 	vec3 pole_pos = t->position - center_pos;
+
 	int number_of_positions = sector_count*(stack_count+1);
 	int number_of_triangles = 2*stack_count*sector_count;
 	int number_of_indices = 3*number_of_triangles;
+
+	//Init temporary data buffers
 	vec3* vertex_data_buffer = (vec3*)malloc(sizeof(vec3)*2*number_of_positions);
 	vec3* vertex_data = vertex_data_buffer;
 	
 	GLuint* index_buffer = (GLuint*)malloc(sizeof(GLuint)*number_of_indices);
 	GLuint* index = index_buffer;
-	
+
 	float stack_angle_step = (float)180/(float)stack_count;
 	float sector_angle_step = (float)360/(float)sector_count;
 
+	//Generate vertex data
 	for(int i = 0; i <= stack_count; i++)
 	{//For each stack
 		float stack_angle = i*stack_angle_step;
@@ -74,6 +88,7 @@ void push_fruit_sphere_to_tree_mesh(mesh* fruit_mesh, turtle* t, float radius, i
 		}
 	}
 
+	//Generate index data
 	for(int i = 0; i < stack_count; i++)
 	{//for each stack
 		for(int j = 0; j < sector_count; j++)
@@ -93,55 +108,69 @@ void push_fruit_sphere_to_tree_mesh(mesh* fruit_mesh, turtle* t, float radius, i
 	}
 
 	fruit_mesh->push_vertex_data(vertex_data_buffer, number_of_positions, index_buffer, number_of_indices);
+
+	//Destroy temporary data buffers
 	free(vertex_data_buffer);
 	free(index_buffer);
 }
 
+//Can push either a triangle or a quad
 void push_leaf_polygon_to_tree_mesh(mesh* leaf_mesh, turtle* t, polygon* p)
 {
 	vec3 e_0 = p->positions[1] - p->positions[0];
 	vec3 e_1 = p->positions[2] - p->positions[1];
 	vec3 normal = normalise(cross(e_1, e_0));
+
 	if(p->vertex_count == 3)
-	{
+	{//If given polygon is a triangle
 		GLuint indices[] = {0, 1, 2};
 		vec3 vertex_data[6];
+
 		vertex_data[0] = p->positions[0];
 		vertex_data[1] = normal;
 		vertex_data[2] = p->positions[1];
 		vertex_data[3] = normal;
 		vertex_data[4] = p->positions[2];
 		vertex_data[5] = normal;
+
 		leaf_mesh->push_vertex_data(vertex_data, 3, indices, 3);
 	}
 	else if(p->vertex_count == 4)
-	{
+	{//If given polygon is a quad
 		GLuint indices[] = {0, 1, 3, 1, 2, 3};
 		vec3 vertex_data[8];
+
 		for(int i = 0; i < 4; i++)
 		{
 			vertex_data[2*i] = p->positions[i];
 			vertex_data[2*i+1] = normal;
 		}
+
 		leaf_mesh->push_vertex_data(vertex_data, 4, indices, 6);
-	}
-	else
-	{
-		//TODO
 	}
 }
 
 void push_branch_cylinder_to_tree_mesh(mesh* branch_mesh, turtle* t, float r, float h, int v)
 {
+	//Calculate geometric information
         int number_of_vertex_positions = 2*(v+1); //2 for each circle, +1 for the central vertex
         int number_of_triangles = 4*v;
         int number_of_indices = 3*number_of_triangles;
         int number_of_faces = 2+v;
         int number_of_vertex_rows = 6*v + 2;
         int length_of_vertex_row = 2; //position + normal vectors
+
+	//Init temporary data buffers
         vec3* positions = (vec3*)malloc(sizeof(vec3)*number_of_vertex_positions);
+        vec3* normals = (vec3*)malloc(sizeof(vec3)*number_of_faces);
+        int vertex_data_size = sizeof(vec3)*length_of_vertex_row*number_of_vertex_rows;
+        vec3* vertex_data = (vec3*)malloc(vertex_data_size);
+        int indices_size = sizeof(GLuint)*number_of_indices;
+        GLuint* indices = (GLuint*)malloc(indices_size);
+
         float v_angle = 360.0f/(float)v;
-        //First circle vertex positions counter clockwise from (r, 0)
+        
+	//First circle vertex positions counter clockwise from (r, 0)
         for(int i = 0; i < v; i++)
         {
                 positions[i] = t->position + rotate_about_axis(r*(-t->orientation.left), t->orientation.heading, i*v_angle);
@@ -154,7 +183,6 @@ void push_branch_cylinder_to_tree_mesh(mesh* branch_mesh, turtle* t, float r, fl
                 positions[v+1+i] = positions[i] + h*t->orientation.heading;
         }
 
-        vec3* normals = (vec3*)malloc(sizeof(vec3)*number_of_faces);
 
         for(int i = 0; i < v; i++)
         {
@@ -164,8 +192,6 @@ void push_branch_cylinder_to_tree_mesh(mesh* branch_mesh, turtle* t, float r, fl
         normals[v] = -t->orientation.heading;
       	normals[v+1] = t->orientation.heading;
 
-        int vertex_data_size = sizeof(vec3)*length_of_vertex_row*number_of_vertex_rows;
-        vec3* vertex_data = (vec3*)malloc(vertex_data_size);
         vec3* vertex_row = vertex_data;
 
         //Bottom circle
@@ -200,8 +226,6 @@ void push_branch_cylinder_to_tree_mesh(mesh* branch_mesh, turtle* t, float r, fl
         }
 
         //Indices
-        int indices_size = sizeof(GLuint)*number_of_indices;
-        GLuint* indices = (GLuint*)malloc(indices_size);
         GLuint* triangle_indices = indices;
         //Bottom circle
         for(int i = 0; i < v; i++)
@@ -230,13 +254,16 @@ void push_branch_cylinder_to_tree_mesh(mesh* branch_mesh, turtle* t, float r, fl
                 triangle_indices[2] = offset + (i+1)%v;
                 triangle_indices += 3;
         }
+
         branch_mesh->push_vertex_data(vertex_data, number_of_vertex_rows, indices, number_of_indices);
+	//Destroy temporary data buffers
         free(positions);
         free(normals);
         free(indices);
         free(vertex_data);
 }
 
+//Takes polygon and returns new polygon with vertices specified in reverse order
 polygon reverse(polygon& p)
 {
 	polygon _p;
@@ -247,9 +274,11 @@ polygon reverse(polygon& p)
 	return _p;
 }
 
+//String -> tree model
 void run_turtle(char* input, tree_mesh_group* tree, int lod, float default_distance, float default_radius, float default_angle)
 {
 	turtle t = {};
+
 	t.orientation.heading = vec3{0.0f, 1.0f, 0.0f};
 	t.orientation.left = vec3{-1.0, 0.0, 0.0};
 	t.orientation.up = vec3{0.0, 0.0, 1.0};
@@ -265,6 +294,7 @@ void run_turtle(char* input, tree_mesh_group* tree, int lod, float default_dista
 
 	int polygon_depth = 0;
 	bool polygon_mode = false;
+
 	for(int i = 0; i < input_length; i++)
 	{
 		int module_param_count = number_of_parameters(module);
@@ -284,15 +314,21 @@ void run_turtle(char* input, tree_mesh_group* tree, int lod, float default_dista
 				break;
 			case '}':
 			{
+				//In order to make leaf quads not transparent through viewing backside of leaf, leaves are pushed to mesh twice, one reversed, and both moved slightly apart
 				polygon _p_0 = p;
 				polygon _p_1 = reverse(p);
+
 				for(int i = 0; i < _p_0.vertex_count;i++) _p_0.positions[i] = _p_0.positions[i] - 0.001f*t.orientation.up;
 				for(int i = 0; i < _p_1.vertex_count;i++) _p_1.positions[i] = _p_1.positions[i] + 0.001f*t.orientation.up;
+
 				push_leaf_polygon_to_tree_mesh(&tree->leaf_mesh, &t, &_p_0);
 				push_leaf_polygon_to_tree_mesh(&tree->leaf_mesh, &t, &_p_1);
+
 				p = p_stack.pop_state();
+
 				polygon_depth--;
 				if(polygon_depth == 0) polygon_mode = false;
+
 				break;
 			}
 			case '.':

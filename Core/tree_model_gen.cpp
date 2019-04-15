@@ -29,8 +29,11 @@ int tree_model_generator::generate_tree_model(tree_mesh_group* t_mesh, int lod)
 void tree_model_generator::derive_tree_str(int derive_count, int species)
 {
 	l_system* l = NULL;
-	int max_derive_count = 0;
-	int derive_coefficient = 0;
+
+	int max_derive_count = 0; //Prevents tree string from becoming longer than the string buffer's allocated size
+	int derive_coefficient = 0; //Necessary due to the differences in max_derive_count's between PINE/BIRCH and ROWAN
+
+	//Choose l_system to use
 	switch(species)
 	{
 		case PINE:
@@ -46,13 +49,16 @@ void tree_model_generator::derive_tree_str(int derive_count, int species)
 		case ROWAN:
 			l = &l_systems[2];
 			max_derive_count = 10;
-			derive_coefficient = 2;
+			derive_coefficient = 1;
 			break;
 	}
 	int final_age = age + derive_coefficient*derive_count;
+
 	if(final_age > max_derive_count) derive_count = max_derive_count - age;
 	else derive_count = final_age - age;
+
 	for(int i = 0; i < derive_count; i++) derive_str(l, tree_str_buffer);
+
 	age += derive_count;
 }
 
@@ -60,6 +66,8 @@ void tree_model_generator::load_axiom(int species)
 {
 	age = 0;
 	char* axiom;
+
+	//Choose axiom
 	switch(species)
 	{
 		case PINE:
