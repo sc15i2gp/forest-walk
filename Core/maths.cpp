@@ -19,24 +19,15 @@ vec3 operator-(vec3 v)
 {
 	return vec3{-v.x, -v.y, -v.z};
 }
-#include <stdio.h>
-vec3 cross(vec3 v1, vec3 v2)
+
+vec3 operator-(vec3 v1, vec3 v2)
 {
-	vec3 v;
-	v.x = v1.y*v2.z - v1.z*v2.y;
-	v.y = v1.z*v2.x - v1.x*v2.z;
-	v.z = v1.x*v2.y - v1.y*v2.x;
-	return v;
+	return vec3{v1.x - v2.x, v1.y - v2.y, v1.z - v2.z};
 }
 
-float dot(vec3 v1, vec3 v2)
+vec3 operator/(vec3 v,float f)
 {
-	return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z;
-}
-
-float dot(float* v1, float* v2)
-{
-	return v1[0]*v2[0] + v1[1]*v2[1] + v1[2]*v2[2];
+	return vec3{v.x/f, v.y/f, v.z/f};
 }
 
 float magnitude(vec3 v)
@@ -54,9 +45,23 @@ vec3 normal_2d(vec3 v)
 	return vec3{v.y, -v.x, v.z};
 }
 
-vec3 operator/(vec3 v,float f)
+float dot(vec3 v1, vec3 v2)
 {
-	return vec3{v.x/f, v.y/f, v.z/f};
+	return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z;
+}
+
+float dot(float* v1, float* v2)
+{
+	return v1[0]*v2[0] + v1[1]*v2[1] + v1[2]*v2[2];
+}
+
+vec3 cross(vec3 v1, vec3 v2)
+{
+	vec3 v;
+	v.x = v1.y*v2.z - v1.z*v2.y;
+	v.y = v1.z*v2.x - v1.x*v2.z;
+	v.z = v1.x*v2.y - v1.y*v2.x;
+	return v;
 }
 
 //Anticlockwise rotation
@@ -78,10 +83,6 @@ vec3 rotate_about_axis(vec3 v, vec3 axis, float angle_deg)
 	return vec3{x, y, z};
 }
 
-vec3 operator-(vec3 v1, vec3 v2)
-{
-	return vec3{v1.x - v2.x, v1.y - v2.y, v1.z - v2.z};
-}
 
 vec3 matrix_multiply_4x4(vec3 v, float* matrix)
 {
@@ -120,12 +121,6 @@ bool do_circles_intersect(float x_0, float y_0, float r_0, float x_1, float y_1,
 	float dist = sqrt((x_0 - x_1)*(x_0 - x_1) + (y_0 - y_1)*(y_0 - y_1));
 	float total_radius = r_0 + r_1;
 	return dist < total_radius;
-}
-
-
-void print_vector(vec3 v)
-{
-	printf("%f %f %f ", v.x, v.y, v.z);
 }
 
 vec3 generate_vector_within_radius(vec3 center, float r_max)
