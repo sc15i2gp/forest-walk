@@ -61,6 +61,7 @@ void ForestGLWidget::set_tree_grid(tree_grid* t)
 
 void ForestGLWidget::buffer_circle_texture()
 {
+	//construct texture data
 	texture_data = (GLubyte*)malloc(sizeof(GLubyte)*CT_WIDTH*CT_WIDTH*4);
 	for(int i = 0; i < CT_WIDTH; i++)
 	{//For each row of pixels
@@ -75,6 +76,8 @@ void ForestGLWidget::buffer_circle_texture()
 			}
 		}
 	}
+
+	//buffer texture data
 	glEnable(GL_TEXTURE_2D);
 	glGenTextures(1, &texture_buffer);
 	glBindTexture(GL_TEXTURE_2D, texture_buffer);
@@ -186,6 +189,7 @@ void ForestGLWidget::set_forest_mode()
 	update();
 }
 
+//draws grid lines
 void ForestGLWidget::render_grid()
 {
 	for(int i = 0; i <= t_grid->width(); i++)
@@ -221,11 +225,13 @@ void ForestGLWidget::render_grid()
 	}
 }
 
+//Renders a rectangle showing the grid cells, the trees in which will be rendered
 void ForestGLWidget::render_view_range()
 {
 	vec3 view_pos = {-translate_x, -translate_y, -translate_z};
 	vec3 view_dir = {0.0f, 0.0f, -1.0f};
 	
+	//Get view position and direction
 	GLfloat current_ball_value[16] = {};
 	Ball_Value(&forest_ball_data, current_ball_value);
 	transpose_matrix_4x4(current_ball_value);
@@ -242,6 +248,7 @@ void ForestGLWidget::render_view_range()
 	vec3 v_2 = rotate_about_axis(f*view_dir, vec3{0.0f, -1.0f, 0.0f}, 45) + view_pos;
 	vec3 v = view_pos;
 
+	//Calculate bounds of view rectangle
 	float min_x = min(min(v.x, v_1.x),v_2.x);
 	float max_x = max(max(v.x, v_1.x), v_2.x);
 	float min_y = min(min(v.z, v_1.z), v_2.z);
@@ -257,12 +264,14 @@ void ForestGLWidget::render_view_range()
 	max_x = _max_x*BUCKET_LENGTH;
 	max_y = _max_y*BUCKET_LENGTH;
 
+	//draw circle representing view position
 	render_circle(view_pos.x, view_pos.z, 3.0f);
 	
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_BLEND);
 
+	//draw view rectangle overlaying grid
 	glLineWidth(2.0f);
 	glBegin(GL_LINES);
 	
@@ -301,11 +310,15 @@ void ForestGLWidget::render_chart()
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
+
 	glAlphaFunc(GL_LESS, 0.2f);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
+
+	//Render tree circles
 	for(int i = 0; i < t_grid->height(); i++)
 	{
 		for(int j = 0; j < t_grid->width(); j++)
@@ -314,6 +327,7 @@ void ForestGLWidget::render_chart()
 			for(; t; t = t->next) render_tree_point(t);
 		}
 	}
+
 	glColor3f(0.0f, 0.0f, 0.0f);
 	
 	if(show_view_range) render_view_range();
@@ -348,6 +362,7 @@ void copy_face_data(float* vertex_positions_src, float* face_normal_src, int* fa
 	}
 }
 
+//Loads a cuboid platform on top of which is the forest
 void ForestGLWidget::load_platform()
 {
 	float w = forest_width;
@@ -393,6 +408,7 @@ void ForestGLWidget::load_platform()
 	vec3 _vertex_data[48];
 	float* vertex_data = (float*)_vertex_data;
 
+	//Construct mesh vertex data face by face
 	for(int face = 0; face < 6; face++)
 	{
 		float* face_normal = face_normals + 3*face;
@@ -425,11 +441,15 @@ void ForestGLWidget::render(render_object obj)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, obj.vertex_buffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj.index_buffer);
+
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, 6*sizeof(float), (void*)0);
+
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glNormalPointer(GL_FLOAT, 6*sizeof(float), (void*)(3*sizeof(float)));
+
 	glDrawElements(GL_TRIANGLES, obj.number_of_indices, GL_UNSIGNED_INT, NULL);
+
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
@@ -520,15 +540,22 @@ void ForestGLWidget::render(tree_buffer_object obj, int species)
 render_object ForestGLWidget::buffer_mesh(mesh* m)
 {
 	render_object obj = {};
+
+	//buffer vertex data
 	glGenBuffers(1, &obj.vertex_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, obj.vertex_buffer);
 	glBufferData(GL_ARRAY_BUFFER, 2*m->vertex_data_length*sizeof(vec3), m->vertex_data, GL_STATIC_DRAW);
+
+	//buffer index data
 	glGenBuffers(1, &obj.index_buffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj.index_buffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m->number_of_indices*sizeof(GLuint), m->indices, GL_STATIC_DRAW);
+
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 	obj.number_of_indices = m->number_of_indices;
+
 	return obj;
 }
 
@@ -536,9 +563,11 @@ tree_buffer_object ForestGLWidget::buffer_tree_mesh_group(tree_mesh_group* t)
 {
 	//TIMED(__func__);
 	tree_buffer_object obj = {};
+
 	if(t->branch_mesh.vertex_data_length > 0) obj.branch_obj = buffer_mesh(&t->branch_mesh);
 	if(t->leaf_mesh.vertex_data_length > 0) obj.leaf_obj = buffer_mesh(&t->leaf_mesh);
 	if(t->fruit_mesh.vertex_data_length > 0) obj.fruit_obj = buffer_mesh(&t->fruit_mesh);
+
 	return obj;
 }
 
@@ -569,6 +598,7 @@ void ForestGLWidget::generate_tree_model(tree_node* t_node, int lod)
 {
 	//TIMED(__func__);
 	clear_tree_model(&tree_model_buffer);
+
 	int model_size = model_generator.generate_tree_model(&tree_model_buffer, lod);
 	t_map.set_model(t_node, buffer_tree_mesh_group(&tree_model_buffer), model_size, lod);
 }
@@ -611,7 +641,7 @@ int models_cleared = 0;
 void ForestGLWidget::generate_tree_models(vec3 view_pos)
 {
 	TIMED(__func__);
-	printf("Initial model data in VRAM = %d bytes\n", t_map.buffered_model_data_size);
+
 	int species = -1;
 	int p_species = -1;
 	int age = -1;
@@ -620,9 +650,11 @@ void ForestGLWidget::generate_tree_models(vec3 view_pos)
 	long int p_seed = -1;
 	int p_model_cache_ref = -1;
 	int previous_model = -1;
+
 	for(int i = 0; i < r_queue.length; i++)
-	{
+	{//For each node in the render queue
 		tree_node* t_node = r_queue.find_item(i);
+
 		species = t_node->species;
 		age = t_node->age;
 		seed = t_node->seed;
@@ -712,7 +744,6 @@ void ForestGLWidget::generate_tree_models(vec3 view_pos)
 		p_age = age;
 		p_seed = seed;
 	}
-	printf("Final model data in VRAM = %d bytes\n", t_map.buffered_model_data_size);
 }
 
 int rendered = 0;
@@ -733,17 +764,21 @@ void ForestGLWidget::render_tree_models()
 int ForestGLWidget::pick_buckets_to_render(int* buckets_to_render, vec3 view_pos, vec3 view_dir, float view_dist)
 {
 	int number_of_buckets_to_render = 0;
+
 	vec3 v = view_pos/(float)BUCKET_LENGTH;
 	float d = view_dist/(float)BUCKET_LENGTH;
 	float rad = 45.0f * (PI/180.0f);
 	float f = d/cos(rad);
+
 	vec3 v_1 = rotate_about_axis(f*view_dir, vec3{0.0f, 1.0f, 0.0f}, 45) + v;
 	vec3 v_2 = rotate_about_axis(f*view_dir, vec3{0.0f, -1.0f, 0.0f}, 45) + v;
 
+	//Calculate bounds of view range
 	int min_x = (int)min(min(v.x, v_1.x),v_2.x) - 1;
 	int max_x = (int)max(max(v.x, v_1.x), v_2.x) + 2;
 	int min_y = (int)min(min(v.z, v_1.z), v_2.z) - 1;
 	int max_y = (int)max(max(v.z, v_1.z), v_2.z) + 2;
+
 	for(int x = min_x; x < max_x; x++)
 	{
 		for(int y = min_y; y < max_y; y++)
@@ -765,26 +800,36 @@ void ForestGLWidget::render_forest()
 	TIMED(__func__);
 	
 	if(platform.vertex_buffer == 0) load_platform();
+
 	glMatrixMode(GL_MODELVIEW);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
+
 	glPushMatrix();
 	glLoadIdentity();
+
+	//Get track ball data
 	GLfloat current_ball_value[16];
 	GLfloat light_pos[] = {0.0f, 1.0f, 1.0f, 0.0f};
+
 	Ball_Value(&light_ball_data, current_ball_value);
 	glMultMatrixf(current_ball_value);
+
+	//Set light position
 	glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
 	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 180.0f);
 
 	glLoadIdentity();
 	//glTranslatef(0.0f, -0.2f, -1.0f);
 	glTranslatef(translate_x, translate_y, translate_z);
+
+	//Calculate view position and direction
 	vec3 view_pos = {-translate_x, -translate_y, -translate_z};
 	vec3 view_dir = {0.0f, 0.0f, -1.0f};
 	
 	Ball_Value(&forest_ball_data, current_ball_value);
 	glMultMatrixf(current_ball_value);
+
 	transpose_matrix_4x4(current_ball_value);
 	view_pos = matrix_multiply_4x4(view_pos, current_ball_value);
 	view_dir = matrix_multiply_4x4(view_dir, current_ball_value);
@@ -796,26 +841,35 @@ void ForestGLWidget::render_forest()
 		{0.5f, 0.51f, 0.5f},
 		2.0f
 	};
+
 	set_material(&grass_material);
+
+	//Set fog parameters
 	glEnable(GL_FOG);
 	glFogf(GL_FOG_START, 0.5f*view_dist);
 	glFogf(GL_FOG_END, 2.0f*view_dist);
 	glFogf(GL_FOG_MODE, GL_LINEAR);
 	glFogf(GL_FOG_DENSITY, 0.05f);
+
 	GLfloat fog_colour[] = {0.494f, 0.753f, 0.933f, 1.0f};
 	glFogfv(GL_FOG_COLOR, fog_colour);
+
+	//Render plane
 	render(platform);
+	
 	glTranslatef(-(forest_width/2.0f),0.0f,-(forest_height/2.0f));
 	view_pos = view_pos + vec3{forest_width/2.0f,0.0f,forest_height/2.0f};
 	view_dir.y = 0.0f;
 	view_dir = normalise(view_dir);
 	
 	printf("------------------------\n");
+	
 	models_gen = 0;
 	models_cleared = 0;
-	printf("%f\n", view_dist);
+
 	clear_unused_model_buffers();
 
+	//Determine which tree node buckets should be rendered
 	int buckets_to_render[400] = {};
 	int number_of_buckets_to_render = pick_buckets_to_render(buckets_to_render, view_pos, view_dir, view_dist);
 	for(int i = 0; i < number_of_buckets_to_render; i++)
@@ -825,19 +879,19 @@ void ForestGLWidget::render_forest()
 		push_bucket_of_trees_to_render_queue(x,y);
 	}
 
-	printf("Rendering %d models\n", r_queue.length);
 	r_queue.sort();
+
 	generate_tree_models(view_pos);
+
 	rendered = 0;
 	render_tree_models();
-	printf("Generated %d tree models\n", models_gen);
-	printf("Removed %d tree models\n", models_cleared);
-	printf("Rendered %d models\n", rendered);
+
 	printf("------------------------\n");
 
 	glDisable(GL_LIGHT0);
 	glDisable(GL_LIGHTING);
 	glDisable(GL_FOG);
+
 	glPopMatrix();
 }
 
@@ -853,11 +907,14 @@ void ForestGLWidget::paintGL()
 void ForestGLWidget::mousePressEvent(QMouseEvent* e)
 {
 	last_pressed_mouse_button = e->button();
+
 	float s_x = width();
 	float s_y = height();
+
 	HVect ball_vec;
 	ball_vec.x = (2.0f*e->x() - s_x)/s_x;
 	ball_vec.y = (s_y - 2.0f*e->y())/s_y;
+
 	switch(last_pressed_mouse_button)
 	{
 		case Qt::LeftButton:
@@ -905,9 +962,11 @@ void ForestGLWidget::mouseMoveEvent(QMouseEvent* e)
 {
 	float s_x = width();
 	float s_y = height();
+
 	HVect ball_vec;
 	ball_vec.x = (2.0f*e->x() - s_x)/s_x;
 	ball_vec.y = (s_y - 2.0f*e->y())/s_y;
+
 	switch(last_pressed_mouse_button)
 	{
 		case Qt::LeftButton:

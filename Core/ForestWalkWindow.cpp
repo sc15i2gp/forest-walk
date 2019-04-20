@@ -10,6 +10,8 @@ void AppWindow::init()
 	gl_widget = new ForestGLWidget(this);
 	ecosystem_widget = new EcosystemWidget(this, gl_widget);
 	layout->addWidget(gl_widget);
+	
+	//Simulation controls
 	QBoxLayout* sim_control_layout = new QBoxLayout(QBoxLayout::LeftToRight);
 	QPushButton* derive_button = new QPushButton("Derive");
 	QPushButton* reset_button = new QPushButton("Reset");
@@ -17,6 +19,7 @@ void AppWindow::init()
 	sim_control_layout->addWidget(reset_button);
 	layout->addLayout(sim_control_layout);
 
+	//Chart mode controls
 	QBoxLayout* chart_mode_control_layout = new QBoxLayout(QBoxLayout::LeftToRight);
 	QRadioButton* chart_mode_button = new QRadioButton("Chart Mode", this);
 	QRadioButton* forest_mode_button = new QRadioButton("Forest Mode", this);
@@ -36,6 +39,7 @@ void AppWindow::init()
 	chart_toggle_layout->addWidget(show_grid);
 	layout->addLayout(chart_toggle_layout);
 
+	//Ecological rule toggles
 	QBoxLayout* ecological_rules_layout = new QBoxLayout(QBoxLayout::LeftToRight);
 	QCheckBox* self_thinning_should_happen = new QCheckBox("Self-thinning", this);
 	QCheckBox* trees_should_propagate = new QCheckBox("Propagation", this);
@@ -47,6 +51,7 @@ void AppWindow::init()
 	self_thinning_should_happen->setCheckState(Qt::Checked);
 	layout->addLayout(ecological_rules_layout);
 
+	//View range slider
 	QSlider* view_dist_slider = new QSlider(Qt::Horizontal, this);
 	view_dist_slider->setMinimum(10);
 	view_dist_slider->setMaximum(80);

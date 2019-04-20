@@ -16,6 +16,7 @@
 #include "render_data.h"
 #include "tree_model_gen.h"
 
+//CT_WIDTH = Number of pixels in s,t dimensions for circle texture
 #define CT_WIDTH 512
 #define MAX_TREE_COUNT 8192
 
@@ -36,13 +37,17 @@ public:
 
 	void render_chart();
 	void render_forest();
+
 	void render_circle(float,float,float);
 	void render_tree_point(tree_node*);
+
 	void set_forest_bounds(float width, float height);
+
 	void mousePressEvent(QMouseEvent*);
 	void mouseReleaseEvent(QMouseEvent*);
 	void mouseMoveEvent(QMouseEvent*);
 	void wheelEvent(QWheelEvent*);
+
 	void set_tree_grid(tree_grid*);
 	void set_show_domination(bool);
 	void set_show_old_age(bool);
@@ -53,6 +58,7 @@ public slots:
 	void set_chart_mode();
 	void set_forest_mode();
 	void set_view_dist(int);
+
 signals:
 	void initialised();
 
