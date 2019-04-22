@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <QWidget>
 #include <QObject>
-#include "l_system.h"
+#include "../Core/l_system.h"
 #include "RenderWidget.h"
 
 #define MAX_STRING_SIZE 0x400000
@@ -45,4 +45,5 @@ private:
 	l_system l_system_in_use;
 	char axiom[64] = {};
 	char* current_string;
+	int derivation_count = 0;
 };

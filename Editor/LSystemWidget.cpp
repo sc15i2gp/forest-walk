@@ -102,7 +102,6 @@ void LSystemWidget::save(const char* path)
 {
 	if(strlen(path) > 0)
 	{
-		//TODO: Move this to l_system.cpp
 		save_l_system(&l_system_in_use, path, axiom);
 	}
 }
@@ -115,6 +114,7 @@ void LSystemWidget::set_axiom(const char* new_axiom)
 void LSystemWidget::reset_current_string()
 {
 	strcpy(current_string, axiom);
+	derivation_count = 0;
 }
 
 void LSystemWidget::reset()
@@ -127,6 +127,11 @@ void LSystemWidget::reset()
 void LSystemWidget::l_system_derivation()
 {
 	derive_str(&l_system_in_use, current_string);
+	derivation_count++;
+
+	printf("Memory used for current string = %d bytes\n", strlen(current_string));
+	printf("Derivation count = %d\n", derivation_count);
+
 	renderer->load_tree_model(&current_string[0]);
 	parentWidget()->update();
 }

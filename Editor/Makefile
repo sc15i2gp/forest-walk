@@ -60,11 +60,12 @@ SOURCES       = main.cpp \
 		../Core/char_queue.cpp \
 		../Core/l_system.cpp \
 		LSystemWidget.cpp \
-		../Core/RenderWidget.cpp \
+		RenderWidget.cpp \
 		LSystemEditorWindow.cpp \
 		../Core/Ball.cpp \
 		../Core/BallMath.cpp \
-		../Core/BallAux.cpp moc_LSystemWidget.cpp \
+		../Core/BallAux.cpp \
+		../Core/timed.cpp moc_LSystemWidget.cpp \
 		moc_RenderWidget.cpp \
 		moc_LSystemEditorWindow.cpp
 OBJECTS       = main.o \
@@ -82,6 +83,7 @@ OBJECTS       = main.o \
 		Ball.o \
 		BallMath.o \
 		BallAux.o \
+		timed.o \
 		moc_LSystemWidget.o \
 		moc_RenderWidget.o \
 		moc_LSystemEditorWindow.o
@@ -167,11 +169,12 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		../Core/char_queue.h \
 		../Core/l_system.h \
 		LSystemWidget.h \
-		../Core/RenderWidget.h \
+		RenderWidget.h \
 		LSystemEditorWindow.h \
 		../Core/Ball.h \
 		../Core/BallMath.h \
-		../Core/BallAux.h main.cpp \
+		../Core/BallAux.h \
+		../Core/timed.h main.cpp \
 		../Core/maths.cpp \
 		../Core/string_functions.cpp \
 		../Core/mesh.cpp \
@@ -181,11 +184,12 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		../Core/char_queue.cpp \
 		../Core/l_system.cpp \
 		LSystemWidget.cpp \
-		../Core/RenderWidget.cpp \
+		RenderWidget.cpp \
 		LSystemEditorWindow.cpp \
 		../Core/Ball.cpp \
 		../Core/BallMath.cpp \
-		../Core/BallAux.cpp
+		../Core/BallAux.cpp \
+		../Core/timed.cpp
 QMAKE_TARGET  = l_system_editor
 DESTDIR       = 
 TARGET        = l_system_editor
@@ -369,8 +373,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../Core/maths.h ../Core/string_functions.h ../Core/mesh.h ../Core/turtle.h ../Core/arithmetic_tokeniser.h ../Core/expression_evaluator.h ../Core/char_queue.h ../Core/l_system.h LSystemWidget.h ../Core/RenderWidget.h LSystemEditorWindow.h ../Core/Ball.h ../Core/BallMath.h ../Core/BallAux.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp ../Core/maths.cpp ../Core/string_functions.cpp ../Core/mesh.cpp ../Core/turtle.cpp ../Core/arithmetic_tokeniser.cpp ../Core/expression_evaluator.cpp ../Core/char_queue.cpp ../Core/l_system.cpp LSystemWidget.cpp ../Core/RenderWidget.cpp LSystemEditorWindow.cpp ../Core/Ball.cpp ../Core/BallMath.cpp ../Core/BallAux.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../Core/maths.h ../Core/string_functions.h ../Core/mesh.h ../Core/turtle.h ../Core/arithmetic_tokeniser.h ../Core/expression_evaluator.h ../Core/char_queue.h ../Core/l_system.h LSystemWidget.h RenderWidget.h LSystemEditorWindow.h ../Core/Ball.h ../Core/BallMath.h ../Core/BallAux.h ../Core/timed.h $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp ../Core/maths.cpp ../Core/string_functions.cpp ../Core/mesh.cpp ../Core/turtle.cpp ../Core/arithmetic_tokeniser.cpp ../Core/expression_evaluator.cpp ../Core/char_queue.cpp ../Core/l_system.cpp LSystemWidget.cpp RenderWidget.cpp LSystemEditorWindow.cpp ../Core/Ball.cpp ../Core/BallMath.cpp ../Core/BallAux.cpp ../Core/timed.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -413,7 +417,10 @@ moc_LSystemWidget.cpp: ../Core/l_system.h \
 		../Core/arithmetic_token_stack.h \
 		../Core/char_queue.h \
 		../Core/char_queue_stack.h \
-		../Core/RenderWidget.h \
+		../Core/timed.h \
+		RenderWidget.h \
+		../Core/Ball.h \
+		../Core/BallAux.h \
 		../Core/turtle.h \
 		../Core/mesh.h \
 		../Core/polygon_stack.h \
@@ -423,16 +430,19 @@ moc_LSystemWidget.cpp: ../Core/l_system.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include ./moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/ip/Documents/forest-walk/Editor -I/home/ip/Documents/forest-walk/Editor -I/opt/local/include -I/home/ip/Documents/forest-walk/Core -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtOpenGL -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include LSystemWidget.h -o moc_LSystemWidget.cpp
 
-moc_RenderWidget.cpp: ../Core/turtle.h \
+moc_RenderWidget.cpp: ../Core/Ball.h \
+		../Core/BallAux.h \
+		../Core/turtle.h \
 		../Core/maths.h \
 		../Core/mesh.h \
 		../Core/string_functions.h \
 		../Core/polygon_stack.h \
 		../Core/turtle_stack.h \
-		../Core/RenderWidget.h \
+		../Core/timed.h \
+		RenderWidget.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include ./moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/ip/Documents/forest-walk/Editor -I/home/ip/Documents/forest-walk/Editor -I/opt/local/include -I/home/ip/Documents/forest-walk/Core -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtOpenGL -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../Core/RenderWidget.h -o moc_RenderWidget.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include ./moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/ip/Documents/forest-walk/Editor -I/home/ip/Documents/forest-walk/Editor -I/opt/local/include -I/home/ip/Documents/forest-walk/Core -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtOpenGL -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include RenderWidget.h -o moc_RenderWidget.cpp
 
 moc_LSystemEditorWindow.cpp: ../Core/maths.h \
 		../Core/string_functions.h \
@@ -447,8 +457,11 @@ moc_LSystemEditorWindow.cpp: ../Core/maths.h \
 		../Core/arithmetic_token_stack.h \
 		../Core/char_queue.h \
 		../Core/char_queue_stack.h \
+		../Core/timed.h \
 		LSystemWidget.h \
-		../Core/RenderWidget.h \
+		RenderWidget.h \
+		../Core/Ball.h \
+		../Core/BallAux.h \
 		LSystemEditorWindow.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
@@ -482,8 +495,11 @@ main.o: main.cpp LSystemEditorWindow.h \
 		../Core/arithmetic_token_stack.h \
 		../Core/char_queue.h \
 		../Core/char_queue_stack.h \
+		../Core/timed.h \
 		LSystemWidget.h \
-		../Core/RenderWidget.h
+		RenderWidget.h \
+		../Core/Ball.h \
+		../Core/BallAux.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 maths.o: ../Core/maths.cpp ../Core/maths.h
@@ -528,7 +544,8 @@ l_system.o: ../Core/l_system.cpp ../Core/l_system.h \
 		../Core/arithmetic_tokeniser.h \
 		../Core/arithmetic_token_stack.h \
 		../Core/char_queue.h \
-		../Core/char_queue_stack.h
+		../Core/char_queue_stack.h \
+		../Core/timed.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o l_system.o ../Core/l_system.cpp
 
 LSystemWidget.o: LSystemWidget.cpp LSystemWidget.h \
@@ -541,21 +558,27 @@ LSystemWidget.o: LSystemWidget.cpp LSystemWidget.h \
 		../Core/arithmetic_token_stack.h \
 		../Core/char_queue.h \
 		../Core/char_queue_stack.h \
-		../Core/RenderWidget.h \
+		../Core/timed.h \
+		RenderWidget.h \
+		../Core/Ball.h \
+		../Core/BallAux.h \
 		../Core/turtle.h \
 		../Core/mesh.h \
 		../Core/polygon_stack.h \
 		../Core/turtle_stack.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o LSystemWidget.o LSystemWidget.cpp
 
-RenderWidget.o: ../Core/RenderWidget.cpp ../Core/RenderWidget.h \
+RenderWidget.o: RenderWidget.cpp RenderWidget.h \
+		../Core/Ball.h \
+		../Core/BallAux.h \
 		../Core/turtle.h \
 		../Core/maths.h \
 		../Core/mesh.h \
 		../Core/string_functions.h \
 		../Core/polygon_stack.h \
-		../Core/turtle_stack.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o RenderWidget.o ../Core/RenderWidget.cpp
+		../Core/turtle_stack.h \
+		../Core/timed.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o RenderWidget.o RenderWidget.cpp
 
 LSystemEditorWindow.o: LSystemEditorWindow.cpp LSystemEditorWindow.h \
 		../Core/maths.h \
@@ -571,8 +594,11 @@ LSystemEditorWindow.o: LSystemEditorWindow.cpp LSystemEditorWindow.h \
 		../Core/arithmetic_token_stack.h \
 		../Core/char_queue.h \
 		../Core/char_queue_stack.h \
+		../Core/timed.h \
 		LSystemWidget.h \
-		../Core/RenderWidget.h
+		RenderWidget.h \
+		../Core/Ball.h \
+		../Core/BallAux.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o LSystemEditorWindow.o LSystemEditorWindow.cpp
 
 Ball.o: ../Core/Ball.cpp ../Core/Ball.h \
@@ -586,6 +612,9 @@ BallMath.o: ../Core/BallMath.cpp ../Core/BallMath.h \
 
 BallAux.o: ../Core/BallAux.cpp ../Core/BallAux.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o BallAux.o ../Core/BallAux.cpp
+
+timed.o: ../Core/timed.cpp ../Core/timed.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o timed.o ../Core/timed.cpp
 
 moc_LSystemWidget.o: moc_LSystemWidget.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_LSystemWidget.o moc_LSystemWidget.cpp
