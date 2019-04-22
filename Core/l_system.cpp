@@ -334,6 +334,7 @@ production* pick_production(l_system* l, char* strict_predecessor, char_queue* l
 //Takes an input string and generates a successor string according to a given l_system
 void derive_str(l_system* l, char* input_str)
 {
+	//TIMED(__func__);
 	char* output_buffer = (char*)malloc(MAX_DERIVED_OUTPUT_SIZE); 
 	char* output_loc = output_buffer;
 

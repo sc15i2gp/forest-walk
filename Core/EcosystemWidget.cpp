@@ -21,6 +21,7 @@ EcosystemWidget::~EcosystemWidget()
 
 void EcosystemWidget::init_ecosystem()
 {
+	ecosystem.number_of_derivations = 0;
 	ecosystem.remove_all_trees();
 
 	srand(seed);
@@ -70,9 +71,10 @@ void EcosystemWidget::set_propagation(bool b)
 
 void EcosystemWidget::iterate_plastochron()
 {
+	BEGIN_MEASURE;
 	ecosystem.iterate_forest_by_one_plastochron();
-	ecosystem.update_tree_grid_data();
 
 	parentWidget()->update();
 	gl_widget->update();
+	END_MEASURE;
 }

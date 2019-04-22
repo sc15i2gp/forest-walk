@@ -519,7 +519,6 @@ void ForestGLWidget::set_fruit_material(int species)
 
 void ForestGLWidget::render(tree_buffer_object obj, int species)
 {
-	//TIMED(__func__);
 	if(obj.branch_obj.vertex_buffer)
 	{
 		set_branch_material(species);
@@ -561,7 +560,6 @@ render_object ForestGLWidget::buffer_mesh(mesh* m)
 
 tree_buffer_object ForestGLWidget::buffer_tree_mesh_group(tree_mesh_group* t)
 {
-	//TIMED(__func__);
 	tree_buffer_object obj = {};
 
 	if(t->branch_mesh.vertex_data_length > 0) obj.branch_obj = buffer_mesh(&t->branch_mesh);
@@ -596,7 +594,6 @@ void ForestGLWidget::clear_tree_model(tree_mesh_group* t)
 
 void ForestGLWidget::generate_tree_model(tree_node* t_node, int lod)
 {
-	//TIMED(__func__);
 	clear_tree_model(&tree_model_buffer);
 
 	int model_size = model_generator.generate_tree_model(&tree_model_buffer, lod);
@@ -640,8 +637,6 @@ int models_cleared = 0;
 
 void ForestGLWidget::generate_tree_models(vec3 view_pos)
 {
-	TIMED(__func__);
-
 	int species = -1;
 	int p_species = -1;
 	int age = -1;
@@ -749,7 +744,6 @@ void ForestGLWidget::generate_tree_models(vec3 view_pos)
 int rendered = 0;
 void ForestGLWidget::render_tree_models()
 {
-	TIMED(__func__);
 	for(tree_node* t_node = r_queue.pop(); r_queue.length >= 0; t_node = r_queue.pop())
 	{
 		glPushMatrix();
@@ -796,9 +790,8 @@ int ForestGLWidget::pick_buckets_to_render(int* buckets_to_render, vec3 view_pos
 }
 
 void ForestGLWidget::render_forest()
-{
+{	
 	TIMED(__func__);
-	
 	if(platform.vertex_buffer == 0) load_platform();
 
 	glMatrixMode(GL_MODELVIEW);

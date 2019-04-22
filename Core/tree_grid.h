@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include "maths.h"
 
 //grid row width = 20 node pts
 //grid height = 20 rows
@@ -48,12 +49,20 @@ struct tree_grid
 	void remove_all_trees();
 
 	int number_of_trees();
+	int number_of_trees_of_species(int);
 
 	int height();
 	int width();
 
 	tree_node* bucket(int,int);
 	int number_of_used_buckets();
+	
+	float area_covered_by(int);
+
+	float h_index(float);
+	float h_index_for_species(float,int);
+	float i_value_calculation(int = -1);
+	float p_value_calculation(float, int = -1);
 };
 
 tree_grid create_tree_grid(int,int);

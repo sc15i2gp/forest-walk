@@ -116,6 +116,11 @@ float max(float f, float g)
 	return (f > g) ? f : g;
 }
 
+float circle_area(float r)
+{
+	return PI*r*r;
+}
+
 bool do_circles_intersect(float x_0, float y_0, float r_0, float x_1, float y_1, float r_1)
 {
 	float dist = sqrt((x_0 - x_1)*(x_0 - x_1) + (y_0 - y_1)*(y_0 - y_1));

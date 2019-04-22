@@ -113,6 +113,16 @@ int tree_grid::number_of_trees()
 	return total;
 }
 
+int tree_grid::number_of_trees_of_species(int species)
+{
+	int total = 0;
+	tree_node* node = node_array;
+
+	for(int i = 0; i < node_array_size; i++, node++) if(node->in_use && node->species == species) total++;
+
+	return total;
+}
+
 int tree_grid::height()
 {
 	return grid_area_length/BUCKET_LENGTH;
@@ -139,4 +149,115 @@ int tree_grid::number_of_used_buckets()
 	}
 
 	return total;
+}
+
+float tree_grid::area_covered_by(int species)
+{
+	float total = 0.0f;
+	for(int i = 0; i < node_array_size; i++)
+	{
+		if(node_array[i].in_use && node_array[i].species == species)
+		{
+			total += circle_area(node_array[i]._r);
+		}
+	}
+	return total;
+}
+
+//Calculates an I value according to B.Hopkins
+//I = distance from individual chosen at random to its nearest individual
+float tree_grid::i_value_calculation(int species)
+{
+	//Choose plant
+	int chosen_tree = rand() % node_array_size;
+	while(!node_array[chosen_tree].in_use) chosen_tree = rand() % node_array_size;
+
+	float chosen_x = node_array[chosen_tree]._x;
+	float chosen_y = node_array[chosen_tree]._y;
+
+	int nearest_tree = chosen_tree;
+	float nearest_dist_sq = 100000.0f;
+	//Find nearest other plant
+	for(int i = 0; i < node_array_size; i++)
+	{
+		if(node_array[i].in_use && (species == -1 || node_array[i].species == species))
+		{
+			float i_x = node_array[i]._x;
+			float i_y = node_array[i]._y;
+
+			float dx = i_x - chosen_x;
+			float dy = i_y - chosen_y;
+
+			float dist_sq = dx*dx + dy*dy;
+
+			if((dist_sq < nearest_dist_sq && i != chosen_tree) || nearest_tree == chosen_tree) 
+			{
+				nearest_tree = i;
+				nearest_dist_sq = dist_sq;
+			}
+		}
+	}
+	return nearest_dist_sq;
+	//Return square of distance between them
+}
+
+float tree_grid::p_value_calculation(float forest_length, int species)
+{
+	//Randomly choose a point
+	float p_x = (float)(rand() % (int)forest_length);
+	float p_y = (float)(rand() % (int)forest_length);
+
+	//Find the square of the distance between point and nearest tree
+	
+	float nearest_dist_sq = 100000.0f;
+	//Find nearest other plant
+	for(int i = 0; i < node_array_size; i++)
+	{
+		if(node_array[i].in_use && (species == -1 || node_array[i].species == species))
+		{
+			float i_x = node_array[i]._x;
+			float i_y = node_array[i]._y;
+
+			float dx = i_x - p_x;
+			float dy = i_y - p_y;
+
+			float dist_sq = dx*dx + dy*dy;
+
+			if(dist_sq < nearest_dist_sq) 
+			{
+				nearest_dist_sq = dist_sq;
+			}
+		}
+	}
+	return nearest_dist_sq;
+}
+
+float tree_grid::h_index(float forest_length)
+{
+	float i_sq = 0.0f;
+	float p_sq = 0.0f;
+	int n = 500;
+	for(int i = 0; i < n; i++)
+	{
+		i_sq += i_value_calculation();
+		p_sq += p_value_calculation(forest_length);
+	}
+	//Aggregate factor
+	float a_factor = p_sq / i_sq;
+	return a_factor;
+}
+
+float tree_grid::h_index_for_species(float forest_length, int species)
+{
+	float i_sq = 0.0f;
+	float p_sq = 0.0f;
+	int n = 500;
+	for(int i = 0; i < n; i++)
+	{
+		i_sq += i_value_calculation(species);
+		p_sq += p_value_calculation(forest_length, species);
+	}
+	//Aggregate factor
+	float a_factor = p_sq / i_sq;
+	return a_factor;
 }

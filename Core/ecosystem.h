@@ -6,6 +6,7 @@ struct forest_ecosystem
 	m_l_system m_l_sys;
 	tree_grid t_grid;
 	int forest_length;
+	int number_of_derivations;
 
 	long int tree_seeds[8];
 

@@ -9,6 +9,7 @@ forest_ecosystem create_ecosystem(int str_set_max_size, int forest_length)
 	//Initialise ecosystem fields
 	ecosystem.m_l_sys = create_m_l_system(str_set_max_size, forest_length);
 	ecosystem.t_grid = create_tree_grid(str_set_max_size, forest_length);
+	ecosystem.number_of_derivations = 0;
 	ecosystem.forest_length = forest_length;
 	ecosystem.trees_should_propagate = false;
 	ecosystem.succession_should_happen = true;
@@ -380,9 +381,42 @@ float forest_ecosystem::generate_initial_tree_radius()
 
 void forest_ecosystem::iterate_forest_by_one_plastochron()
 {
+	MEASURE_TIME;
 	derive_tree_strs(&m_l_sys, &t_grid, succession_should_happen, forest_length);
 	prune_tree_strs(&m_l_sys, &t_grid, trees_should_propagate);
 
+
 	if(self_thinning_should_happen) tree_domination_check();
 	remove_dead_trees(&m_l_sys, &t_grid);
+	
+	update_tree_grid_data();
+	
+	number_of_derivations++;
+
+	MEASURE_INT(number_of_derivations);
+	MEASURE_INT(t_grid.number_of_trees_of_species(PINE));
+	MEASURE_INT(t_grid.number_of_trees_of_species(BIRCH));
+	MEASURE_INT(t_grid.number_of_trees_of_species(ROWAN));
+	MEASURE_INT(t_grid.number_of_trees());
+
+	MEASURE_FLOAT(t_grid.h_index(forest_length));
+	MEASURE_FLOAT(t_grid.h_index_for_species(forest_length, PINE));
+	MEASURE_FLOAT(t_grid.h_index_for_species(forest_length, BIRCH));
+	MEASURE_FLOAT(t_grid.h_index_for_species(forest_length, ROWAN));
+	MEASURE_FLOAT(t_grid.area_covered_by(PINE));
+	MEASURE_FLOAT(t_grid.area_covered_by(BIRCH));
+	MEASURE_FLOAT(t_grid.area_covered_by(ROWAN));
+
+	printf("Number of pine trees = %d\n", t_grid.number_of_trees_of_species(PINE));
+	printf("Number of birch trees = %d\n", t_grid.number_of_trees_of_species(BIRCH));
+	printf("Number of rowan trees = %d\n", t_grid.number_of_trees_of_species(ROWAN));
+	printf("Total number of trees = %d\n", t_grid.number_of_trees());
+	printf("Number of derivations = %d\n", number_of_derivations);
+	printf("Hopkin's Index = %f\n", t_grid.h_index(forest_length));
+	printf("Hopkin's Index for pine = %f\n", t_grid.h_index_for_species(forest_length, PINE));
+	printf("Hopkin's Index for birch = %f\n", t_grid.h_index_for_species(forest_length, BIRCH));
+	printf("Hopkin's Index for rowan = %f\n", t_grid.h_index_for_species(forest_length, ROWAN));
+	printf("Area covered by pine trees = %f\n", t_grid.area_covered_by(PINE));
+	printf("Area covered by birch trees = %f\n", t_grid.area_covered_by(BIRCH));
+	printf("Area covered by rowan trees = %f\n", t_grid.area_covered_by(ROWAN));
 }
