@@ -1,4 +1,4 @@
-#include "timed.h"
+#include "measure.h"
 
 measure __global_measure = {};
 
@@ -27,6 +27,15 @@ void measure::begin_measure()
 {
 	recording = true;
 	event_queue_length = 0;
+	if(written)
+	output_file = fopen("eval_log","a");
+	else
+	output_file = fopen("eval_log","w");
+}
+
+void measure::measure_key(int k)
+{
+	key = k;
 }
 
 void measure::measure_time(float t)
@@ -54,26 +63,34 @@ void measure::end_measure()
 {
 	recording = false;
 
+	if(!output_file)
+	{
+		printf("Error: No eval log file specified\n");
+		return;
+	}
 	//flush queues
-	printf("MEASURED: ");
+	fprintf(output_file, "%d,", key);
 	for(int i = 0; i < event_queue_length; i++)
 	{
 		measure_event e = event_queue[i];
 		switch(e.type)
 		{
 			case MT_TIME:
-				printf("%f,", time_queue[e.queue_index]);
+				fprintf(output_file, "%f,", time_queue[e.queue_index]);
 				break;
 			case MT_INT:
-				printf("%d,", int_queue[e.queue_index]);
+				fprintf(output_file, "%d,", int_queue[e.queue_index]);
 				break;
 			case MT_FLOAT:
-				printf("%f,", float_queue[e.queue_index]);
+				fprintf(output_file, "%f,", float_queue[e.queue_index]);
 				break;
 		}
 	}
-	printf("\n");
+	fprintf(output_file, "\n");
 
+	fclose(output_file);
+	written = true;
+	output_file = NULL;
 	time_queue_length = 0;
 	int_queue_length = 0;
 	float_queue_length = 0;

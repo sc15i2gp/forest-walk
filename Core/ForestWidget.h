@@ -11,7 +11,7 @@
 #include "l_system.h"
 #include "turtle.h"
 #include "species_info.h"
-#include "timed.h"
+#include "measure.h"
 #include "tree_grid.h"
 #include "render_data.h"
 #include "tree_model_gen.h"

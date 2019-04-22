@@ -4,7 +4,7 @@
 #include "expression_evaluator.h"
 #include "char_queue.h"
 #include "char_queue_stack.h"
-#include "timed.h"
+#include "measure.h"
 
 #define CONTEXT_MAX 32
 #define STRICT_MAX 16

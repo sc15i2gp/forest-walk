@@ -12,7 +12,7 @@ MAKEFILE      = Makefile
 
 CC            = gcc
 CXX           = g++
-DEFINES       = -DQT_NO_DEBUG -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
+DEFINES       = -DSHOULD_EVALUATE= -DQT_NO_DEBUG -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -Wno-write-strings -O2 -std=gnu++11 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 INCPATH       = -I. -I. -I/opt/local/include -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtOpenGL -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -I. -isystem /usr/include/libdrm -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++
@@ -68,7 +68,7 @@ SOURCES       = main.cpp \
 		Ball.cpp \
 		BallMath.cpp \
 		BallAux.cpp \
-		timed.cpp \
+		measure.cpp \
 		tree_model_gen.cpp \
 		render_data.cpp \
 		ecosystem.cpp moc_ForestWalkWindow.cpp \
@@ -92,7 +92,7 @@ OBJECTS       = main.o \
 		Ball.o \
 		BallMath.o \
 		BallAux.o \
-		timed.o \
+		measure.o \
 		tree_model_gen.o \
 		render_data.o \
 		ecosystem.o \
@@ -189,7 +189,7 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		Ball.h \
 		BallMath.h \
 		BallAux.h \
-		timed.h \
+		measure.h \
 		tree_model_gen.h \
 		render_data.h \
 		ecosystem.h main.cpp \
@@ -210,7 +210,7 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		Ball.cpp \
 		BallMath.cpp \
 		BallAux.cpp \
-		timed.cpp \
+		measure.cpp \
 		tree_model_gen.cpp \
 		render_data.cpp \
 		ecosystem.cpp
@@ -397,8 +397,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents maths.h string_functions.h mesh.h turtle.h arithmetic_tokeniser.h expression_evaluator.h char_queue.h l_system.h ForestWalkWindow.h ForestWidget.h multiset_l_system.h EcosystemWidget.h str_set.h tree_grid.h Ball.h BallMath.h BallAux.h timed.h tree_model_gen.h render_data.h ecosystem.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp maths.cpp string_functions.cpp mesh.cpp turtle.cpp arithmetic_tokeniser.cpp expression_evaluator.cpp char_queue.cpp l_system.cpp ForestWalkWindow.cpp ForestWidget.cpp multiset_l_system.cpp EcosystemWidget.cpp str_set.cpp tree_grid.cpp Ball.cpp BallMath.cpp BallAux.cpp timed.cpp tree_model_gen.cpp render_data.cpp ecosystem.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents maths.h string_functions.h mesh.h turtle.h arithmetic_tokeniser.h expression_evaluator.h char_queue.h l_system.h ForestWalkWindow.h ForestWidget.h multiset_l_system.h EcosystemWidget.h str_set.h tree_grid.h Ball.h BallMath.h BallAux.h measure.h tree_model_gen.h render_data.h ecosystem.h $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp maths.cpp string_functions.cpp mesh.cpp turtle.cpp arithmetic_tokeniser.cpp expression_evaluator.cpp char_queue.cpp l_system.cpp ForestWalkWindow.cpp ForestWidget.cpp multiset_l_system.cpp EcosystemWidget.cpp str_set.cpp tree_grid.cpp Ball.cpp BallMath.cpp BallAux.cpp measure.cpp tree_model_gen.cpp render_data.cpp ecosystem.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -445,11 +445,11 @@ moc_ForestWalkWindow.cpp: ForestWidget.h \
 		arithmetic_token_stack.h \
 		char_queue.h \
 		char_queue_stack.h \
+		measure.h \
 		turtle.h \
 		polygon_stack.h \
 		turtle_stack.h \
 		species_info.h \
-		timed.h \
 		tree_grid.h \
 		render_data.h \
 		tree_model_gen.h \
@@ -474,11 +474,11 @@ moc_ForestWidget.cpp: maths.h \
 		arithmetic_token_stack.h \
 		char_queue.h \
 		char_queue_stack.h \
+		measure.h \
 		turtle.h \
 		polygon_stack.h \
 		turtle_stack.h \
 		species_info.h \
-		timed.h \
 		tree_grid.h \
 		render_data.h \
 		tree_model_gen.h \
@@ -500,11 +500,11 @@ moc_EcosystemWidget.cpp: ForestWidget.h \
 		arithmetic_token_stack.h \
 		char_queue.h \
 		char_queue_stack.h \
+		measure.h \
 		turtle.h \
 		polygon_stack.h \
 		turtle_stack.h \
 		species_info.h \
-		timed.h \
 		tree_grid.h \
 		render_data.h \
 		tree_model_gen.h \
@@ -544,11 +544,11 @@ main.o: main.cpp ForestWalkWindow.h \
 		arithmetic_token_stack.h \
 		char_queue.h \
 		char_queue_stack.h \
+		measure.h \
 		turtle.h \
 		polygon_stack.h \
 		turtle_stack.h \
 		species_info.h \
-		timed.h \
 		tree_grid.h \
 		render_data.h \
 		tree_model_gen.h \
@@ -600,7 +600,8 @@ l_system.o: l_system.cpp l_system.h \
 		arithmetic_tokeniser.h \
 		arithmetic_token_stack.h \
 		char_queue.h \
-		char_queue_stack.h
+		char_queue_stack.h \
+		measure.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o l_system.o l_system.cpp
 
 ForestWalkWindow.o: ForestWalkWindow.cpp ForestWalkWindow.h \
@@ -617,11 +618,11 @@ ForestWalkWindow.o: ForestWalkWindow.cpp ForestWalkWindow.h \
 		arithmetic_token_stack.h \
 		char_queue.h \
 		char_queue_stack.h \
+		measure.h \
 		turtle.h \
 		polygon_stack.h \
 		turtle_stack.h \
 		species_info.h \
-		timed.h \
 		tree_grid.h \
 		render_data.h \
 		tree_model_gen.h \
@@ -644,11 +645,11 @@ ForestWidget.o: ForestWidget.cpp ForestWidget.h \
 		arithmetic_token_stack.h \
 		char_queue.h \
 		char_queue_stack.h \
+		measure.h \
 		turtle.h \
 		polygon_stack.h \
 		turtle_stack.h \
 		species_info.h \
-		timed.h \
 		tree_grid.h \
 		render_data.h \
 		tree_model_gen.h
@@ -664,10 +665,10 @@ multiset_l_system.o: multiset_l_system.cpp multiset_l_system.h \
 		arithmetic_token_stack.h \
 		char_queue.h \
 		char_queue_stack.h \
+		measure.h \
 		str_set.h \
 		tree_grid.h \
-		species_info.h \
-		timed.h
+		species_info.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o multiset_l_system.o multiset_l_system.cpp
 
 EcosystemWidget.o: EcosystemWidget.cpp EcosystemWidget.h \
@@ -684,11 +685,11 @@ EcosystemWidget.o: EcosystemWidget.cpp EcosystemWidget.h \
 		arithmetic_token_stack.h \
 		char_queue.h \
 		char_queue_stack.h \
+		measure.h \
 		turtle.h \
 		polygon_stack.h \
 		turtle_stack.h \
 		species_info.h \
-		timed.h \
 		tree_grid.h \
 		render_data.h \
 		tree_model_gen.h \
@@ -700,7 +701,8 @@ EcosystemWidget.o: EcosystemWidget.cpp EcosystemWidget.h \
 str_set.o: str_set.cpp str_set.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o str_set.o str_set.cpp
 
-tree_grid.o: tree_grid.cpp tree_grid.h
+tree_grid.o: tree_grid.cpp tree_grid.h \
+		maths.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o tree_grid.o tree_grid.cpp
 
 Ball.o: Ball.cpp Ball.h \
@@ -715,8 +717,8 @@ BallMath.o: BallMath.cpp BallMath.h \
 BallAux.o: BallAux.cpp BallAux.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o BallAux.o BallAux.cpp
 
-timed.o: timed.cpp timed.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o timed.o timed.cpp
+measure.o: measure.cpp measure.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o measure.o measure.cpp
 
 tree_model_gen.o: tree_model_gen.cpp tree_model_gen.h \
 		l_system.h \
@@ -728,6 +730,7 @@ tree_model_gen.o: tree_model_gen.cpp tree_model_gen.h \
 		arithmetic_token_stack.h \
 		char_queue.h \
 		char_queue_stack.h \
+		measure.h \
 		species_info.h \
 		mesh.h \
 		turtle.h \
@@ -736,7 +739,8 @@ tree_model_gen.o: tree_model_gen.cpp tree_model_gen.h \
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o tree_model_gen.o tree_model_gen.cpp
 
 render_data.o: render_data.cpp render_data.h \
-		tree_grid.h
+		tree_grid.h \
+		maths.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o render_data.o render_data.cpp
 
 ecosystem.o: ecosystem.cpp ecosystem.h \
@@ -750,10 +754,10 @@ ecosystem.o: ecosystem.cpp ecosystem.h \
 		arithmetic_token_stack.h \
 		char_queue.h \
 		char_queue_stack.h \
+		measure.h \
 		str_set.h \
 		tree_grid.h \
-		species_info.h \
-		timed.h
+		species_info.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ecosystem.o ecosystem.cpp
 
 moc_ForestWalkWindow.o: moc_ForestWalkWindow.cpp 

@@ -393,7 +393,7 @@ void forest_ecosystem::iterate_forest_by_one_plastochron()
 	
 	number_of_derivations++;
 
-	MEASURE_INT(number_of_derivations);
+	MEASURE_KEY(number_of_derivations);
 	MEASURE_INT(t_grid.number_of_trees_of_species(PINE));
 	MEASURE_INT(t_grid.number_of_trees_of_species(BIRCH));
 	MEASURE_INT(t_grid.number_of_trees_of_species(ROWAN));

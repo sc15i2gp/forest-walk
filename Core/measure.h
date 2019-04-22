@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+//NOTE: This module is used to output measurements to evaluate the project programs
+
 struct timed_block
 {
 	timed_block(const char*,const char* = NULL);
@@ -25,6 +27,9 @@ struct measure_event
 struct measure
 {
 	bool recording;
+	bool written;
+
+	int key;
 
 	float time_queue[256];
 	int time_queue_length;
@@ -43,6 +48,7 @@ struct measure
 	void push_event(int,int);
 
 	void begin_measure();
+	void measure_key(int);
 	void measure_time(float);
 	void measure_float(float);
 	void measure_int(int);
@@ -51,14 +57,36 @@ struct measure
 
 extern measure __global_measure;
 
-//At start of program, open output file
-//When begin measure, set queues to 0
-//When end measure, iterate through event queue, append data as row to output csv file
+//Between BEGIN_MEASURE and END_MEASURE, values are taken and stored in queues
+//The queues are flushed as a single row to a csv file for processing
 
+#ifdef SHOULD_EVALUATE
 #define TIMED(func) timed_block _t(func)
-
 #define BEGIN_MEASURE __global_measure.begin_measure()
+#define MEASURE_KEY(i) __global_measure.measure_key(i)
 #define MEASURE_TIME TIMED(__func__)
 #define MEASURE_INT(i) __global_measure.measure_int(i)
 #define MEASURE_FLOAT(f) __global_measure.measure_float(f)
 #define END_MEASURE __global_measure.end_measure()
+
+
+#ifdef EDITOR_EVALUATE
+#define MEASURE_TIME_IF_EDITOR MEASURE_TIME
+
+#else
+#define MEASURE_TIME_IF_EDITOR
+
+#endif
+
+
+#else
+#define TIMED(func)
+#define BEGIN_MEASURE
+#define MEASURE_TIME
+#define MEASURE_KEY
+#define MEASURE_INT(i)
+#define MEASURE_FLOAT(f)
+#define END_MEASURE
+#define MEASURE_TIME_IF_EDITOR
+
+#endif
