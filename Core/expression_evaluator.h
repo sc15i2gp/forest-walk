@@ -6,5 +6,5 @@
 #include "string_functions.h"
 #include "char_queue.h"
 
-void convert_expression_to_rpn(char*, int);
-float compute_rpn_string_result(char*, int);
+void convert_expression_to_postfix(char*, int);
+float compute_postfix_string_result(char*, int);

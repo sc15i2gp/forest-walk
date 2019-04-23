@@ -71,12 +71,12 @@ bool has_equal_precedence(char* x, char* y)
 	return p_x == p_y;
 }
 
-float compute_rpn_string_result(char* str, int str_length)
+float compute_postfix_string_result(char* str, int str_length)
 {
 	STACK(float) s;
 	arithmetic_tokeniser tokeniser = {str, str_length};
 
-	for(arithmetic_token token = tokeniser.get_next_rpn_token(); token.type != token_end && token.type != token_invalid; token = tokeniser.get_next_rpn_token())
+	for(arithmetic_token token = tokeniser.get_next_postfix_token(); token.type != token_end && token.type != token_invalid; token = tokeniser.get_next_postfix_token())
 	{//For each token in input rpn string
 		if(token.type == token_operator)
 		{
@@ -115,16 +115,16 @@ char top_operator(STACK(arithmetic_token)* s)
 
 
 //NOTE: Imlpementation of shunting yard algorithm
-//NOTE: This function cannot tell if a string is already rpn, if the input string is already rpn, then result could be 
+//NOTE: This function cannot tell if a string is already postfix, if the input string is already postfix, then result could be 
 //	an incorrectly formatted string
-void convert_expression_to_rpn(char* input, int input_length)
+void convert_expression_to_postfix(char* input, int input_length)
 {
 	STACK(arithmetic_token) s;
 
 	char_queue output_queue;
 	arithmetic_tokeniser tokeniser = {input, input_length};
 
-	for(arithmetic_token token = tokeniser.get_next_token(); token.type != token_end && token.type != token_invalid; token = tokeniser.get_next_token())
+	for(arithmetic_token token = tokeniser.get_next_infix_token(); token.type != token_end && token.type != token_invalid; token = tokeniser.get_next_infix_token())
 	{//For each token in input str
 		if(token.type == token_real)
 		{

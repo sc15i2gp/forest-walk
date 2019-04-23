@@ -126,12 +126,17 @@ void LSystemWidget::reset()
 
 void LSystemWidget::l_system_derivation()
 {
+	BEGIN_MEASURE;
 	derive_str(&l_system_in_use, current_string);
 	derivation_count++;
 
 	printf("Memory used for current string = %d bytes\n", strlen(current_string));
 	printf("Derivation count = %d\n", derivation_count);
 
+	MEASURE_KEY(derivation_count);
+	MEASURE_INT(strlen(current_string));
+
 	renderer->load_tree_model(&current_string[0]);
 	parentWidget()->update();
+	END_MEASURE;
 }

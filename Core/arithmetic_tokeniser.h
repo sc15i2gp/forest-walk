@@ -28,8 +28,8 @@ struct arithmetic_tokeniser
 	arithmetic_token current_token; 
 	
 	void set_current_token(token_type, char*, int);
-	arithmetic_token get_next_token();
-	arithmetic_token get_next_rpn_token(); //rpn function necessary since there is no "simple" way of checking if a string is rpn or not
+	arithmetic_token get_next_infix_token();
+	arithmetic_token get_next_postfix_token(); //rpn function necessary since there is no "simple" way of checking if a string is postfix or not
 };
 
 void print_token(arithmetic_token t);

@@ -3,6 +3,7 @@
 #include <QWidget>
 #include <QObject>
 #include "../Core/l_system.h"
+#include "../Core/measure.h"
 #include "RenderWidget.h"
 
 #define MAX_STRING_SIZE 0x400000

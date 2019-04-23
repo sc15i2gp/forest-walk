@@ -36,7 +36,7 @@ void add_production(l_system* l, char* pre_l_context, char* pre_strict, char* pr
 		{
 			if(is_parameter_expression(successor_module, j))
 			{
-				convert_expression_to_rpn(find_parameter(successor_module,j), length_of_parameter(successor_module, j));
+				convert_expression_to_postfix(find_parameter(successor_module,j), length_of_parameter(successor_module, j));
 			}
 		}
 		successor_module = find_next_module(successor_module);
@@ -46,7 +46,7 @@ void add_production(l_system* l, char* pre_l_context, char* pre_strict, char* pr
 	int condition_length = strlen(p->condition);
 	if(condition_length > 0)
 	{
-		convert_expression_to_rpn(p->condition, condition_length);
+		convert_expression_to_postfix(p->condition, condition_length);
 	}
 
 	//Context sizes
@@ -236,7 +236,7 @@ bool condition_met(production* p, char* strict_predecessor, char_queue* l_contex
 		replace_parameter_tokens_with_values(p->predecessor.strict, strict_predecessor, condition);
 		replace_global_parameter_tokens_with_values(param_map, condition);
 
-		float result = compute_rpn_string_result(condition, strlen(condition));
+		float result = compute_postfix_string_result(condition, strlen(condition));
 		return result > 0;
 	}
 	else return true;
@@ -399,7 +399,7 @@ void derive_str(l_system* l, char* input_str)
 					{//If the parameter is an arithmetic expression, calculate result of expression and replace expression string with result
 						char* param = find_parameter(successor_module, k);
 						int param_length = length_of_parameter(successor_module, k);
-						write_into_parameter(successor_module, k, compute_rpn_string_result(param, param_length));
+						write_into_parameter(successor_module, k, compute_postfix_string_result(param, param_length));
 					}
 				}
 				successor_module = find_next_module(successor_module);

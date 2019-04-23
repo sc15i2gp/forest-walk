@@ -110,7 +110,7 @@ void GLWidget::load_tree_model(char* tree_string)
 
 void GLWidget::render_scene(int view_width, int view_height)
 {
-	TIMED(__func__);
+	MEASURE_TIME;
 	glViewport(0.0, 0.0, view_width, view_height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	

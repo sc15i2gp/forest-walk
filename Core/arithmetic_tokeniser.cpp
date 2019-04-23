@@ -7,10 +7,10 @@ void arithmetic_tokeniser::set_current_token(token_type type, char* token_str, i
 	current_token.length = token_length;
 }
 
-//NOTE: This algorithm assumes that, when an arithmetic string is transformed to rpn, then '-' used to denote a negative
+//NOTE: This algorithm assumes that, when an arithmetic string is transformed to postfix, then '-' used to denote a negative
 //	real, then there is no whitespace between '-' and the number's digits
 //	If '-' denotes the minus operator, then there is whitespace between it and the previous and next symbols
-arithmetic_token arithmetic_tokeniser::get_next_rpn_token()
+arithmetic_token arithmetic_tokeniser::get_next_postfix_token()
 {
 	current_pos += current_token.length;
 	while(is_whitespace(arithmetic_str[current_pos])) current_pos++;
@@ -43,7 +43,7 @@ arithmetic_token arithmetic_tokeniser::get_next_rpn_token()
 	return current_token;
 }
 
-arithmetic_token arithmetic_tokeniser::get_next_token()
+arithmetic_token arithmetic_tokeniser::get_next_infix_token()
 {
 	current_pos += current_token.length;
 	while(is_whitespace(arithmetic_str[current_pos])) current_pos++;

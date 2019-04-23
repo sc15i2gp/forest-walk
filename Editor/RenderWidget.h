@@ -7,7 +7,7 @@
 #include "../Core/Ball.h"
 #include "../Core/turtle.h"
 #include "../Core/mesh.h"
-#include "../Core/timed.h"
+#include "../Core/measure.h"
 
 struct render_object
 {
