@@ -16,12 +16,14 @@ void AppWindow::init()
 	QBoxLayout* sim_step_layout = new QBoxLayout(QBoxLayout::LeftToRight);
 	QPushButton* derive_button = new QPushButton("Derive",this);
 	QPushButton* reset_button = new QPushButton("Reset",this);
+	QPushButton* capture_button = new QPushButton("Capture",this);
 	QSpinBox* spin_box = new QSpinBox(this);
 	spin_box->setMinimum(1);
 	sim_step_layout->addWidget(spin_box);
 	sim_step_layout->addWidget(derive_button);
 	sim_control_layout->addLayout(sim_step_layout);
 	sim_control_layout->addWidget(reset_button);
+	sim_control_layout->addWidget(capture_button);
 	layout->addLayout(sim_control_layout);
 
 	//Chart mode controls
@@ -66,6 +68,7 @@ void AppWindow::init()
 	connect(derive_button, SIGNAL(clicked()), this->ecosystem_widget, SLOT(iterate_plastochron()));
 	connect(spin_box, SIGNAL(valueChanged(int)), this, SLOT(set_plastochron_count(int)));
 	connect(reset_button, SIGNAL(clicked()), this->ecosystem_widget, SLOT(init_ecosystem()));
+	connect(capture_button, SIGNAL(clicked()), this->gl_widget, SLOT(capture()));
 	connect(chart_mode_button, SIGNAL(pressed()), this->gl_widget, SLOT(set_chart_mode()));
 	connect(forest_mode_button, SIGNAL(pressed()), this->gl_widget, SLOT(set_forest_mode()));
 	connect(view_dist_slider, SIGNAL(valueChanged(int)), this->gl_widget, SLOT(set_view_dist(int)));

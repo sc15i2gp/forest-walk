@@ -58,6 +58,7 @@ public slots:
 	void set_chart_mode();
 	void set_forest_mode();
 	void set_view_dist(int);
+	void capture();
 
 signals:
 	void initialised();
