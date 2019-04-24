@@ -12,7 +12,7 @@ MAKEFILE      = Makefile
 
 CC            = gcc
 CXX           = g++
-DEFINES       = -DSHOULD_EVALUATE=, -DEDITOR_EVALUATE= -DQT_NO_DEBUG -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
+DEFINES       = -DQT_NO_DEBUG -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -O2 -std=gnu++11 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 INCPATH       = -I. -I. -I/opt/local/include -I../Core -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtOpenGL -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -I. -isystem /usr/include/libdrm -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++
@@ -438,6 +438,7 @@ moc_RenderWidget.cpp: ../Core/Ball.h \
 		../Core/string_functions.h \
 		../Core/polygon_stack.h \
 		../Core/turtle_stack.h \
+		../Core/measure.h \
 		RenderWidget.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
@@ -575,7 +576,8 @@ RenderWidget.o: RenderWidget.cpp RenderWidget.h \
 		../Core/mesh.h \
 		../Core/string_functions.h \
 		../Core/polygon_stack.h \
-		../Core/turtle_stack.h
+		../Core/turtle_stack.h \
+		../Core/measure.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o RenderWidget.o RenderWidget.cpp
 
 LSystemEditorWindow.o: LSystemEditorWindow.cpp LSystemEditorWindow.h \

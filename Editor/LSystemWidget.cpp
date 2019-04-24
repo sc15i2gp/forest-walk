@@ -94,6 +94,7 @@ void LSystemWidget::load(const char* path)
 	else if(strlen(path) > 0)
 	{
 		load_l_system(&l_system_in_use, path, axiom);
+		reset();
 		emit l_system_loaded();
 	}
 }
