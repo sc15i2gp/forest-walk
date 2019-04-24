@@ -2,6 +2,7 @@
 
 EcosystemWidget::EcosystemWidget(QWidget* parent, ForestGLWidget* gl): QWidget(parent)
 {
+	plastochron_count = 1;
 	int forest_length = 100;
 	ecosystem = create_ecosystem(8192, forest_length);
 	ecosystem.forest_length = 100;
@@ -69,12 +70,19 @@ void EcosystemWidget::set_propagation(bool b)
 	gl_widget->update();
 }
 
+void EcosystemWidget::set_plastochron_count(int n)
+{
+	plastochron_count = n;
+}
+
 void EcosystemWidget::iterate_plastochron()
 {
-	BEGIN_MEASURE;
-	ecosystem.iterate_forest_by_one_plastochron();
-
+	for(int i = 0; i < plastochron_count; i++)
+	{
+		BEGIN_MEASURE;
+		ecosystem.iterate_forest_by_one_plastochron();
+		END_MEASURE;
+	}
 	parentWidget()->update();
 	gl_widget->update();
-	END_MEASURE;
 }

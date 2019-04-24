@@ -7,6 +7,7 @@
 #include <QSlider>
 #include <QCheckBox>
 #include <QPixmap>
+#include <QSpinBox>
 #include "ForestWidget.h"
 #include "EcosystemWidget.h"
 
@@ -25,6 +26,7 @@ public slots:
 	void self_thinning_checked(int);
 	void propagation_checked(int);
 	void succession_checked(int);
+	void set_plastochron_count(int);
 
 private:
 	QBoxLayout* layout;

@@ -13,9 +13,14 @@ void AppWindow::init()
 	
 	//Simulation controls
 	QBoxLayout* sim_control_layout = new QBoxLayout(QBoxLayout::LeftToRight);
-	QPushButton* derive_button = new QPushButton("Derive");
-	QPushButton* reset_button = new QPushButton("Reset");
-	sim_control_layout->addWidget(derive_button);
+	QBoxLayout* sim_step_layout = new QBoxLayout(QBoxLayout::LeftToRight);
+	QPushButton* derive_button = new QPushButton("Derive",this);
+	QPushButton* reset_button = new QPushButton("Reset",this);
+	QSpinBox* spin_box = new QSpinBox(this);
+	spin_box->setMinimum(1);
+	sim_step_layout->addWidget(spin_box);
+	sim_step_layout->addWidget(derive_button);
+	sim_control_layout->addLayout(sim_step_layout);
 	sim_control_layout->addWidget(reset_button);
 	layout->addLayout(sim_control_layout);
 
@@ -59,6 +64,7 @@ void AppWindow::init()
 	layout->addWidget(view_dist_slider);
 
 	connect(derive_button, SIGNAL(clicked()), this->ecosystem_widget, SLOT(iterate_plastochron()));
+	connect(spin_box, SIGNAL(valueChanged(int)), this, SLOT(set_plastochron_count(int)));
 	connect(reset_button, SIGNAL(clicked()), this->ecosystem_widget, SLOT(init_ecosystem()));
 	connect(chart_mode_button, SIGNAL(pressed()), this->gl_widget, SLOT(set_chart_mode()));
 	connect(forest_mode_button, SIGNAL(pressed()), this->gl_widget, SLOT(set_forest_mode()));
@@ -105,4 +111,9 @@ void AppWindow::propagation_checked(int state)
 void AppWindow::succession_checked(int state)
 {
 	ecosystem_widget->set_succession(state == Qt::Checked);
+}
+
+void AppWindow::set_plastochron_count(int n)
+{
+	ecosystem_widget->set_plastochron_count(n);
 }
