@@ -31,7 +31,7 @@ struct measure
 
 	int key;
 
-	float time_queue[256];
+	int time_queue[256];
 	int time_queue_length;
 
 	int int_queue[256];
@@ -49,7 +49,7 @@ struct measure
 
 	void begin_measure();
 	void measure_key(int);
-	void measure_time(float);
+	void measure_time(int);
 	void measure_float(float);
 	void measure_int(int);
 	void end_measure();

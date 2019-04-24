@@ -38,7 +38,7 @@ void measure::measure_key(int k)
 	key = k;
 }
 
-void measure::measure_time(float t)
+void measure::measure_time(int t)
 {
 	time_queue[time_queue_length] = t;
 	push_event(MT_TIME, time_queue_length);
@@ -76,7 +76,7 @@ void measure::end_measure()
 		switch(e.type)
 		{
 			case MT_TIME:
-				fprintf(output_file, "%f,", time_queue[e.queue_index]);
+				fprintf(output_file, "%d,", time_queue[e.queue_index]);
 				break;
 			case MT_INT:
 				fprintf(output_file, "%d,", int_queue[e.queue_index]);
