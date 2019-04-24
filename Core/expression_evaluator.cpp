@@ -129,8 +129,6 @@ void convert_expression_to_postfix(char* input, int input_length)
 
 	for(arithmetic_token token = tokeniser.get_next_infix_token(); token.type != token_end && token.type != token_invalid; token = tokeniser.get_next_infix_token())
 	{//For each token in input str
-		print_token(token);
-		printf("\n");
 		if(token.type == token_real)
 		{
 			output_queue.push(token.str, token.length);
