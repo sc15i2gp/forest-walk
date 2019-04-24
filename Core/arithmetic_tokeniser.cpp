@@ -74,6 +74,16 @@ arithmetic_token arithmetic_tokeniser::get_next_infix_token()
 			break;
 
 		}
+		case token_open_paren:
+		{
+			if	(is_real(t))				set_current_token(token_real, t, length_of_real(t));
+			else if	(is_operator(t) && !is_real(t))		set_current_token(token_operator, t, length_of_operator(t));
+			else if	(*t == '(')				set_current_token(token_open_paren, t, 1);
+			else if	(*t == ')')				set_current_token(token_close_paren, t, 1);
+			else 						set_current_token(token_invalid, t, 0);
+			break;
+
+		}
 		case token_close_paren:
 		{//If token ')' then accept operator
 			

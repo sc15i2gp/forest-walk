@@ -104,8 +104,11 @@ bool is_left_associative(char c)
 void pop_operator(STACK(arithmetic_token)* s, char_queue* output_queue)
 {
 	arithmetic_token op = s->pop_state();
-	output_queue->push(op.str, op.length);
-	output_queue->push(" ", 1);
+	if(op.str[0] != '(') 
+	{
+		output_queue->push(op.str, op.length);
+		output_queue->push(" ", 1);
+	}
 }
 
 char top_operator(STACK(arithmetic_token)* s)
@@ -126,6 +129,8 @@ void convert_expression_to_postfix(char* input, int input_length)
 
 	for(arithmetic_token token = tokeniser.get_next_infix_token(); token.type != token_end && token.type != token_invalid; token = tokeniser.get_next_infix_token())
 	{//For each token in input str
+		print_token(token);
+		printf("\n");
 		if(token.type == token_real)
 		{
 			output_queue.push(token.str, token.length);
