@@ -332,10 +332,10 @@ production* pick_production(l_system* l, char* strict_predecessor, char_queue* l
 }
 
 //Takes an input string and generates a successor string according to a given l_system
-void derive_str(l_system* l, char* input_str)
+void derive_str(l_system* l, char* input_str, int max_output_size)
 {
 	MEASURE_TIME_IF_EDITOR;
-	char* output_buffer = (char*)malloc(MAX_DERIVED_OUTPUT_SIZE); 
+	char* output_buffer = (char*)malloc(max_output_size); 
 	char* output_loc = output_buffer;
 
 	char_queue l_context_queue;
@@ -406,7 +406,7 @@ void derive_str(l_system* l, char* input_str)
 			}
 
 			//Copy successor string to output queue
-			if(output_loc + strlen(successor) < output_buffer + MAX_DERIVED_OUTPUT_SIZE)
+			if(output_loc + strlen(successor) < output_buffer + max_output_size)
 			{
 				memcpy(output_loc, successor, strlen(successor));
 				output_loc += strlen(successor);
@@ -420,7 +420,7 @@ void derive_str(l_system* l, char* input_str)
 		else
 		{//If the identity production should be used
 			//Copy input module to output queue
-			if(output_loc + length_of_module(current_module) < output_buffer + MAX_DERIVED_OUTPUT_SIZE)
+			if(output_loc + length_of_module(current_module) < output_buffer + max_output_size)
 			{
 				memcpy(output_loc, current_module, length_of_module(current_module));
 				output_loc += length_of_module(current_module);

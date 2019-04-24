@@ -55,7 +55,7 @@ void set_global_parameter(l_system*, char token, char* value);
 void set_production_probability(l_system*, int production, float probability);
 
 //Derive
-void derive_str(l_system*,char*);
+void derive_str(l_system*,char*,int=MAX_DERIVED_OUTPUT_SIZE);
 
 //File I/O
 void load_l_system(l_system*,const char* path, char* axiom_buffer);
