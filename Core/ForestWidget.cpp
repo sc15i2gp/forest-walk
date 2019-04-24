@@ -148,7 +148,7 @@ void ForestGLWidget::render_tree_point(tree_node* t)
 				break;
 		}
 	}
-	if(t->old_age && show_senescence) colour = colour - vec3{0.1f, 0.1f, 0.1f};
+	if(t->old_age && show_senescence) colour = colour - vec3{0.3f, 0.3f, 0.3f};
 	glColor3f(colour.x, colour.y, colour.z);
 	render_circle(t->_x, t->_y, t->_r);
 }

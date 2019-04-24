@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define SET_STR_MAX_SIZE 128
+#define SET_STR_MAX_SIZE 256
 
 //String multiset (str_m_set) contains a char buffer interpreted as max_size number of string buffers with SET_STR_MAX_SIZE chars each
 //str_m_set contains an array of max_size bools. The n'th bool indicates whether the n'th string buffer is in use

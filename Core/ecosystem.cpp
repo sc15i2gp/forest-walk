@@ -21,11 +21,12 @@ forest_ecosystem create_ecosystem(int str_set_max_size, int forest_length)
 	ecosystem.m_l_sys.add_global_parameter('w', "390.0");
 	ecosystem.m_l_sys.add_global_parameter('t', "10.0");
 	ecosystem.m_l_sys.add_global_parameter('G', "20.0");
+	ecosystem.m_l_sys.add_global_parameter('e', "2.71828");
 	ecosystem.m_l_sys.add_production("<T(s,x,y,r,a)>?(c)", "", "c == 0", 1.0f);
 	ecosystem.m_l_sys.add_production("<T(s,x,y,r,a)>?(c)", "T(s,x,y,r,a)", "c==0", 0.0f); //Shade tolerance
 	ecosystem.m_l_sys.add_production("<T(s,x,y,r,a)>", "T(s,x,y,r,a)", "r >= R", 1.0f);
 	ecosystem.m_l_sys.add_production("<T(s,x,y,r,a)>", "", "r >= R", 0.0f); //Longevity
-	ecosystem.m_l_sys.add_production("<T(s,x,y,r,a)>?(c)", "T(s,x,y,G*r,a+1)[%T(s,v,w,t,0)?(1)]", NULL, 1.0f);
+	ecosystem.m_l_sys.add_production("<T(s,x,y,r,a)>?(c)", "T(s,x,y,0.5+R*(1 - e^(-G*(a+1))),a+1)[%T(s,v,w,t,0)?(1)]", NULL, 1.0f);
 
 	return ecosystem;
 }
@@ -134,10 +135,9 @@ void remove_dead_trees(m_l_system* m_l_sys, tree_grid* t_grid)
 	}
 }
 
-//TODO: Remove reliance on forest_length for generating initial radius
 float generate_initial_tree_radius(int forest_length)
 {
-	return (float)(rand() % forest_length)/(forest_length+200.0f) + 0.1f;
+	return 0.5f;
 }
 
 //Generates a propagation vector and an initial radius for a new tree
@@ -156,13 +156,13 @@ void generate_propagation_data(m_l_system* m_l_sys, tree_grid* t_grid, int paren
 	switch(species)
 	{
 		case PINE:
-			propagation_radius = 10.0f;
+			propagation_radius = PINE_PROPAGATION_MAX_RADIUS;
 			break;
 		case BIRCH:
-			propagation_radius = 15.0f;
+			propagation_radius = BIRCH_PROPAGATION_MAX_RADIUS;
 			break;
 		case ROWAN:
-			propagation_radius = 50.0f;
+			propagation_radius = ROWAN_PROPAGATION_MAX_RADIUS;
 			break;
 	}
 
@@ -406,17 +406,4 @@ void forest_ecosystem::iterate_forest_by_one_plastochron()
 	MEASURE_FLOAT(t_grid.area_covered_by(PINE));
 	MEASURE_FLOAT(t_grid.area_covered_by(BIRCH));
 	MEASURE_FLOAT(t_grid.area_covered_by(ROWAN));
-
-	printf("Number of pine trees = %d\n", t_grid.number_of_trees_of_species(PINE));
-	printf("Number of birch trees = %d\n", t_grid.number_of_trees_of_species(BIRCH));
-	printf("Number of rowan trees = %d\n", t_grid.number_of_trees_of_species(ROWAN));
-	printf("Total number of trees = %d\n", t_grid.number_of_trees());
-	printf("Number of derivations = %d\n", number_of_derivations);
-	printf("Hopkin's Index = %f\n", t_grid.h_index(forest_length));
-	printf("Hopkin's Index for pine = %f\n", t_grid.h_index_for_species(forest_length, PINE));
-	printf("Hopkin's Index for birch = %f\n", t_grid.h_index_for_species(forest_length, BIRCH));
-	printf("Hopkin's Index for rowan = %f\n", t_grid.h_index_for_species(forest_length, ROWAN));
-	printf("Area covered by pine trees = %f\n", t_grid.area_covered_by(PINE));
-	printf("Area covered by birch trees = %f\n", t_grid.area_covered_by(BIRCH));
-	printf("Area covered by rowan trees = %f\n", t_grid.area_covered_by(ROWAN));
 }
