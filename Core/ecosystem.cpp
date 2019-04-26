@@ -55,12 +55,12 @@ void determine_dominated_tree(char* t, char* u)
 	float t_r = read_real_parameter_value(t, 3);
 	float u_r = read_real_parameter_value(u, 3);
 
-	char* dominated_tree;
+	char* dominated_tree = NULL;
 	if(t_r < u_r) dominated_tree = t;
-	else dominated_tree = u;
+	else if(u_r < t_r)  dominated_tree = u;
 
 	//Dominated tree's domination parameter set to 0 (?(c) where c = 0)
-	write_into_parameter(find_next_module(dominated_tree), 0, 0.0f);
+	if(dominated_tree) write_into_parameter(find_next_module(dominated_tree), 0, 0.0f);
 }
 
 void check_for_tree_intersection(m_l_system* m_l_sys, int t_0, int t_1)
