@@ -3,9 +3,9 @@
 EcosystemWidget::EcosystemWidget(QWidget* parent, ForestGLWidget* gl): QWidget(parent)
 {
 	plastochron_count = 1;
-	int forest_length = 100;
+	int forest_length = 200;
 	ecosystem = create_ecosystem(8192, forest_length);
-	ecosystem.forest_length = 100;
+	ecosystem.forest_length = forest_length;
 	seed = (long int)time(NULL);
 
 	gl_widget = gl;
@@ -20,11 +20,9 @@ EcosystemWidget::~EcosystemWidget()
 	destroy_ecosystem(&ecosystem);
 }
 
-void EcosystemWidget::init_ecosystem()
+void EcosystemWidget::populate_initial_ecosystem()
 {
-	ecosystem.number_of_derivations = 0;
-	ecosystem.remove_all_trees();
-
+	/*
 	srand(seed);
 
 	for(int i = 0; i < 128; i++)
@@ -36,7 +34,24 @@ void EcosystemWidget::init_ecosystem()
 		float r = ecosystem.generate_initial_tree_radius();
 
 		ecosystem.add_tree(x, y, r, s);
-	}
+	}*/
+	ecosystem.add_tree(100, 90, 0.5f, PINE);
+	ecosystem.add_tree(90, 80, 0.5f, PINE);
+	ecosystem.add_tree(110, 80, 0.5f, PINE);
+
+	ecosystem.add_tree(80, 70, 0.5f, PINE);
+	ecosystem.add_tree(120, 70, 0.5f, PINE);
+
+	ecosystem.add_tree(70, 60, 0.5f, PINE);
+	ecosystem.add_tree(130, 60, 0.5f, PINE);
+}
+
+void EcosystemWidget::init_ecosystem()
+{
+	ecosystem.number_of_derivations = 0;
+	ecosystem.remove_all_trees();
+
+	populate_initial_ecosystem();
 
 	ecosystem.update_tree_grid_data();
 

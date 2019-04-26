@@ -53,6 +53,7 @@ public:
 	void set_show_old_age(bool);
 	void set_show_view_range(bool);
 	void set_show_grid(bool);
+	void set_apply_lod(bool);
 
 public slots:
 	void set_chart_mode();
@@ -111,7 +112,8 @@ protected:
 	bool show_senescence = false;
 	bool show_view_range = false;
 	bool show_grid = false;
-	
+	bool apply_lod = true;
+
 	//Texture data
 	GLubyte* texture_data = 0;
 	GLuint texture_buffer = 0;

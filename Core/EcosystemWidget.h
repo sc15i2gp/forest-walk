@@ -17,6 +17,7 @@ public:
 	void set_succession(bool);
 	void set_propagation(bool);
 	void set_plastochron_count(int);
+	void populate_initial_ecosystem();
 
 public slots:
 	void iterate_plastochron();

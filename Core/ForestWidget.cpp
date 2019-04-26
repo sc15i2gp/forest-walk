@@ -54,6 +54,12 @@ void ForestGLWidget::set_show_grid(bool b)
 	updateGL();
 }
 
+void ForestGLWidget::set_apply_lod(bool b)
+{
+	apply_lod = b;
+	updateGL();
+}
+
 void ForestGLWidget::set_tree_grid(tree_grid* t)
 {
 	t_grid = t;
@@ -635,6 +641,9 @@ int models_cleared = 0;
 #define MID_DETAIL 1
 #define HIGH_DETAIL 2
 
+#define MID_DETAIL_DIST 40.0f
+#define HIGH_DETAIL_DIST 20.0f
+
 void ForestGLWidget::generate_tree_models(vec3 view_pos)
 {
 	int species = -1;
@@ -654,15 +663,17 @@ void ForestGLWidget::generate_tree_models(vec3 view_pos)
 		age = t_node->age;
 		seed = t_node->seed;
 
-		//If tree < 10 away, set high detail
-		//Else if tree < 20 away, set mid detail
-		//Else set low detail
 		vec3 tree_pos = {t_node->_x, 0.0f, t_node->_y};
 		float dist = magnitude(view_pos - tree_pos);
+		
 		int lod;
-		if(dist < 10.0f) lod = HIGH_DETAIL;
-		else if(dist < 20.0f) lod = MID_DETAIL;
-		else lod = LOW_DETAIL;
+		if(apply_lod)
+		{
+			if(dist < HIGH_DETAIL_DIST) lod = HIGH_DETAIL;
+			else if(dist < MID_DETAIL_DIST) lod = MID_DETAIL;
+			else lod = LOW_DETAIL;
+		}
+		else lod = HIGH_DETAIL;
 
 		//Generate tree string
 		if(species != p_species || age != p_age || seed != p_seed)

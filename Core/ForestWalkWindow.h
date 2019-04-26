@@ -27,6 +27,7 @@ public slots:
 	void propagation_checked(int);
 	void succession_checked(int);
 	void set_plastochron_count(int);
+	void apply_lod_checked(int);
 
 private:
 	QBoxLayout* layout;

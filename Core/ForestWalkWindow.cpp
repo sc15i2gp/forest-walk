@@ -59,11 +59,16 @@ void AppWindow::init()
 	layout->addLayout(ecological_rules_layout);
 
 	//View range slider
+	QBoxLayout* render_settings_layout = new QBoxLayout(QBoxLayout::LeftToRight);
 	QSlider* view_dist_slider = new QSlider(Qt::Horizontal, this);
+	QCheckBox* apply_lod = new QCheckBox("Apply L.O.D.", this);
 	view_dist_slider->setMinimum(10);
 	view_dist_slider->setMaximum(80);
 	view_dist_slider->setValue(30);
-	layout->addWidget(view_dist_slider);
+	apply_lod->setCheckState(Qt::Checked);
+	render_settings_layout->addWidget(view_dist_slider);
+	render_settings_layout->addWidget(apply_lod);
+	layout->addLayout(render_settings_layout);
 
 	connect(derive_button, SIGNAL(clicked()), this->ecosystem_widget, SLOT(iterate_plastochron()));
 	connect(spin_box, SIGNAL(valueChanged(int)), this, SLOT(set_plastochron_count(int)));
@@ -72,6 +77,7 @@ void AppWindow::init()
 	connect(chart_mode_button, SIGNAL(pressed()), this->gl_widget, SLOT(set_chart_mode()));
 	connect(forest_mode_button, SIGNAL(pressed()), this->gl_widget, SLOT(set_forest_mode()));
 	connect(view_dist_slider, SIGNAL(valueChanged(int)), this->gl_widget, SLOT(set_view_dist(int)));
+	connect(apply_lod, SIGNAL(stateChanged(int)), this, SLOT(apply_lod_checked(int)));
 	connect(show_old_age, SIGNAL(stateChanged(int)), this, SLOT(show_old_age_checked(int)));
 	connect(show_view_range, SIGNAL(stateChanged(int)), this, SLOT(show_view_range_checked(int)));
 	connect(show_grid, SIGNAL(stateChanged(int)), this, SLOT(show_grid_checked(int)));
@@ -119,4 +125,9 @@ void AppWindow::succession_checked(int state)
 void AppWindow::set_plastochron_count(int n)
 {
 	ecosystem_widget->set_plastochron_count(n);
+}
+
+void AppWindow::apply_lod_checked(int state)
+{
+	gl_widget->set_apply_lod(state == Qt::Checked);
 }
