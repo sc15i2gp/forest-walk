@@ -1,6 +1,6 @@
 TEMPLATE = app
 CONFIG += c++11
-TARGET = l_system_editor
+TARGET = l-system-editor
 INCLUDEPATH += . /opt/local/include ../Core/
 
 QT += widgets opengl gui core
