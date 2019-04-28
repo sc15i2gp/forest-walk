@@ -128,6 +128,7 @@ void LSystemWidget::reset()
 void LSystemWidget::l_system_derivation()
 {
 	BEGIN_MEASURE;
+	MEASURE_TIME;
 	derive_str(&l_system_in_use, current_string);
 	derivation_count++;
 

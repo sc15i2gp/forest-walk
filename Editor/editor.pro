@@ -1,6 +1,7 @@
 TEMPLATE = app
 CONFIG += c++11
 TARGET = l-system-editor
+DEFINES += "SHOULD_EVALUATE"="" "EDITOR_EVALUATE"=""
 INCLUDEPATH += . /opt/local/include ../Core/
 
 QT += widgets opengl gui core
