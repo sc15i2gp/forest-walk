@@ -28,44 +28,67 @@ void AppWindow::init()
 
 	//Chart mode controls
 	QBoxLayout* chart_mode_control_layout = new QBoxLayout(QBoxLayout::LeftToRight);
+	QLabel* view_label = new QLabel("View Modes:",this);
+	view_label->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Maximum);
+	view_label->setMaximumWidth(150);
 	QRadioButton* chart_mode_button = new QRadioButton("Chart Mode", this);
+	chart_mode_button->setMaximumWidth(150);
 	QRadioButton* forest_mode_button = new QRadioButton("Forest Mode", this);
 	chart_mode_button->setChecked(true);
+	chart_mode_control_layout->addWidget(view_label);
 	chart_mode_control_layout->addWidget(chart_mode_button);
 	chart_mode_control_layout->addWidget(forest_mode_button);
 	layout->addLayout(chart_mode_control_layout);
 
 	QBoxLayout* chart_toggle_layout = new QBoxLayout(QBoxLayout::LeftToRight);
+	QLabel* chart_controls_label = new QLabel("Chart controls:",this);
+	chart_controls_label->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Maximum);
+	chart_controls_label->setMaximumWidth(150);
 	QCheckBox* show_domination = new QCheckBox("Show domination", this);
+	show_domination->setMaximumWidth(150);
 	QCheckBox* show_old_age = new QCheckBox("Show old age", this);
+	show_old_age->setMaximumWidth(150);
 	QCheckBox* show_view_range = new QCheckBox("Show view range", this);
+	show_old_age->setMaximumWidth(150);
 	QCheckBox* show_grid = new QCheckBox("Show grid", this);
+	chart_toggle_layout->addWidget(chart_controls_label);
 	chart_toggle_layout->addWidget(show_domination);
 	chart_toggle_layout->addWidget(show_old_age);
 	chart_toggle_layout->addWidget(show_view_range);
 	chart_toggle_layout->addWidget(show_grid);
-	layout->addLayout(chart_toggle_layout);
 
 	//Ecological rule toggles
 	QBoxLayout* ecological_rules_layout = new QBoxLayout(QBoxLayout::LeftToRight);
+	QLabel* rules_label = new QLabel("Ecological Rules:",this);
+	rules_label->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Maximum);
+	rules_label->setMaximumWidth(150);
 	QCheckBox* self_thinning_should_happen = new QCheckBox("Self-thinning", this);
+	self_thinning_should_happen->setMaximumWidth(150);
 	QCheckBox* trees_should_propagate = new QCheckBox("Propagation", this);
+	trees_should_propagate->setMaximumWidth(150);
 	QCheckBox* succession_should_happen = new QCheckBox("Succession", this);
+	ecological_rules_layout->addWidget(rules_label);
 	ecological_rules_layout->addWidget(self_thinning_should_happen);
 	ecological_rules_layout->addWidget(trees_should_propagate);
 	ecological_rules_layout->addWidget(succession_should_happen);
 	succession_should_happen->setCheckState(Qt::Checked);
 	self_thinning_should_happen->setCheckState(Qt::Checked);
 	layout->addLayout(ecological_rules_layout);
+	layout->addLayout(chart_toggle_layout);
 
 	//View range slider
 	QBoxLayout* render_settings_layout = new QBoxLayout(QBoxLayout::LeftToRight);
+	QLabel* forest_mode_label = new QLabel("3D controls:",this);
+	forest_mode_label->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Maximum);
+	forest_mode_label->setMaximumWidth(150);
 	QSlider* view_dist_slider = new QSlider(Qt::Horizontal, this);
+	view_dist_slider->setMaximumWidth(514);
 	QCheckBox* apply_lod = new QCheckBox("Apply L.O.D.", this);
 	view_dist_slider->setMinimum(10);
 	view_dist_slider->setMaximum(80);
 	view_dist_slider->setValue(30);
 	apply_lod->setCheckState(Qt::Checked);
+	render_settings_layout->addWidget(forest_mode_label);
 	render_settings_layout->addWidget(view_dist_slider);
 	render_settings_layout->addWidget(apply_lod);
 	layout->addLayout(render_settings_layout);

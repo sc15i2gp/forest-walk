@@ -8,6 +8,7 @@
 #include <QCheckBox>
 #include <QPixmap>
 #include <QSpinBox>
+#include <QLabel>
 #include "ForestWidget.h"
 #include "EcosystemWidget.h"
 

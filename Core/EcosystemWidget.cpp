@@ -22,7 +22,6 @@ EcosystemWidget::~EcosystemWidget()
 
 void EcosystemWidget::populate_initial_ecosystem()
 {
-	/*
 	srand(seed);
 
 	for(int i = 0; i < 128; i++)
@@ -34,7 +33,8 @@ void EcosystemWidget::populate_initial_ecosystem()
 		float r = ecosystem.generate_initial_tree_radius();
 
 		ecosystem.add_tree(x, y, r, s);
-	}*/
+	}
+	/*
 	ecosystem.add_tree(100, 90, 0.5f, PINE);
 	ecosystem.add_tree(90, 80, 0.5f, PINE);
 	ecosystem.add_tree(110, 80, 0.5f, PINE);
@@ -44,6 +44,7 @@ void EcosystemWidget::populate_initial_ecosystem()
 
 	ecosystem.add_tree(70, 60, 0.5f, PINE);
 	ecosystem.add_tree(130, 60, 0.5f, PINE);
+	*/
 }
 
 void EcosystemWidget::init_ecosystem()
