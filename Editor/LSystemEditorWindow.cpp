@@ -205,6 +205,8 @@ void AppWindow::init()
 	gl_widget = new GLWidget(this);
 	QPushButton* derive_button = new QPushButton("Derive", this);
 	QPushButton* reset_button  = new QPushButton("Reset", this);
+	QPushButton* capture_button = new QPushButton("Capture", this);
+
 	QBoxLayout* simulation_interact_layout = new QBoxLayout(QBoxLayout::LeftToRight);
 	QBoxLayout* camera_controls_layout = new QBoxLayout(QBoxLayout::LeftToRight, NULL);
 	l_system_widget = new LSystemWidget(this, gl_widget);
@@ -212,6 +214,7 @@ void AppWindow::init()
 	gl_widget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Ignored);
 	simulation_interact_layout->addWidget(derive_button);
 	simulation_interact_layout->addWidget(reset_button);
+	simulation_interact_layout->addWidget(capture_button);
 	layout->addLayout(simulation_interact_layout);
 
 	QBoxLayout* axiom_layout = new QBoxLayout(QBoxLayout::LeftToRight);
@@ -220,11 +223,11 @@ void AppWindow::init()
 	axiom_layout->addWidget(axiom_label);
 	axiom_edit = new QLineEdit(this);
 	axiom_layout->addWidget(axiom_edit);
-	
+
 	current_str_label = new QLabel("N/A");
 	//layout->addWidget(current_str_label);
 	current_str_label->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Maximum);
-	current_str_label->setWordWrap(true);	
+	current_str_label->setWordWrap(true);
 
 	QBoxLayout* param_layout_0 = new QBoxLayout(QBoxLayout::LeftToRight);
 	QBoxLayout* param_layout_1 = new QBoxLayout(QBoxLayout::LeftToRight);
@@ -279,6 +282,7 @@ void AppWindow::init()
 	layout->addLayout(file_io_layout);
 	connect(derive_button, SIGNAL(clicked()), this, SLOT(update_render()));
 	connect(reset_button, SIGNAL(clicked()), this, SLOT(reset()));
+	connect(capture_button, SIGNAL(clicked()), this->gl_widget, SLOT(capture()));
 
 	connect(add_production_button, SIGNAL(clicked()), this, SLOT(add_production_text_fields()));
 	connect(reload_productions_button, SIGNAL(clicked()), this, SLOT(reset_production_list()));

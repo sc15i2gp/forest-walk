@@ -37,6 +37,9 @@ public:
 	void mouseMoveEvent(QMouseEvent* e);
 	void wheelEvent(QWheelEvent* e);
 
+public slots:
+	void capture();
+
 signals:
 	void initialised();
 
@@ -44,7 +47,7 @@ protected:
 	void initializeGL();
 	void resizeGL(int w, int h);
 	void paintGL();
-	void render_scene(int,int);
+	void render_scene();
 	void render(render_object);
 	render_object buffer_mesh(mesh*);
 	void clear_buffers(render_object);

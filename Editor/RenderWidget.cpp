@@ -44,7 +44,8 @@ void GLWidget::resizeGL(int w, int h)
 
 void GLWidget::paintGL()
 {
-	render_scene(view_width, view_height);
+	glViewport(0.0, 0.0, view_width, view_height);
+	render_scene();
 }
 
 void GLWidget::clear_buffers(render_object r)
@@ -108,10 +109,78 @@ void GLWidget::load_tree_model(char* tree_string)
 	if(tree.fruit_mesh.vertex_data_length > 0) fruit = buffer_mesh(&tree.fruit_mesh);
 }
 
-void GLWidget::render_scene(int view_width, int view_height)
+void output_ppm(GLubyte* pixels, int width, int height)
+{
+	FILE* ppm = fopen("image.ppm", "w");
+	fprintf(ppm, "P3\n");
+	fprintf(ppm, "%d %d\n", width, height);
+	fprintf(ppm, "255\n");
+
+	for(int i = height-1; i >= 0; i--)
+	{
+		for(int j = 0; j < width; j++)
+		{
+			GLubyte* px = pixels+(3*i*width)+(3*j);
+			fprintf(ppm, "%d %d %d\n", px[0], px[1], px[2]);
+		}
+	}
+
+	fclose(ppm);
+}
+
+void GLWidget::capture()
+{
+	int out_width = 2048;
+	int out_height = 2048;
+
+	GLuint colour_rbo;
+	glGenRenderbuffers(1, &colour_rbo);
+	
+	glBindRenderbuffer(GL_RENDERBUFFER, colour_rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_RGB, out_width, out_height);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+	GLuint depth_rbo;
+	glGenRenderbuffers(1, &depth_rbo);
+
+	glBindRenderbuffer(GL_RENDERBUFFER, depth_rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, out_width, out_height);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+	GLuint fbo;
+	glGenFramebuffers(1, &fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colour_rbo);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_rbo);
+
+	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if(status != GL_FRAMEBUFFER_COMPLETE) 
+	{
+		printf("Error in framebuffer construction\n");
+	}
+	else
+	{	
+		glViewport(0,0,out_width, out_height);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		render_scene();
+		glFlush();
+
+		GLubyte* px_buffer = (GLubyte*)malloc(3*out_width*out_height*sizeof(GLubyte));
+		glReadPixels(0, 0, out_width, out_height, GL_RGB, GL_UNSIGNED_BYTE, px_buffer);
+
+		output_ppm(px_buffer, out_width, out_height);
+		free(px_buffer);
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glDeleteFramebuffers(1, &fbo);
+	glDeleteRenderbuffers(1, &depth_rbo);
+	glDeleteRenderbuffers(1, &colour_rbo);
+}
+
+void GLWidget::render_scene()
 {
 	MEASURE_TIME;
-	glViewport(0.0, 0.0, view_width, view_height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	glMatrixMode(GL_MODELVIEW);
