@@ -75,7 +75,6 @@ arithmetic_token arithmetic_tokeniser::get_next_infix_token()
 		case token_open_paren:
 		{
 			if	(is_real(t))				set_current_token(token_real, t, length_of_real(t));
-			else if	(is_operator(t) && !is_real(t))		set_current_token(token_operator, t, length_of_operator(t));
 			else if	(*t == '(')				set_current_token(token_open_paren, t, 1);
 			else if	(*t == ')')				set_current_token(token_close_paren, t, 1);
 			else 						set_current_token(token_invalid, t, 0);
@@ -86,7 +85,8 @@ arithmetic_token arithmetic_tokeniser::get_next_infix_token()
 		{//If token ')' then accept operator
 			
 			//second half of condition necessary to see if '-' is part of a negative real or not
-			if	(is_operator(t) && !is_real(t)) 	set_current_token(token_operator, t, length_of_operator(t));
+			if	(is_operator(t)) 			set_current_token(token_operator, t, length_of_operator(t));
+			else if (*t == ')')				set_current_token(token_close_paren, t, 1);
 			else 						set_current_token(token_invalid, t, 0);
 			
 			break;
