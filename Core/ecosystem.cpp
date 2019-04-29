@@ -22,11 +22,11 @@ forest_ecosystem create_ecosystem(int str_set_max_size, int forest_length)
 	ecosystem.m_l_sys.add_global_parameter('t', "10.0");
 	ecosystem.m_l_sys.add_global_parameter('G', "20.0");
 	ecosystem.m_l_sys.add_global_parameter('e', "2.71828");
-	ecosystem.m_l_sys.add_production("<T(s,x,y,r,a)>?(c)", "", "c == 0", 1.0f);
-	ecosystem.m_l_sys.add_production("<T(s,x,y,r,a)>?(c)", "T(s,x,y,r,a)", "c==0", 0.0f); //Shade tolerance
-	ecosystem.m_l_sys.add_production("<T(s,x,y,r,a)>", "T(s,x,y,r,a)", "r >= R", 1.0f);
-	ecosystem.m_l_sys.add_production("<T(s,x,y,r,a)>", "", "r >= R", 0.0f); //Longevity
-	ecosystem.m_l_sys.add_production("<T(s,x,y,r,a)>?(c)", "T(s,x,y,0.5+R*(1 - e^(-G*(a+1))),a+1)[%T(s,v,w,t,0)?(1)]", NULL, 1.0f);
+	ecosystem.m_l_sys.add_production("<T(s,x,y,r,t,a)>?(c)", "", "c == 0", 1.0f);
+	ecosystem.m_l_sys.add_production("<T(s,x,y,r,t,a)>?(c)", "T(s,x,y,r,t,a)", "c==0", 0.0f); //Shade tolerance
+	ecosystem.m_l_sys.add_production("<T(s,x,y,r,t,a)>", "T(s,x,y,r,t,a)", "r >= R", 1.0f);
+	ecosystem.m_l_sys.add_production("<T(s,x,y,r,t,a)>", "", "r >= R", 0.0f); //Longevity
+	ecosystem.m_l_sys.add_production("<T(s,x,y,r,t,a)>?(c)", "T(s,x,y,t+R*(1 - e^(-G*(a+1))),t,a+1)[%T(s,v,w,t,t,0)?(1)]", NULL, 1.0f);
 
 	return ecosystem;
 }
@@ -137,7 +137,7 @@ void remove_dead_trees(m_l_system* m_l_sys, tree_grid* t_grid)
 
 float generate_initial_tree_radius(int forest_length)
 {
-	return 0.5f;
+	return 0.4f + (float)rand()/(float)RAND_MAX;
 }
 
 //Generates a propagation vector and an initial radius for a new tree
@@ -341,7 +341,7 @@ void forest_ecosystem::update_tree_grid_data()
 					float x = read_real_parameter_value(str, 1);
 					float y = read_real_parameter_value(str, 2);
 					float r = read_real_parameter_value(str, 3);
-					int age = (int)read_real_parameter_value(str, 4);
+					int age = (int)read_real_parameter_value(str, 5);
 					int c = (int)read_real_parameter_value(find_next_module(str));
 					if(tree->seed < 0) tree->seed = tree_seeds[rand() % 8];
 					tree->species = sp;
@@ -368,7 +368,7 @@ void forest_ecosystem::add_tree(float x, float y, float r, int s)
 	int str_index;
 	char* str = m_l_sys.str_set.find_str_and_alloc(&str_index);
 
-	snprintf(str, SET_STR_MAX_SIZE, "T(%d,%f,%f,%f,0)?(1)\0", s, x, y, r);
+	snprintf(str, SET_STR_MAX_SIZE, "T(%d,%f,%f,%f,%f,0)?(1)\0", s, x, y, r, r);
 
 	t_grid.insert_tree(str_index, x, y);
 	::tree_domination_check(&m_l_sys, &t_grid, str_index);//Only go through current string set once for added string to check for domination

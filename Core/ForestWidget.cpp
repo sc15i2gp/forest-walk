@@ -802,7 +802,7 @@ int ForestGLWidget::pick_buckets_to_render(int* buckets_to_render, vec3 view_pos
 
 void ForestGLWidget::render_forest()
 {	
-	TIMED(__func__);
+	MEASURE_TIME;
 	if(platform.vertex_buffer == 0) load_platform();
 
 	glMatrixMode(GL_MODELVIEW);
