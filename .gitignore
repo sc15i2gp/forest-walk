@@ -3,7 +3,7 @@
 *.stash
 *.swp
 forest-walk
-Editor/l_system_editor
+Editor/l-system-editor
 gen_stack_code
 moc_*
 eval_log

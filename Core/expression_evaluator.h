@@ -8,3 +8,4 @@
 
 void convert_expression_to_postfix(char*, int);
 float compute_postfix_string_result(char*, int);
+bool is_valid_infix_expr(char*, int);

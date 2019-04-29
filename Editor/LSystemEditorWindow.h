@@ -44,6 +44,7 @@ private:
 	int number_of_production_layouts = 0;
 	QBoxLayout* l_system_production_layouts[16];
 	int production_layout_ids[16] = {};
+	bool production_changed[16] = {};
 	QSignalMapper* signal_map;
 	GLWidget* gl_widget;
 	QBoxLayout* layout;

@@ -36,6 +36,7 @@ void add_production(l_system* l, char* pre_l_context, char* pre_strict, char* pr
 		{
 			if(is_parameter_expression(successor_module, j))
 			{
+				if(is_valid_infix_expr(find_parameter(successor_module, j), length_of_parameter(successor_module, j)))
 				convert_expression_to_postfix(find_parameter(successor_module,j), length_of_parameter(successor_module, j));
 			}
 		}
@@ -44,7 +45,7 @@ void add_production(l_system* l, char* pre_l_context, char* pre_strict, char* pr
 
 	//Convert condition to rpn
 	int condition_length = strlen(p->condition);
-	if(condition_length > 0)
+	if(condition_length > 0 && is_valid_infix_expr(p->condition, condition_length))
 	{
 		convert_expression_to_postfix(p->condition, condition_length);
 	}

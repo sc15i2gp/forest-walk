@@ -116,6 +116,13 @@ char top_operator(STACK(arithmetic_token)* s)
 	return *s->read_state().str;
 }
 
+bool is_valid_infix_expr(char* input, int input_length)
+{
+	arithmetic_tokeniser tokeniser = {input, input_length};
+	arithmetic_token token;
+	for(token = tokeniser.get_next_infix_token(); token.type != token_end && token.type != token_invalid; token = tokeniser.get_next_infix_token());
+	return token.type == token_end;
+}
 
 //NOTE: Imlpementation of shunting yard algorithm
 //NOTE: This function cannot tell if a string is already postfix, if the input string is already postfix, then result could be 

@@ -65,9 +65,7 @@ arithmetic_token arithmetic_tokeniser::get_next_infix_token()
 		}
 		case token_real:
 		{//If token real then accept operator or ')'
-			
-			//second half of condition necessary to see if '-' is part of a negative real or not
-			if	(is_operator(t) && !is_real(t)) 	set_current_token(token_operator, t, length_of_operator(t));
+			if	(is_operator(t)) 			set_current_token(token_operator, t, length_of_operator(t));
 			else if	(*t == ')') 				set_current_token(token_close_paren, t, 1);
 			else 						set_current_token(token_invalid, t, 0);
 			
