@@ -50,7 +50,7 @@ protected:
 	void render_scene();
 	void render(render_object);
 	render_object buffer_mesh(mesh*);
-	void clear_buffers(render_object);
+	void clear_buffers(render_object&);
 	void set_material(material*);
 
 private:

@@ -48,7 +48,7 @@ void GLWidget::paintGL()
 	render_scene();
 }
 
-void GLWidget::clear_buffers(render_object r)
+void GLWidget::clear_buffers(render_object& r)
 {
 	glDeleteBuffers(1, &r.vertex_buffer);
 	glDeleteBuffers(1, &r.index_buffer);
