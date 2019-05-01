@@ -317,13 +317,13 @@ production* pick_production(l_system* l, char* strict_predecessor, char_queue* l
 		bool production_matches = matches(p_j, strict_predecessor, l_context_queue, r_context_queue, l->param_map);
 		if(production_matches && p_j->probability == 1.0) 
 		{
-			//Deterministic context sensitive production found
+			//Deterministic production found
 			p = p_j;
 			return p;
 		}
 		else if(production_matches)
 		{
-			//Non deterministic context sensitive production found
+			//Non deterministic production found
 			int p_index = sample_non_deterministic_productions(p_j, j);
 			p = l->p_set + p_index;
 			return p;
