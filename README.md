@@ -15,7 +15,7 @@ To run the editor, enter the command:
 ~~~~
 
 ## Creating an L-system
-When first running the editor, the first screen you will see is: ![]{Images/editor_UI.png}
+When first running the editor, the first screen you will see is: ![Screenshot]{Images/editor_UI.png}
 ## Editing L-systems
 ## Generating tree models
 ## Production language
