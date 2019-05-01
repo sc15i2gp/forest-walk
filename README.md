@@ -14,11 +14,11 @@ To run the editor, enter the command:
 ./l-system-editor
 ~~~~
 
-# Creating an L-system
-When first running the editor, the first screen you will see is: 
-# Editing L-systems
-# Generating tree models
-# Production language
+## Creating an L-system
+When first running the editor, the first screen you will see is: ![]{Images/editor_UI.png}
+## Editing L-systems
+## Generating tree models
+## Production language
 
 # Forest Simulator (forest-walk)
 The forest simulator (forest-walk) is a program which procedurally generates a forest.
@@ -34,7 +34,7 @@ To run the simulator, enter the command:
 ./forest-walk
 ~~~~
 
-# Simulation
-# Visualisation
+## Simulation
+## Visualisation
 
 Implementation for COMP 3931
